@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      finderJS 运用 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="后台finder JS运用" href="index.html" />
+
+        <link rel="next" title="wpage" href="AJAX框架Wpage运用.html" />
+        <link rel="prev" title="index" href="后台finder JS运用.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="wpage.html" title="AJAX框架Wpage运用" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="后台finder JS运用" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">未归档</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">后台finder JS运用</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> finderJS 运用</h1>
+            
+<p>创建时间： 2011年5月12日</p>
+<h2><a name="id1">Finder 按钮操作区域</a></h2>
+<p><b>如图Finder区域</b><br /><img border="0" alt="" align="middle" src="images/finder.png" />按钮操作区域 按钮submit表示要选译finder数据才会请求,href则直接请求。</p>
+
+<p>对选择Finder数据的操作，需在按钮上绑定属性submit指定提交地址，通过按钮上的target属性和confirm属性判断处理类型.</p>
+
+<p><b>常用处理类型</b>:
+<ol>
+<li>Dialog  (弹出对话框)  类型有参数则用两个冒号（::）隔开 如:<pre>target=&quot;dialog::{width:400,title:'设置标签'}&quot;;
+</pre>
+<li>Confirm  (选择提示框)
+<li>_blank   (弹出新页面)
+<li>Wpage    (Ajax请求)
+<li>refresh  (刷新finder)</li>
+</li>
+</li>
+</li>
+</li>
+</ol>
+</p>
+</ol>
+
+<ul>
+<ul>
+<li>按钮区域中选择列表数据后弹出Dialog,将url地址绑定到submit属性中,<pre>&lt;a href=&quot;javascript:void(0);&quot; target=&quot;dialog::{width:400,height:170,title:'导出'}&quot; submit=&quot;index.php?&quot; icon=&quot;download.gif&quot; label=&quot;导出&quot;&gt;
+    &lt;span&gt;导出&lt;/span&gt;&lt;/a&gt;
+</pre>
+<li>选择列表数据刷新finder时target='refresh'<pre>&lt;a target=&quot;refresh&quot; submit=&quot;index.php&quot; icon=&quot;download.gif&quot; label=&quot;商品上架&quot; href=&quot;javascript:void(0);&quot;&gt;&lt;span&gt;商品上架&lt;/span&gt;&lt;/a&gt;
+</pre></li>
+</li>
+</ul>
+</ul>
+
+<ul>
+<li>选择列表判断提示操作加选择提示框</li>
+</ul>
+<pre>&lt;a href=&quot;javascript:void(0);&quot; submit=&quot;index.php?&quot; confirm=&quot;确定删除选中项？删除后可进入回收站恢复&quot; icon=&quot;del.gif&quot; label=&quot;删除&quot;&gt;&lt;span&gt;删除&lt;/span&gt;&lt;/a&gt;
+</pre></ul>
+
+<ol>
+<ol>
+<li>后台所有请求，后台系统会将标有href属性的标签拦截成ajax请求
+<p>如请求要弹出dialog：<pre>&lt;a target=&quot;dialog::{width:300,title:'配置列表项'}&quot; href=&quot;index.php&quot; title=&quot;列表项配置&quot; class=&quot;lnk-operation&quot;&gt;&lt;span&gt;列表项配置&lt;/span&gt;&lt;/a&gt;
+</pre>
+<li>finder常用操作
+<ul>
+<li>a.刷新finder<pre>finderGroup[finderID],refresh();   //finderID需PHP后台抛出
+</pre>
+<li>b.在新页面刷新finder<pre>opener.finderGroup[finderID],refresh();  /finderID需PHP后台抛出
+</pre>
+<li>c.关闭dialog 获取dialog页面中的任意一个元素如element,<pre>element.getParent('.dialog').retrieve('instance').close();
+</pre>或者为某个元素添加isCloseDialogBtn属性如：<pre>&lt;span isCloseDialogBtn=true&gt;取消&lt;/span &gt;
+</pre>
+<li>d.提交dialog中的表单关闭dialog并刷新finder.  先获得dialog中的from元素,如_from;<pre>_from.store('target',{onComplete:function(response){
+	_from.getParent('.dialog').retrieve('instance').close();     //此处可加入提交成功任何处理代码
+finderGroup[finderID],refresh();
+}});
+</pre>或在dialog中的from元素中加入属性isCloseDialog,如要刷新finder则在返回中返回<pre>JSON( {finder_id:'eff564'} );
+</pre></li>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</p>
+</li>
+</ol>
+</ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">Finder 按钮操作区域</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">后台finder JS运用</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="wpage.html"
+                                  title="下一章">AJAX框架Wpage运用</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="wpage.html" title="AJAX框架Wpage运用" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="后台finder JS运用" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">未归档</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">后台finder JS运用</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      archlinux &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="未归档" href="index.html" />
+
+        <link rel="next" title="cluster" href="集群搭建.html" />
+        <link rel="prev" title="desktop_controller" href="desktop_controller.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="cluster.html" title="集群搭建" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="desktop_controller.html" title="desktop_controller" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> archlinux</h1>
+            <h2><a name="id1">安装</a></h2><h3><a name="id2">获得到archlinux的镜像文件 iso</a></h3>
+<ul>
+<li>到archlinux官网下载 dual boot iso <a href="http://www.archlinux.org/download/">http://www.archlinux.org/download/</a>
+<li>没有装过linux系统的朋友先看看<a href="Install_Guide_for_Arch_Linux.pdf">Install_Guide_for_Arch_Linux.pdf</a></li>
+</li>
+</ul>
+<h3><a name="id3">制作archlinux的usb启动盘</a></h3><h3><a name="id4">开机F12选择USB-ZIP启动，开始安装</a></h3>
+<p>选择第一项 Boot Arch Linux Live CD</p>
+<h3><a name="id5">开始安装系统</a></h3>
+<ul>
+<li>系统启动后需要登录，用户名为 root ，无密码。
+<li>输入命令来启动安装程序<pre>/arch/setup
+</pre>
+<li>进入安装程序界面</li>
+</li>
+</li>
+</ul>
+<h4><a name="id6">select source</a></h4>
+<p>我们选择第一个，CD安装</p>
+<h4><a name="id7">select region and timezone</a></h4>
+<ul>
+<li>选择地区Asia，时区Shanghai
+<li>之后回到时间设置界面，set time and date，选local time</li>
+</li>
+</ul>
+<h4><a name="id8">Prepare Hard Drive</a></h4>
+<ul>
+<li>安装基本包不许选择select package这步
+<p>base-devel因为arch源更新太快，不如直接线上同步
+<li>分区，我们选择第一项自动分区然后一路回车</li>
+</p>
+</li>
+</ul>
+<h4><a name="id9">configuration</a></h4>
+<ul>
+<li>配置系统
+<li>选择自己熟悉的编辑器，这里我选vi
+<li>我们需要配置的几个地方
+<ol>
+<li>/etc/rc.conf 修改下面的地方<pre class="quote">LOCALE=&quot;zh_CN.UTF-8&quot;
+</pre>
+<li>/etc/locale.gen
+<p>将里面zh_CN前面的&quot;#&quot;全部去掉,保存推出
+<li>/etc/pacman.d/mirrorlist打开China下面所有的server
+<li>DHCP /etc/resolv.conf<pre class="quote">nameserver 192.168.0.230
+nameserver 8.8.8.8
+</pre>
+<li>ROOT-PASSWORD设置密码
+<li>到此配置完成，选择DONE进行设置，使配置生效。</li>
+</li>
+</li>
+</li>
+</p>
+</li>
+</li>
+</ol>
+</li>
+</li>
+</li>
+</ul>
+<h4><a name="id10">最后一部安装启动器Grub</a></h4></ol>
+
+<ul>
+<li>安装grub需要先编辑一下系统菜单。如果你是爽系统请一定将下面的&quot;#&quot;去掉，否则将无法启动windows系统：<pre class="quote">#title Windows
+#rootnoverify
+#makeactive
+#chainloader +1
+</pre>
+<li>保存后退出，安装程序会询问你将grub安装到哪里
+<p>将grub安装到硬盘
+<li>至此，基本系统安装完成，可退出安装。<pre class="quote">关机 poweroff
+重启 reboot
+</pre></li>
+</p>
+</li>
+</li>
+</ul>
+<h3><a name="id11">重启进入系统</a></h3><h4><a name="id12">设置tmpfs</a></h4><pre class="quote">mount tmpfs /tmp -o size 512m
+</pre>
+<p>为了将ecos cache放置到tmpfs上，把该命令加入/etc/rc.local保重每次重启加载</p>
+
+<p>卸载命令<pre class="quote">umout /tmp
+</pre></p>
+<h4><a name="id13">更新系统</a></h4><pre class="quote">pacman -Syu base-devel openssh python curl boost boost-libs pcre spidermonkey tcsh scons readline gcc ncurses git ntp ntpdate db  mcrypt vim  inetutils
+</pre><h4><a name="id14">内核参数</a></h4>
+<p>修改/etc/sysctl.conf<pre class="quote"># Add
+net.ipv4.tcp_max_syn_backlog = 65536
+net.core.netdev_max_backlog =  32768
+net.core.somaxconn = 32768
+net.core.wmem_default = 8388608
+net.core.rmem_default = 8388608
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216
+net.ipv4.tcp_timestamps = 0
+net.ipv4.tcp_synack_retries = 2
+net.ipv4.tcp_syn_retries = 2
+net.ipv4.tcp_tw_recycle = 1
+#net.ipv4.tcp_tw_len = 1
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.tcp_mem = 94500000 915000000 927000000
+net.ipv4.tcp_max_orphans = 3276800
+#net.ipv4.tcp_fin_timeout = 30
+#net.ipv4.tcp_keepalive_time = 120
+net.ipv4.ip_local_port_range = 1024  65535
+
+kernel.shmmax=268435456
+</pre></p>
+
+<p>配置立即生效<pre class="quote">/sbin/sysctl -p
+</pre></p>
+<h4><a name="id15">调高系统限制</a></h4>
+<p>修改文件/etc/security/limits.conf，在最末尾添加<pre class="quote">* soft nofile 1024000
+* hard nofile 1024000
+</pre></p>
+
+<p>用下面的命令检查是否收效<pre class="quote">ulimit -a
+</pre></p>
+<h4><a name="id16">配置 sshd</a></h4>
+<p>/etc/hosts.allow<pre class="quote">ALL:ALL
+</pre>/etc/hosts.deny<pre class="quote">#ALL: ALL
+hosts.deny 允许所有的
+</pre></p>
+
+<p>/etc/rc.conf<pre class="quote">DAEMONS=(syslog-ng network netfs crond sshd ntp ntpdate)
+</pre></p>
+
+<p>修改如上的服务器启动</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">安装</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">获得到archlinux的镜像文件 iso</a>
+        <li><a href="#id3" class="reference internal">制作archlinux的usb启动盘</a>
+        <li><a href="#id4" class="reference internal">开机F12选择USB-ZIP启动，开始安装</a>
+        <li><a href="#id5" class="reference internal">开始安装系统</a>
+            <ul>
+            <li><a href="#id6" class="reference internal">select source</a>
+            <li><a href="#id7" class="reference internal">select region and timezone</a>
+            <li><a href="#id8" class="reference internal">Prepare Hard Drive</a>
+            <li><a href="#id9" class="reference internal">configuration</a>
+            <li><a href="#id10" class="reference internal">最后一部安装启动器Grub</a>
+        </ul>
+        <li><a href="#id11" class="reference internal">重启进入系统</a>
+            <ul>
+            <li><a href="#id12" class="reference internal">设置tmpfs</a>
+            <li><a href="#id13" class="reference internal">更新系统</a>
+            <li><a href="#id14" class="reference internal">内核参数</a>
+            <li><a href="#id15" class="reference internal">调高系统限制</a>
+            <li><a href="#id16" class="reference internal">配置 sshd</a>
+        </ul>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="desktop_controller.html"
+                                  title="上一章">desktop_controller</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="cluster.html"
+                                  title="下一章">集群搭建</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="cluster.html" title="集群搭建" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="desktop_controller.html" title="desktop_controller" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

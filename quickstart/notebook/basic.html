@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      创建数据表，实现基本功能代码 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="创建一个带后端的留言版" href="index.html" />
+
+        <link rel="next" title="autoload" href="类的自动载入机制.html" />
+        <link rel="prev" title="new-project" href="创建项目目录并安装.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="autoload.html" title="类的自动载入机制" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="new-project.html" title="创建项目目录并安装" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">快速入门</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">创建一个带后端的留言版</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 创建数据表，实现基本功能代码</h1>
+            <h2><a name="id1">新建数据表</a></h2>
+<ul>
+<li>添加数据库描述文件: <b>app/notebook/dbschema/item.php</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$db</span><span style="color: #007700">[</span><span style="color: #DD0000">'item'</span><span style="color: #007700">]=array&nbsp;(<br />&nbsp;&nbsp;</span><span style="color: #DD0000">'columns'&nbsp;</span><span style="color: #007700">=&gt;<br />&nbsp;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item_id'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'number'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'required'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'extra'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'auto_increment'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'pkey'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item_subject'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array&nbsp;(&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'varchar(100)'&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item_content'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array&nbsp;(&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'text'&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item_posttime'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array&nbsp;(&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'time'&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item_email'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array&nbsp;(&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'email'</span><span style="color: #007700">),<br />&nbsp;&nbsp;),<br />);<br /></span>
+</span>
+</code></div>
+<li>数据库文件写好后，执行<b>update</b>命令即可自动创建数据库。<pre>app/base/cmd update
+Updating base_application_dbtable@notebook.
+CREATE TABLE `sdb_notebook_item` (
+	`item_id` mediumint(8) unsigned not null auto_increment,
+	`item_subject` varchar(100),
+	`item_content` text,
+	`item_posttime` int(10) unsigned,
+	`item_email` varchar(255),
+	primary key (item_id)
+)ENGINE = MyISAM DEFAULT CHARACTER SET utf8;
+Updating base_application_cache_expires@notebook.
+Installing Cache_Expires DB:SDB_NOTEBOOK_ITEM
+UPDATE CACHE EXPIRES KV DATA
+Applications database and services is up-to-date, ok.
+</pre></li>
+</li>
+</ul>
+<h2><a name="id2">编写php和html模版</a></h2>
+<ul>
+<li>控制器文件:<b>app/notebook/controller/default.php</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">notebook_ctl_default&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">base_controller</span><span style="color: #007700">{<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">index</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">pagedata</span><span style="color: #007700">[</span><span style="color: #DD0000">'items'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">(</span><span style="color: #DD0000">'item'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">getList</span><span style="color: #007700">(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">display</span><span style="color: #007700">(</span><span style="color: #DD0000">'default.html'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">addnew</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">begin</span><span style="color: #007700">(array(</span><span style="color: #DD0000">"ctl"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">"default"</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">"act"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">"index"</span><span style="color: #007700">));<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$data&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item_subject'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$_POST</span><span style="color: #007700">[</span><span style="color: #DD0000">'subject'</span><span style="color: #007700">],<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item_content'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$_POST</span><span style="color: #007700">[</span><span style="color: #DD0000">'content'</span><span style="color: #007700">],<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item_email'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$_POST</span><span style="color: #007700">[</span><span style="color: #DD0000">'email'</span><span style="color: #007700">],<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item_posttime'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">time</span><span style="color: #007700">(),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$result&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">(</span><span style="color: #DD0000">'item'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">insert</span><span style="color: #007700">(</span><span style="color: #0000BB">$data</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">end</span><span style="color: #007700">(</span><span style="color: #0000BB">$result</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />}<br /></span>
+</span>
+</code></div></li>
+</ul>
+
+<ul>
+<li>编写视图文件:<b>app/notebook/view/default.html</b> <i>为了简化实现，此处用了</i><b>webkit</b> <i>浏览器的私有属性</i>。</li>
+</ul>
+<pre>&lt;html&gt;
+    &lt;head&gt;
+        &lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html; charset=utf-8&quot;&gt;
+        &lt;title&gt;Notebook&lt;/title&gt;
+        &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot;
+                href=&quot;&lt;{$env.app.res_url}&gt;/style.css&quot; media=&quot;screen&quot; /&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;h1&gt;Notebook&lt;/h1&gt;
+        &lt;dl&gt;
+            &lt;{foreach from=$items item=item}&gt;
+            &lt;dt&gt;
+            &lt;{$item.item_subject}&gt;
+            &lt;span class=&quot;date&quot;&gt;日期: &lt;{$item.item_posttime|cdate}&gt;&lt;/span&gt;
+            &lt;/dt&gt;
+            &lt;dd&gt;&lt;{$item.item_content}&gt;&lt;/dd&gt;
+            &lt;{/foreach}&gt;
+            &lt;div style=&quot;margin-bottom:20px;clear:both&quot; /&gt;&amp;nbsp;&lt;/div&gt;
+        &lt;/dl&gt;
+
+        &lt;form id=&quot;writer&quot; method=&quot;post&quot; action=&quot;&lt;{link ctl='default' act='addnew' app='notebook'}&gt;&quot;&gt;
+            &lt;input id=&quot;writer-subject&quot; type=&quot;text&quot; value=&quot;&quot;
+                    name=&quot;subject&quot; placeholder=&quot;请输入留言的标题&quot; /&gt;
+            &lt;input id=&quot;writer-email&quot; type=&quot;text&quot; value=&quot;&quot;
+                    name=&quot;email&quot; placeholder=&quot;请输入邮箱地址&quot; /&gt;
+            &lt;textarea name=&quot;content&quot; placeholder=&quot;留言正文&quot;&gt;&lt;/textarea&gt;
+            &lt;input type=&quot;submit&quot; value=&quot;发布新留言&quot; id=&quot;writer-submit&quot; /&gt;
+        &lt;/form&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<ul>
+<li>我们写个简单的样式:<b>app/notebook/statics/style.css</b></li>
+</ul>
+<pre>html{background:#A4C5FF}
+body{width:380px;margin:auto;background:#fff;padding:20px}
+dd{padding:10px}
+dt{border-bottom:1px solid #ccc;margin:10px 0;
+	font-weight:bold;color:#42597B;font-size:20px;}
+#writer{background:#E8EEF7;padding:10px;border:1px solid #E1ECFE}
+#writer-email,#writer-subject{display:block;margin-bottom:10px;width:300px}
+#writer textarea{width:300px;margin-bottom:10px;display:block;height:80px}
+#writer-submit{padding:2px 18px;font-weight:bold;}
+h1{text-align:center;padding:20px;text-shadow: 2px 2px 2px #999;}
+</pre>
+<ul>
+<li>修改<b>config/mapper.php</b>,增加如下代码：<pre class="quote">'/front'=&gt; array('app'=&gt;'notebook'),
+</pre>
+<li>用浏览器访问[<a href="http://localhost/项目名称/index.php/front">http://localhost/项目名称/index.php/front</a>],效果如下：
+<p><br /><img border="0" alt="" align="middle" src="screen-2.png" /></p>
+</li>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">新建数据表</a>
+    <li><a href="#id2" class="reference internal">编写php和html模版</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="new-project.html"
+                                  title="上一章">创建项目目录并安装</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="autoload.html"
+                                  title="下一章">类的自动载入机制</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="autoload.html" title="类的自动载入机制" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="new-project.html" title="创建项目目录并安装" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">快速入门</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">创建一个带后端的留言版</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

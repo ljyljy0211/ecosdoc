@@ -1,0 +1,978 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      desktop开发指南 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="强大的后端 - desktop" href="index.html" />
+
+        <link rel="next" title="../image/index" href="图片管理 - image.html" />
+        <link rel="prev" title="desktop_controller" href="desktop_controller控制器基类.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../image/index.html" title="图片管理 - image" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="desktop_controller.html" title="desktop_controller控制器基类" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">强大的后端 - desktop</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> desktop开发指南</h1>
+            <h2><a name="id1">desktop简介</a></h2>
+<ul>
+<li>desktop是基于base的一个独立的app。
+<li>通俗的讲desktop就是后台管理系统。
+<li>desktop还有以下特点：
+<ol>
+<li>desktop提供了常用的后台操作实现机制，这大大节省了你后台开发的时间。
+<li>desktop提供一个带有权限和工作流的操作环境。
+<li>desktop作为ecos的一个基础app一般不单独存在，是其他app操作流程的载体。</ol>
+
+<li>安装desktop后，访问后台，会出现如下登录界面：
+<p><br /><img border="0" alt="" align="middle" src="image/desktop1.png" /></p>
+</li>
+</li>
+</li>
+</ol>
+</li>
+</li>
+</li>
+</ul>
+<h3><a name="id2">desktop.xml说明</a></h3>
+<ul>
+<li>desktop.xml是后台菜单“显示”文件。
+<li>装了desktop这个app，就能识别其他app目录下的desktop.xml文件。
+<li>这个文件必须列出所有后台看见或看不见的控制器，否则除非是超级管理员，任何其他非超级管理员desktop用户无法访问这些控制器。
+<li>desktop.xml的基本结构是如下：</li>
+</li>
+</li>
+</li>
+</ul>
+<pre>&lt;desktop&gt;
+
+    &lt;panelgroup id=&quot;other&quot; icon=&quot;panel-other.png&quot; order=&quot;100&quot;&gt;其他&lt;/panelgroup&gt;
+    ...
+    &lt;adminpanel group=&quot;desktop_other&quot; permission=&quot;other&quot; controller='admin_member_attr' action='index' display='true'&gt;会员注册项&lt;/adminpanel&gt;
+    ...
+    &lt;permissions&gt;
+        &lt;permission id=&quot;shipment&quot; display='true'&gt;配送设置&lt;/permission&gt;
+        ...
+    &lt;/permissions&gt;
+
+    &lt;workground name=&quot;商品&quot; id=&quot;b2c.wrokground.goods&quot; controller=&quot;admin_goods&quot; action=&quot;index&quot; order=&quot;20&quot;&gt;
+        &lt;menugroup name=&quot;商品管理&quot;&gt;
+            &lt;menu controller='admin_goods_editor' action='add' permission='goods' display='false' order='10'&gt;添加商品&lt;/menu&gt;
+            ...
+        &lt;/menugroup&gt;
+        ...
+    &lt;/workground&gt;
+    ...
+&lt;/desktop&gt;
+
+</pre>
+<ul>
+<li>desktop.xml不一定包含上面的所有标签，在符合语法规则的前提下，可以根据自己的需求任意增减标签。
+<li>语法规则以及各个标签和标签属性含义如下：</li>
+</li>
+</ul>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">desktop </span></tt></li>
+</ul>
+
+<p>每个 desktop.xml 的根标签
+<ul>
+<li><tt class="docutils literal"><span class="pre">panelgroup</span></tt></li>
+</ul>
+</p>
+
+<p>控制面板里的组其属性含义如下：</p>
+
+<ol>
+<ol>
+<li><tt class="docutils literal"><span class="pre">id:</span></tt>控制面板里组的唯一标识
+<li><tt class="docutils literal"><span class="pre">icon:</span></tt> 控制面板里组的图标，路径默认的起点是app下的static，假如此desktop.xml是desktop这个app的，则图标的路径会自动解析成/app/desktop/static/panel-other.png
+<li><tt class="docutils literal"><span class="pre">order:</span></tt> 组的显示顺序</li>
+</li>
+</li>
+</ol>
+</ol>
+</ol>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">adminpanel</span></tt></li>
+</ul>
+
+<p>控制面板里的项其属性含义如下：</p>
+
+<ol>
+<ol>
+<li><tt class="docutils literal"><span class="pre">group:</span></tt> 指属性那个控制面板组，其值是panelgroup的id属性值加app前缀，例如group=&quot;desktop_other&quot;
+<li><tt class="docutils literal"><span class="pre">permission:</span></tt> 指此控制面板里的项属性那个权限（下面讲到权限）
+<li><tt class="docutils literal"><span class="pre">controller:</span></tt> controller和action(构成点此控制面板项时的去处，如果action属性未写则默认值为index)
+<li><tt class="docutils literal"><span class="pre">action:</span></tt> controller和action(构成点此控制面板项时的去处，如果action属性未写则默认值为index)
+<li><tt class="docutils literal"><span class="pre">display:</span></tt> 是否显示在控制面板组里，true为显示，false为不显示</li>
+</li>
+</li>
+</li>
+</li>
+</ol>
+</ol>
+</ol>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">permissions</span></tt>
+<p>权限被包括在它里面</p>
+</li>
+</ul>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">permission</span></tt>
+<p>包含在permissions标签里，每一个都是一个权限其属性含义如下：</p>
+</li>
+</ul>
+
+<ol>
+<ol>
+<li><tt class="docutils literal"><span class="pre">id:</span></tt> 权限的唯一标识，全局唯一
+<li><tt class="docutils literal"><span class="pre">display:</span></tt> 新建角色时，是否显示在角色权限列表里，true为显示，false为不显示</li>
+</li>
+</ol>
+</ol>
+</ol>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">workground</span></tt></li>
+</ul>
+
+<p>可以包含多个menugroup，看下【desktop图例】其属性有:</p>
+
+<ol>
+<ol>
+<li><tt class="docutils literal"><span class="pre">name:</span></tt> 【1区】显示出来的label
+<li><tt class="docutils literal"><span class="pre">id:</span></tt>(workground的唯一标识)
+<li><tt class="docutils literal"><span class="pre">controller:</span></tt> 构成点此workground tab时的去处，如果action属性未写则默认值为index
+<li><tt class="docutils literal"><span class="pre">action:</span></tt> 构成点此workground tab时的去处，如果action属性未写则默认值为index
+<li><tt class="docutils literal"><span class="pre">order:</span></tt> 此workground在tab列表中的排序</li>
+</li>
+</li>
+</li>
+</li>
+</ol>
+</ol>
+</ol>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">menugroup</span></tt></li>
+</ul>
+
+<p>可以包含多个<tt class="docutils literal"><span class="pre">menu</span></tt>，看【desktop图例】  【2区】</p>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">menu</span></tt></li>
+</ul>
+
+<p>看【desktop图例】为【3区】提供菜单,除了拥有跟workground一样的属性外，此标签还有另外三个属性:</p>
+
+<p><tt class="docutils literal"><span class="pre">permission:</span></tt> 权限,为标签permission里的id属性的值</p>
+
+<p><tt class="docutils literal"><span class="pre">display:</span></tt> 是否显示,有些控制器里的方法是不必显示成菜单的，比如得到post数据保存商品的控制器等，这时需把display设成false的</p>
+
+<p><tt class="docutils literal"><span class="pre">params:</span></tt> 在<b>url</b>中传值,菜单上的访问链接将加上params的参数例如：<pre class="quote">	&lt;menu controller=&quot;admin_notebook&quot; action=&quot;index&quot; params=&quot;view:1|schema:2&quot;&gt;留言编辑列表&lt;/menu&gt;
+
+	点击留言编辑列表  得到的URL地址为：
+
+	http://localhost/book/index.php/shopadmin/#app=notebook&amp;ctl=admin_notebook&amp;act=index&amp;view=1&amp;schema=2
+</pre></p>
+<h2><a name="id3">desktop图例</a></h2>
+<ul>
+<li>一个典型的desktop的列表页包含了哪些内容，如下图所示：
+<p><br /><img border="0" alt="" align="middle" src="image/desktop3.png" /></p>
+</li>
+</ul>
+<h2><a name="id4">接下来我们看各个区里的内容是如何增删及展示出来的</a></h2>
+<ul>
+<li>【1、2、3区】都是根据app下的<tt class="docutils literal"><span class="pre">desktop.xml</span></tt>产生，如何填充，可以参照desktop.xml的介绍试试看</li>
+</ul>
+
+<ul>
+<li>【5区】顶部菜单产生是靠往服务id为desktop_menu里注册服务实现</li>
+</ul>
+
+<p>在<tt class="docutils literal"><span class="pre">service.xml</span></tt>里添加<pre>     &lt;service id=&quot;desktop_menu&quot;&gt;
+        &lt;class&gt;b2c_service_view_menu&lt;/class&gt;
+    &lt;/service&gt;
+</pre></p>
+
+<p><tt class="docutils literal"><span class="pre">b2c_service_view_menu</span></tt>内容如下<pre>class b2c_service_view_menu{
+    function function_menu(){
+        $shop_base = app::get('site')-&gt;router()-&gt;gen_url(array('app'=&gt;'site', 'ctl'=&gt;'default'));
+        $html[] = &quot;&lt;a href='$shop_base' target='_blank'&gt;浏览商店&lt;/a&gt;&quot;;
+        return $html;
+
+    }
+}
+</pre>说明：<tt class="docutils literal"><span class="pre">desktop_menu</span></tt>的服务，必须定义名字为function_menu的方法,它的返回值即为【5区】的菜单项</p>
+<h2><a name="id5">4区finder详细解释</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="image/desktop4.png" /></p>
+
+<p>finder说明：
+<ul>
+<li>下面对finder各个区的内容的来龙去脉做解释：<pre class="quote">    我们平时做任何web应用大概都少不了后台管理功能，
+    这之中最常看到的大概就是：数据列表，对数据进行单条查看，删除，搜索列表数据。
+    finder就是做这样工作的，要做到这些事情只需简单的给一个方法传几个参数而已。
+</pre>例如：<pre>    function index(){
+        $this-&gt;finder('b2c_mdl_goods',array(
+        'title'=&gt;app::get('b2c')-&gt;_('商品列表'),
+        'actions'=&gt;array(array('label'=&gt;app::get('b2c')-&gt;_('添加商品'),
+	            'href'=&gt;'index.php?app=b2c&amp;ctl=admin_goods_editor&amp;act=add','target'=&gt;'_blank'),),
+        'use_buildin_set_tag'=&gt;true,
+        'use_buildin_filter'=&gt;true,
+        'use_buildin_export'=&gt;true,
+        'allow_detail_popup'=&gt;true,
+        'use_view_tab'=&gt;true,
+        'base_filter'=&gt;array('order_refer'=&gt;'local','disabled'=&gt;'false'), //对tab数据进行过滤筛选
+        'finder_aliasname'=&gt;'xxxx',
+            ));
+    }
+</pre>后台的控制器必须继承desktop_controller，继承后才有finder方法，下面介绍下finder方法的几个参数：</li>
+</ul>
+</p>
+
+<ul>
+<li>第一个参数是字符串，（上例中是b2c_mdl_goods），是model里的class名，它决定了finder列表的数据源，默认情况下是b2c_mdl_goods类里的getlist方法返回的数据</li>
+</ul>
+
+<ul>
+<li>第二个参数是数组，这个数组内涵相当丰富，解释如下：</li>
+</ul>
+
+<p><tt class="docutils literal"><span class="pre">title:</span></tt> 【图 finder】中的【1区】显示出来的内容</p>
+
+<p><tt class="docutils literal"><span class="pre">actions:</span></tt> 【图 finder】【2区】里的内容除了显示内置的操作以外(use_buildin_set_tag,use_buildin_filter这些是控制项)，还可以自定义添加新操作，参照上面格式。</p>
+
+<p><tt class="docutils literal"><span class="pre">allow_detail_popup：</span></tt> allow_detail_popup和其下面的其他项，是上面所说的内置的操作的控制项，其值为true时，显示此内置项。完整的内置操作及含义如下(可到desktop_finder_builder_view类里查看)：</p>
+
+<p><b>use_buildin_new_dialog:</b> 是否显示新建操作</p>
+
+<p><b>use_buildin_set_tag:</b> 是否显示设置标签操作</p>
+
+<p><b>use_buildin_recycle:</b> 是否显示删除操作</p>
+
+<p><b>use_buildin_export:</b> 是否显示导出操作</p>
+
+<p><b>use_buildin_import:</b> 是否显示导入操作</p>
+
+<p><b>use_buildin_tagedit:</b> 是否显示标签管理操作</p>
+
+<p><b>base_filter：</b> 对tab数据进行过滤筛选，参照上面格式</p>
+
+<p><b>top_extra_view</b> 在finder列表头部增加其他自定义html显示,如top_extra_view=&gt;array('app名称'=&gt;'页面路径');</p>
+
+<ul>
+<li>下面几个控制项是控制【图 finder】【2区】里的内容</li>
+</ul>
+
+<p><b>use_view_tab:</b>  是否显示finder中的tab（如果有），有无需看控制器中是否有_views方法。</p>
+
+<p><b>use_buildin_filter:</b> 是否使用高级筛选 【图 finder】【6区】</p>
+
+<p><b>use_buildin_refresh:</b>  是否显示刷新操作(高级筛选旁)</p>
+
+<p><b>use_buildin_setcol:</b> 是否显示列配置</p>
+
+<p><b>use_buildin_selectrow:</b> 是否显示每条记录前的复选按钮</p>
+
+<p><b>allow_detail_popup:</b> 是否显示查看列中的弹出查看图标（【图 finder.png】4区第二个图标）</p>
+
+<p><b>finder_aliasname:</b> 此finder的别名，用于保存此finder的</p>
+<h2><a name="id6">下面对几个重点区域内容的填充做详细讲解</a></h2><h3><a name="id7">增加finder列表的自定义列</a></h3>
+<ul>
+<li>finder列表的列分为以下三种：</ul>
+
+<ol>
+<ol>
+<li>查看列 (分为下列查看和弹出查看)
+<li>自定义列(也可称函数列)，可以通过一种方法扩展
+<li>普通列(数据表里有的字段，也即dbschema里有的字段)</li>
+</li>
+</li>
+</ol>
+</ol>
+</ul>
+</ol>
+
+<ul>
+<ul>
+<li>【图 finder】【5区】的两列操作和标签都不是dbschema里的字段，还能显示出来是因为他们是自定义列.
+<li>通过下面的步骤实现：</li>
+</li>
+</ul>
+</ul>
+
+<ol>
+<ol>
+<li>注册一个service，其id是desktop_finder.xxx,xxx是finder方法的第一个参数.
+<li>上例中是b2c_mdl_goods，最终结果在相应的应用中services.xml中如下样子：</li>
+</li>
+</ol>
+</ol>
+<pre>    &lt;service id=&quot;desktop_finder.b2c_mdl_goods&quot;&gt;
+        &lt;class&gt;b2c_finder_goods&lt;/class&gt;
+    &lt;/service&gt;
+
+</pre><pre class="quote">b2c_finder_goods类里有两种方法，两种属性，属性和方法成对出现：
+</pre></ol>
+
+<ul>
+<li>第一种 属性以detail_开头，对应的方法也以detail_开头 例如：<pre>
+    var $detail_basic = '基本信息';
+    function detail_basic($gid){
+        ...
+        return $str;
+    }
+</pre><pre class="quote">属性detail_basic是作为列头显示的，
+方法detail_basic的返回值是点击查看里出现的内容
+[如果有多个detail_开头的方法，则显示第一个里面的内容]
+</pre></li>
+</ul>
+
+<ul>
+<li>第二种：属性以column_开头，对应的方法也以column_开头</li>
+</ul>
+<pre>    var $column_editbutton = '操作';
+    public function column_editbutton($row)
+    {
+        ...
+        return $str;
+    }
+</pre><pre class="quote">属性column_editbutton是作为列头显示的，
+方法column_editbutton的返回值是每行此列的显示内容，
+方法column_editbutton的参数是当前行的数组。
+</pre><h3><a name="id8">finder自定义列初始化宽度</a></h3>
+<ul>
+<li>在finder自定义列中设置</li>
+</ul>
+<pre> ...
+   	var $column_try = '测试';
+   	var $column_try_width = 100;
+	public function column_try($row)
+	{
+		return '====';
+	}
+ ...
+</pre>
+<p>效果如图：<br /><img border="0" alt="" align="middle" src="image/desktop17.jpg" /></p>
+<h3><a name="id9">finder列表初始化排序</a></h3>
+<ul>
+<li>1 .在 dbschema 列属性中加order 属性<pre>     ...........
+
+      'item_subject' =&gt;
+          array (
+             'type' =&gt; 'varchar(100)',
+             'in_list'=&gt;true,
+             'is_title'=&gt;true,
+             'default_in_list'=&gt;true,
+             'label'=&gt;'第一列',
+             'order'=&gt;10,   //注意这里
+             ),
+      'item_content' =&gt;
+           array (
+             'label' =&gt; '第三列',
+             'in_list'=&gt;true,
+             'default_in_list' =&gt; true,
+             'order'=&gt;30,
+             'type' =&gt; 'text',
+             ),
+      'item_posttime' =&gt;
+          array (
+             'in_list'=&gt;true,
+             'default_in_list' =&gt; true,
+             'label' =&gt; '第二列',
+          	 'order'=&gt;20,
+             'type' =&gt; 'archar',
+             ),
+
+      ...........
+
+</pre>
+<p>效果如图：<br /><img border="0" alt="" align="middle" src="image/desktop13.jpg" /></p>
+</li>
+</ul>
+
+<ul>
+<li>2.在finder自定义列中设置</li>
+</ul>
+
+<p>属性名规则是列变量加_order 例如 var $column_editbutton_order = order</ul>
+
+<ol>
+<ol>
+<li>order 可以是COLUMN_IN_HEAD[放在普通列前面]或COLUMN_IN_TAIL[放在普通列后面]
+<li>order 也可以是数值  它会和  <b>dbschema</b> 中的<b>order</b> 的数值做比较</li>
+</li>
+</ol>
+</ol>
+<pre> ...
+   	var $column_editbutton = '操作';
+   	var $column_editbutton_order = COLUMN_IN_TAIL;
+	public function column_editbutton($row)
+	{
+		return '====';
+	}
+...
+</pre>
+<p>效果如下：<br /><img border="0" alt="" align="middle" src="image/desktop14.jpg" /></p>
+<pre class="quote">注意：此列表排序只能为初始化排序，如果做了如下保存操作则只能手动排序咯
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="image/desktop15.jpg" /></p>
+<h3><a name="id10">高级筛选</a></h3><pre class="quote">高级筛选中的搜索项大部分来自dbschema中，
+搜索类型[单选或下拉或输入关键词]也定义在dbschema
+</pre></ol>
+
+<ul>
+<ul>
+<li><b>除此之外，高级筛选中的搜索项还可以通过注册service扩展。</b>
+<li>id为extend_filter_xxx,xxx为finder方法的第一个参数，例如：</li>
+</li>
+</ul>
+</ul>
+<pre>    &lt;service id=&quot;extend_filter_b2c_mdl_orders&quot;&gt;
+        &lt;class&gt;b2c_finder_extend_orders&lt;/class&gt;
+    &lt;/service&gt;
+
+</pre>
+<ul>
+<li>b2c_finder_extend_orders 类如下：</li>
+</ul>
+<pre>
+class b2c_finder_extend_members{
+    function get_extend_colums(){
+            $db['members']=array (
+              'columns' =&gt;
+              array (
+                'refer_id' =&gt;
+                array (
+                  'type' =&gt; 'varchar(200)',
+                  'required' =&gt; true,
+                  'default' =&gt; 0,
+                  'label' =&gt; '首次来源ID',
+                  'width' =&gt; 75,
+                  'editable' =&gt; true,
+                  'filtertype' =&gt; 'yes',
+                  'filterdefault' =&gt; true,
+                  'in_list' =&gt; true,
+                  'default_in_list' =&gt; true,
+                ),
+
+        ...
+
+                 'refer_url' =&gt;
+                array (
+                  'type' =&gt; 'varchar(200)',
+                  'required' =&gt; true,
+                  'default' =&gt; 0,
+                  'label' =&gt; '首次来源URL',
+                  'width' =&gt; 75,
+                  'editable' =&gt; true,
+                  'filtertype' =&gt; 'yes',
+                  'filterdefault' =&gt; true,
+                  'in_list' =&gt; true,
+                  'default_in_list' =&gt; true,
+                )));
+			return $db;
+    }
+}
+
+</pre><pre class="quote">class里必须包含get_extend_colums方法，
+它的返回值跟dbschema里的一样，如果扩展了高级搜索，
+一般需要在model里重定义_filter方法，以便使用上扩展过滤字段
+</pre><h3><a name="id11">快捷搜索</a></h3>
+<ul>
+<li>有两个地方影响快捷搜索，dbschema中定义的字段中，searchtype这一项，
+<li>如果有这项则会在快捷搜索里出现，还有就是在model里定义searchOptions函数，
+<li>返回值的数组就为快速搜索里的项，例如：</li>
+</li>
+</li>
+</ul>
+<pre>    function searchOptions(){
+        $arr = parent::searchOptions();
+        return array_merge($arr,array(
+                'bn'=&gt;__('货号'),
+                'keyword'=&gt;__('商品关键字'),
+            ));
+    }
+</pre><h3><a name="id12">finder上的tab</a></h3>
+<ul>
+<li>需要在调用了finder的控制器里定义_views方法，_views方法的返回值格式如下：</li>
+</ul>
+<pre>
+$sub_menu = array(
+            0=&gt;array('label'=&gt;app::get('b2c')-&gt;_('全部'),'optional'=&gt;false,'filter'=&gt;&quot;&quot;,'addon'=&gt;1,'href'=&gt;'xxx.xxx','finder'=&gt;'xxxx'),
+        ...
+            7=&gt;array('label'=&gt;app::get('b2c')-&gt;_('已作废'),'optional'=&gt;false,'filter'=&gt;array('status'=&gt;'dead'),'addon'=&gt;1,'href'=&gt;'xxx.xxx'),
+        );
+
+</pre>
+<p><tt class="docutils literal"><span class="pre">label:</span></tt> tab的标题文字</p>
+
+<p><tt class="docutils literal"><span class="pre">optional:</span></tt> 此tab是否可选</p>
+
+<p><tt class="docutils literal"><span class="pre">filter:</span></tt> 此tab的过滤条件</p>
+
+<p><tt class="docutils literal"><span class="pre">addon:</span></tt> 此过滤条件下有多少条记录</p>
+
+<p><tt class="docutils literal"><span class="pre">href:</span></tt> 此tab的链接地址</p>
+<h2><a name="id13">回收站</a></h2><pre class="quote">如果finder方法第二个参数中使用了use_buildin_recycle，
+则此finder列表的actions区就有了内置的删除按钮，
+有时需要在删除前和删除后做一些检测工作，
+比方记录不准删除，或删除记录时需删除资源文件等。
+实现这一功能机制是在model里定义pre_recycle[删除前执行]和suf_recycle[删除后执行]方法
+</pre><h2><a name="id14">桌面</a></h2><pre class="quote">登录后台首先看到的界面，其内容由各个app通过service注册进来，
+里面每一块都是一个widgets，下面是b2c的service.xml里桌面内容相关的一段
+</pre><pre>    &lt;service id=&quot;desktop.widgets&quot;&gt;
+        &lt;class&gt;b2c_desktop_widgets_workcount&lt;/class&gt;
+        &lt;class&gt;b2c_desktop_widgets_stats&lt;/class&gt;
+        &lt;class&gt;b2c_desktop_widgets_exstatistics&lt;/class&gt;
+    &lt;/service&gt;
+
+</pre>
+<ul>
+<li>每个class就是一个widgets，每个class里面的内容为以下格式[以b2c_desktop_widgets_workcount为例]：</li>
+</ul>
+<pre>
+class b2c_desktop_widgets_workcount implements desktop_interface_widget{
+
+
+    function __construct($app){
+        $this-&gt;app = $app;
+        $this-&gt;render =  new base_render(app::get('b2c'));
+    }
+
+    function get_title(){
+
+        return app::get('b2c')-&gt;_(&quot;统计分析&quot;);
+
+    }
+    function get_html(){
+    ...
+        return $render-&gt;fetch('desktop/widgets/workcount.html');
+    }
+    function get_className(){
+
+          return &quot; valigntop&quot;;
+    }
+    function get_width(){
+
+          return &quot;l-1&quot;;
+
+    }
+
+}
+
+</pre>
+<ul>
+<li>函数说明</li>
+</ul>
+
+<p><tt class="docutils literal"><span class="pre"> function get_title():</span></tt> desktop widgets标题</p>
+
+<p><tt class="docutils literal"><span class="pre"> function get_title():</span></tt> desktop widgets 内容</p>
+
+<p><tt class="docutils literal"><span class="pre"> function get_className():</span></tt> 给desktop widgets 区块添加class name</p>
+
+<p><tt class="docutils literal"><span class="pre"> function get_width():</span></tt> 返回值为l-1显示在左侧，值为l-2显示在左侧</p>
+<h2><a name="id15">个性化定制</a></h2><h3><a name="id16">1、多个查看标签页</a></h3>
+<ul>
+<li><b>实例定位</b>：我们在“入门”时做的ECOS，相信大家都并不陌生。效果图如下：<br /><img border="0" alt="" align="middle" src="image/desktop5.png" />
+<li>现在我们就来“改造”一下<b>查看</b>功能，我们让我们的<b>查看</b>功能变的更加丰富。
+<li>我们先来看一下最终效果图：<br /><img border="0" alt="" align="middle" src="image/desktop6.png" />。
+<li>通过上图我们可以看出，我们可以为<b>查看</b>功能添加多个选项卡，每个选项卡可以有自身独立的显示页面。
+<li>该功能实现起来也非常简单。(我们就拿我们之前的做的notebook这个项目做为实例讲解。)实现过程如下：</ul>
+
+<ol>
+<li>首先，定位实现“查看”功能的文件：app/notebook/lib/finder/<b>item.php</b>。
+<li>然后在该文件中加上如下代码：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$detail_edit2&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'详细列表2'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">detail_edit2</span><span style="color: #007700">(</span><span style="color: #0000BB">$id</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$render&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'notebook'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">render</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$oItem&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">"notebook_mdl_item"</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$items&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$oItem</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getList</span><span style="color: #007700">(</span><span style="color: #DD0000">'item_subject,&nbsp;item_posttime,&nbsp;item_email'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(</span><span style="color: #DD0000">'item_id'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">$id</span><span style="color: #007700">),&nbsp;</span><span style="color: #0000BB">0</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">1</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$render</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">pagedata</span><span style="color: #007700">[</span><span style="color: #DD0000">'item'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">$items</span><span style="color: #007700">[</span><span style="color: #0000BB">0</span><span style="color: #007700">];<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$render</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">display</span><span style="color: #007700">(</span><span style="color: #DD0000">'admin/itemdetail.html'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />...<br /></span>
+</span>
+</code></div><pre class="quote">以上代码仅仅是为了实例需要，没有什么实际的意义。在function中我们可以根据自己的需求进行处理。
+</pre>
+<li>最后，刷新页面就可以看到相应的效果。</li>
+</li>
+</li>
+</ol>
+</li>
+</li>
+</li>
+</li>
+</ul>
+<h3><a name="id17">2、对finder下的数据的modify处理</a></h3></ol>
+
+<ul>
+<ul>
+<li>我们通过一个“实例”来说明我们要做什么。
+<li>我们通过model文件里加<b>modifier</b>方法来给<b>email</b>这个字段<b>标红</b>。
+<li>我们先来看一下操作之前效果图：<br /><img border="0" alt="" align="middle" src="image/desktop7.png" />
+<li>然后我们做以下操作：</ul>
+
+<ol>
+<li>定位文件app\notebook\model\<b>item.php</b>
+<li>添加以下代码：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">modifier_item_email</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$row&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">"&lt;span&nbsp;style='color:red'&gt;"</span><span style="color: #007700">.</span><span style="color: #0000BB">$row</span><span style="color: #007700">.</span><span style="color: #DD0000">"&lt;/span&gt;"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$row</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />...<br /></span>
+</span>
+</code></div><pre class="quote">重要提示：modifier的命名规则是modifier_ColumnName(ColumnName是表对应dbshema中的字段名字)。
+</pre>
+<li>修改后效果如下：<br /><img border="0" alt="" align="middle" src="image/desktop8.png" />
+<li>也可以对代码稍作调整：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">modifier_item_email</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//修改后代码<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">if&nbsp;(</span><span style="color: #0000BB">strstr</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">,</span><span style="color: #DD0000">'tntppa'</span><span style="color: #007700">)){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #DD0000">"&lt;span&nbsp;style='color:red'&gt;"</span><span style="color: #007700">.</span><span style="color: #0000BB">$row</span><span style="color: #007700">.</span><span style="color: #DD0000">"&lt;/span&gt;"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}else{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$row</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//修改后代码<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">}<br />...<br /></span>
+</span>
+</code></div>
+<li>效果如下：<br /><img border="0" alt="" align="middle" src="image/desktop12.png" /></li>
+</li>
+</li>
+</li>
+</li>
+</ol>
+</li>
+</li>
+</li>
+</ul>
+</ul>
+<h3><a name="id18">3、为后台首页添加自己的logo(modify操作)</a></h3></ol>
+
+<ul>
+<ul>
+<li>一般我们安装完desktop这个app后后台的logo会固定为<b>ECstore</b>,如下图所示：<br /><img border="0" alt="" align="middle" src="image/desktop9.png" />
+<li>如果我们要添加自己的logo图片我们要做如下操作：</ul>
+
+<ol>
+<li>在app\notebook\services.xml中添加如下代码：<pre>...
+    &lt;service id=&quot;desktop_controller_content.desktop.default.index&quot;&gt;
+        &lt;class&gt;notebook_ctl_admin_out&lt;/class&gt;
+    &lt;/service&gt;
+...
+</pre>
+<li>在app\notebook\controller\admin目录下新建文件<b>out.php</b>,代码如下：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">notebook_ctl_admin_out&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">base_controller&nbsp;</span><span style="color: #007700">implements&nbsp;</span><span style="color: #0000BB">desktop_interface_controller_content</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">modify</span><span style="color: #007700">(&amp;</span><span style="color: #0000BB">$html</span><span style="color: #007700">,&nbsp;&amp;</span><span style="color: #0000BB">$obj</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$arr&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">"&lt;a&nbsp;href=\"index.php?ctl=dashboard&amp;act=index\"&gt;ECstore&lt;/a&gt;"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$html&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">str_replace</span><span style="color: #007700">(</span><span style="color: #0000BB">$arr</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">""</span><span style="color: #007700">,</span><span style="color: #0000BB">$html</span><span style="color: #007700">);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//替换logo<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$logoimg&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">"&lt;img&nbsp;src=\"http://service.shopex.cn/images/fail.gif\"&nbsp;&nbsp;alt=\"ShopEx&nbsp;CERT&nbsp;INFO\"&nbsp;/&gt;"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$logoimgM&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">"&lt;img&nbsp;src=\"http://www.shopex.cn/images/alllogo/alllogo_19.gif\"&nbsp;height=\"40px\"/&gt;"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$html&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">str_replace</span><span style="color: #007700">(</span><span style="color: #0000BB">$logoimg</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$logoimgM</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$html</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /></span>
+</span>
+</code></div>
+<li>我们执行<b>cmd update</b>操作，如图所示：<br /><img border="0" alt="" align="middle" src="image/desktop10.png" />
+<li>最终效果如下图所示：<br /><img border="0" alt="" align="middle" src="image/desktop11.png" /><pre class="quote">注：我们也可以通过modify这个方法来修改其他后台页面信息。
+</pre></ol>
+
+<ul>
+<li>【方法二】我们也可以通过修改数据库的方式来修改后台logo文字。具体操作见【个性化定制七】
+<li>【方法三】我们还可以通过修改<b>/config/deploy.xml</b>来修改后台登陆banner、logo等信息。<pre class="quote">注：【方法三】只有在系统安装前可以使用。
+</pre></li>
+</li>
+</ul>
+</li>
+</li>
+</li>
+</ol>
+</li>
+</ul>
+</ul>
+<h3><a name="id19">4、在finder区域添加一个虚拟列</a></h3></ul>
+
+<ol>
+<ol>
+<li>我们还是来看一下我们要实现的效果：<br /><img border="0" alt="" align="middle" src="image/desktop16.png" />
+<li>其实在我们ECOS框架中要实现添加虚拟列的方法是非常简单的。我们只需要做如下操作即可：
+<li>先要注册services，代码如下：<pre>&lt;services&gt;
+    &lt;service id=&quot;desktop_finder.notebook_mdl_item&quot;&gt;
+        &lt;class&gt;notebook_finder_item&lt;/class&gt;
+    &lt;/service&gt;
+&lt;/services&gt;
+</pre>
+<li>找到<b>app\notebook\lib\finder\</b>目录下的<b>item.php</b>添加如下代码：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//增加一个虚拟列<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">var&nbsp;</span><span style="color: #0000BB">$column_edit2&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'测试列'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">column_edit2</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #DD0000">'item_subject'</span><span style="color: #007700">];<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />...<br /></span>
+</span>
+</code></div>
+<li>最后我们刷新页面就可以得到我们想要的效果。</li>
+</li>
+</li>
+</li>
+</li>
+</ol>
+</ol>
+<h3><a name="id20">5、按照条件改变行数据颜色</a></h3></ol>
+
+<ul>
+<ul>
+<li>我们先来看一张效果图：<br /><img border="0" alt="" align="middle" src="image/desktop19.png" />
+<li>要实现以上的效果图，我们需要做一下操作：</ul>
+
+<ol>
+<li>首先我们要注册一个services,在<b>services.xml</b>添加如下代码：<pre>...
+    &lt;service id=&quot;desktop_view_helper&quot;&gt;
+        &lt;class&gt;notebook_view_helper&lt;/class&gt;
+    &lt;/service&gt;
+...
+</pre>
+<li>然后我们在lib下建立view文件夹，然后建立<b>helper.php</b>,代码如下：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">notebook_view_helper&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">desktop_controller</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">function_desktop_header</span><span style="color: #007700">(</span><span style="color: #0000BB">$params</span><span style="color: #007700">,&nbsp;&amp;</span><span style="color: #0000BB">$smarty</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">"notebook"</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">render</span><span style="color: #007700">()-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">(</span><span style="color: #DD0000">"header.html"</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />}<br /></span>
+</span>
+</code></div>
+<li>然后在<b>app/notebook/view</b>下建立<b>header.html</b>添加如下代码：<pre>&lt;style&gt;
+/*按需求增加的列表另外三种颜色状态*/
+.finder-list .list-row {background:#FFCC33}
+.finder-list .list-warn{background:#FF0000}
+.finder-list .list-even{background:#66CC00}
+&lt;/style&gt;
+</pre>
+<li>在<b>app/notebook/lib/finder/item.php</b>,添加如下方法：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">row_style</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">){<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #DD0000">'item_subject'</span><span style="color: #007700">]==</span><span style="color: #DD0000">'t'</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #DD0000">'list-even'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}elseif(</span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #DD0000">'item_subject'</span><span style="color: #007700">]==</span><span style="color: #DD0000">'rt'</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #DD0000">'list-row'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}else{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #DD0000">'list-warn'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />...<br /></span>
+</span>
+</code></div>
+<li>运行cmd update注册services后会出现效果。</li>
+</li>
+</li>
+</li>
+</li>
+</ol>
+</li>
+</ul>
+</ul>
+<h3><a name="id21">6、finder中的多表链接显示</a></h3></ol>
+
+<ul>
+<ul>
+<li>同样的我们还是先来看效果：<br /><img border="0" alt="" align="middle" src="image/desktop20.png" />
+<li>我们看到上图中<b>用户ID</b>这个字段下面显示的是邮箱的名字而非数字，
+<p>实际上这个字段数据是通过<b>dbschema</b>多表链接来完成的。
+<li>接下来我们看具体的操作步骤(我们以项目twitter中的pam_account和privacy_config表来说明)：</ul>
+
+<ol>
+<li>首先我们在创建<b>privacy_config</b>表的时候<b>user_id</b>字段设置如下：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'user_id'&nbsp;</span><span style="color: #007700">=&gt;<br />&nbsp;&nbsp;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'table:account@pam'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'required'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'用户ID'</span><span style="color: #007700">,</span><span style="color: #FF8000">//finder里显示的列名称<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,</span><span style="color: #FF8000">//是否显示在列配置中,默认为false<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default_in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #FF8000">//默认在desktop列表中是否显示<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />...<br /></span>
+</span>
+</code></div><pre class="quote">  在这里我们有必要解释一下：'type' =&gt; 'table:account@pam',
+  这句代码的意思是：
+  在本表中的user_id这个字段的类型与pam_account这个表中的主键的字段一致。
+</pre>
+<li>既然我们之前已经将user_id这个字段链接到pam_account中的主键，接下来就要设置要链接查询的字段。将这个要显示的字段加上属性：'is_title'=&gt;true：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'login_name'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'varchar(100)'</span><span style="color: #007700">,</span><span style="color: #DD0000">'is_title'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">true</span><span style="color: #007700">,</span><span style="color: #DD0000">'required'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,&nbsp;),<br />...<br /></span>
+</span>
+</code></div>
+<li>然后，我们进行cmd update操作。<pre>D:\wamp\www\twitter\app\base&gt;cmd update
+Scanning local Applications... ok.
+Updating base_application_cache_expires@pam.
+Installing Cache_Expires DB:PAM_ACCOUNT
+UPDATE CACHE EXPIRES KV DATA
+Installing Cache_Expires DB:PAM_AUTH
+UPDATE CACHE EXPIRES KV DATA
+Installing Cache_Expires DB:PAM_LOG
+UPDATE CACHE EXPIRES KV DATA
+</pre>
+<li>刷新页面后即可看到效果。<pre class="quote">  注：如果被链接的表（本例中的pam_accout表）没有字段被设置属性为'is_title'=&gt;true,那么系统默认
+  将主键的下一个字段为输出数据。
+</pre></ol>
+
+<ul>
+<li>如果要在主表中（本例中的privacy_config表）显示多个字段（默认只能显示链接表的一个字段数据）信息，可以通过services注册虚拟字段来实现。（2011-04-28：sunjinrong）</li>
+</ul>
+</li>
+</li>
+</li>
+</ol>
+</p>
+</li>
+</li>
+</ul>
+</ul>
+<h3><a name="id22">7、后台页面的banner和logo修改</a></h3>
+<ul>
+<li>很多时候我们有对后台的banner和logo进行修改的需求，前面我们讲的个性化定制之三《3、为后台首页添加自己的logo(modify操作)》
+<p>中也说到，用通过modify这个函数来实现对后台logo的操作，但是这样无法覆盖全部的需求（比如后台登陆logo）。这个时候，就可以用下面修改数据库然后进行cmd kvrecovery 操作，来完成我们的需求。
+<li>具体操作步骤如下：</ul>
+
+<ol>
+<li>首先，打开数据库表sdb_base_kvstore。
+<li>找到表字段修改key字段为<b>banner\logo</b>的value值。如下图所示：<br /><img border="0" alt="" align="middle" src="image/desktop21.png" /><pre class="quote">注意：&quot;s:18:这是一个测试&quot;是序列化后的结果，修改时不仅要修改后面的文本，还要修改与之对应的字符个数&quot;s:18&quot;。
+在utf8字符集下，每个汉字=3个字符。于是上例中“这是一个测试”=3*6个字符。
+</pre>
+<li>在cmd中运行<b>cmd kvrecovery</b>命令就可以得到最终效果图：<br /><img border="0" alt="" align="middle" src="image/desktop22.png" /><br /><img border="0" alt="" align="middle" src="image/desktop23.png" /></li>
+</li>
+</li>
+</ol>
+</p>
+</li>
+</ul>
+<h3><a name="id23">8、快速搜索区域自定义搜索名称</a></h3></ol>
+
+<ul>
+<ul>
+<li>让我们先看一张图片来说明我们要做的事情。
+<p><br /><img border="0" alt="" align="middle" src="image/desktop24.png" />
+<li>通过图片我们知道可以看出我们是要对后台界面的快速搜索区域的名称进行更改。具体实现如下：</ul>
+
+<ol>
+<li>打开对应该finder区域的model文件(在这里我们以app/ecbook/model/item.php为例进行操作)加入如下函数：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//自定义快速搜索字段名称<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">function&nbsp;</span><span style="color: #0000BB">searchOptions</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$arr&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">parent</span><span style="color: #007700">::</span><span style="color: #0000BB">searchOptions</span><span style="color: #007700">();</span><span style="color: #FF8000">//得到dbschema里定义searchtype的字段<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$columns&nbsp;</span><span style="color: #007700">=&nbsp;array();<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$columns</span><span style="color: #007700">[</span><span style="color: #DD0000">'item_subject'</span><span style="color: #007700">]=</span><span style="color: #DD0000">'自定义1'</span><span style="color: #007700">;</span><span style="color: #FF8000">//将搜索字段自定义名称<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$columns</span><span style="color: #007700">[</span><span style="color: #DD0000">'item_posttime'</span><span style="color: #007700">]=</span><span style="color: #DD0000">'自定义2'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$columns</span><span style="color: #007700">[</span><span style="color: #DD0000">'item_email'</span><span style="color: #007700">]=</span><span style="color: #DD0000">'自定义3'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$return&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">array_merge</span><span style="color: #007700">(</span><span style="color: #0000BB">$arr</span><span style="color: #007700">,</span><span style="color: #0000BB">$columns</span><span style="color: #007700">);</span><span style="color: #FF8000">//保证所有属性为searchtype的字段都显示<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">return&nbsp;</span><span style="color: #0000BB">$return</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />...<br /></span>
+</span>
+</code></div>
+<li>刷新页面后效果如下：<br /><img border="0" alt="" align="middle" src="image/desktop25.png" /></li>
+</li>
+</ol>
+</p>
+</li>
+</ul>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">desktop简介</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">desktop.xml说明</a>
+    </ul>
+    <li><a href="#id3" class="reference internal">desktop图例</a>
+    <li><a href="#id4" class="reference internal">接下来我们看各个区里的内容是如何增删及展示出来的</a>
+    <li><a href="#id5" class="reference internal">4区finder详细解释</a>
+    <li><a href="#id6" class="reference internal">下面对几个重点区域内容的填充做详细讲解</a>
+        <ul>
+        <li><a href="#id7" class="reference internal">增加finder列表的自定义列</a>
+        <li><a href="#id8" class="reference internal">finder自定义列初始化宽度</a>
+        <li><a href="#id9" class="reference internal">finder列表初始化排序</a>
+        <li><a href="#id10" class="reference internal">高级筛选</a>
+        <li><a href="#id11" class="reference internal">快捷搜索</a>
+        <li><a href="#id12" class="reference internal">finder上的tab</a>
+    </ul>
+    <li><a href="#id13" class="reference internal">回收站</a>
+    <li><a href="#id14" class="reference internal">桌面</a>
+    <li><a href="#id15" class="reference internal">个性化定制</a>
+        <ul>
+        <li><a href="#id16" class="reference internal">1、多个查看标签页</a>
+        <li><a href="#id17" class="reference internal">2、对finder下的数据的modify处理</a>
+        <li><a href="#id18" class="reference internal">3、为后台首页添加自己的logo(modify操作)</a>
+        <li><a href="#id19" class="reference internal">4、在finder区域添加一个虚拟列</a>
+        <li><a href="#id20" class="reference internal">5、按照条件改变行数据颜色</a>
+        <li><a href="#id21" class="reference internal">6、finder中的多表链接显示</a>
+        <li><a href="#id22" class="reference internal">7、后台页面的banner和logo修改</a>
+        <li><a href="#id23" class="reference internal">8、快速搜索区域自定义搜索名称</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="desktop_controller.html"
+                                  title="上一章">desktop_controller控制器基类</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../image/index.html"
+                                  title="下一章">图片管理 - image</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../image/index.html" title="图片管理 - image" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="desktop_controller.html" title="desktop_controller控制器基类" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">强大的后端 - desktop</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      集群搭建 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="未归档" href="index.html" />
+
+        <link rel="next" title="linuxcommand" href="The Linux Command Line@学习笔记.html" />
+        <link rel="prev" title="archlinux" href="archlinux.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="linuxcommand.html" title="The Linux Command Line@学习笔记" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="archlinux.html" title="archlinux" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 集群搭建</h1>
+            <h2><a name="id1">硬件</a></h2>
+<p>系统统一是Arch</p>
+
+<ul>
+<li>第一台双网卡，分别联到内网和路由
+<li>第二台Mysql主
+<ul>
+<li>nginx
+<ul>
+<li>proxy
+<li>sphinx
+<li>q4m
+<li>映射</ul>
+</ul>
+
+<li>第三台Mysql从</li>
+</li>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</li>
+</ul>
+<h2><a name="id2">配置文件位置</a></h2><pre class="mark"># Main Configuration for Arch Linux
+/etc/rc.conf
+# 一般服务都是在这里启动,重启和停止,如
+/etc/rc.d/network start | stop | restart
+# dns
+/etc/resolv.conf
+</pre><h2><a name="id3">路由</a></h2>
+<ul>
+<li>iptables 防火墙
+<ul>
+<li>首先分配IP
+<li>第一台双网卡机器，内网ip：192.168.51.119，局域网ip：10.0.0.1
+<li>另外两台机器ip：10.0.0.2和10.0.0.3</ul>
+
+<li>开机加载<pre>vi /etc/rc.conf
+</pre>
+<p>添加iptables服务,如<pre class="quote">DAEMONS=(syslog-ng network netfs crond sshd iptables)
+</pre></p>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</ul>
+<h3><a name="id4">三台机器可以ping通，局域网机器可以访问互联网</a></h3>
+<p>修改<pre>vi /etc/rc.conf
+</pre>设置各有不同</p>
+
+<ul>
+<li>应用服务器<pre># 第一块网卡
+eth0=&quot;eth0 192.168.51.119 netmask 255.255.255.0 broadcast 192.168.51.255&quot;
+# 第二网卡
+eth1=&quot;eth1 10.0.0.1 netmask 255.0.0.0 broadcast 192.168.51.255&quot;
+# 设置ip地址
+INTERFACES=(eth0 eth1)
+# 设置网关
+gateway=&quot;default gw 192.168.51.1&quot;
+# 设置路由,默认!gateway是关闭
+ROUTES=(gateway)
+</pre>
+<li>主服务器<pre>eth0=&quot;eth0 10.0.0.2 netmask 255.0.0.0 broadcast 192.168.51.255&quot;
+# 设置ip地址
+INTERFACES=(eth0)
+# 设置网关
+gateway=&quot;default gw 10.0.0.1&quot;
+ROUTES=(gateway)
+</pre>
+<li>从服务器<pre>eth0=&quot;eth0 10.0.0.3 netmask 255.0.0.0 broadcast 192.168.51.255&quot;
+# 设置ip地址
+INTERFACES=(eth0)
+# 设置网关
+gateway=&quot;default gw 10.0.0.1&quot;
+ROUTES=(gateway)
+</pre></li>
+</li>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">硬件</a>
+    <li><a href="#id2" class="reference internal">配置文件位置</a>
+    <li><a href="#id3" class="reference internal">路由</a>
+        <ul>
+        <li><a href="#id4" class="reference internal">三台机器可以ping通，局域网机器可以访问互联网</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="archlinux.html"
+                                  title="上一章">archlinux</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="linuxcommand.html"
+                                  title="下一章">The Linux Command Line@学习笔记</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="linuxcommand.html" title="The Linux Command Line@学习笔记" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="archlinux.html" title="archlinux" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

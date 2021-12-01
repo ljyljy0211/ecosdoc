@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      MYSQL 安装&配置 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="资料" href="../../_refs.html" />
+
+        <link rel="next" title="nginx" href="NGINX 安装&配置.html" />
+        <link rel="prev" title="../../advance/base/common-library/../app/setting" href="setting - 专属app的配置信息.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="nginx.html" title="NGINX 安装&配置" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../../advance/base/common-library/../app/setting.html" title="setting - 专属app的配置信息" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../_refs.html">资料</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> MYSQL 安装&配置</h1>
+            
+<ul>
+<li>安装<pre>wget http://dev.mysql.com/get/Downloads/MySQL-5.6/mysql-5.6.12-linux-glibc2.5-x86_64.tar.gz/from/http://cdn.mysql.com/
+tar zxvf mysql-5.6.12-linux-glibc2.5-x86_64.tar.gz -C /usr/local/webserver
+mv mysql-5.6.12-linux-glibc2.5-x86_64 mysql
+
+</pre></li>
+</ul>
+
+<ul>
+<li>配置<pre>shell&gt; groupadd mysql
+shell&gt; useradd -r -g mysql mysql
+shell&gt; cd /usr/local/webserver/mysql
+shell&gt; chown -R mysql .
+shell&gt; chgrp -R mysql .
+shell&gt; scripts/mysql_install_db --user=mysql
+shell&gt; chown -R root .
+shell&gt; chown -R mysql data
+# Next command is optional
+shell&gt; cp support-files/my-default.cnf /etc/my.cnf
+shell&gt; bin/mysqld_safe --user=mysql &amp;
+</pre>
+<li>修改mysql.server脚本<pre class="mark">将
+basedir=
+datadir=
+改为
+basedir=/usr/local/webserver/mysql
+datadir=/usr/local/webserver/mysql/data
+</pre>
+<li>配置启动脚本<pre class="mark">cd /usr/local/webserver/mysql
+cp support-files/mysql.server /etc/init.d/mysql
+</pre>
+<li>启动mysql<pre class="mark">service mysql start
+service mysql stop
+service mysql restart
+</pre>
+<li>配置的参考资料
+<ol>
+<li><a href="http://dev.mysql.com/doc/refman/5.6/en/binary-installation.html">安装配置</a></li>
+</ol>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../../advance/base/common-library/../app/setting.html"
+                                  title="上一章">setting - 专属app的配置信息</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="nginx.html"
+                                  title="下一章">NGINX 安装&配置</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="nginx.html" title="NGINX 安装&配置" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../../advance/base/common-library/../app/setting.html" title="setting - 专属app的配置信息" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../_refs.html">资料</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

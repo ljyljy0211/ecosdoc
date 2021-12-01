@@ -1,0 +1,441 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      windows-Apache单机部署(开发版本) &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="ECstore部署文档" href="index.html" />
+
+        <link rel="next" title="nginx_windows2" href="nginx + windows单机部署(开发版本).html" />
+        <link rel="prev" title="window" href="iis + windows单机部署(开发版本).html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="nginx_windows2.html" title="nginx + windows单机部署(开发版本)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="window.html" title="iis + windows单机部署(开发版本)" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ECstore部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> windows-Apache单机部署(开发版本)</h1>
+            <pre class="mark">声明:
+此方案只限于本地化开发.
+ecstore目前不支持windows的生产环境
+</pre><h2><a name="id1">第一步：下载安装的文件</a></h2>
+<p>Apache下载地址：（httpd-2.2.21-win32-x86-no_ssl.msi）[<a href="http://archive.apache.org/dist/httpd/binaries/win32/httpd-2.2.21-win32-x86-no_ssl.msi">http://archive.apache.org/dist/httpd/binaries/win32/httpd-2.2.21-win32-x86-no_ssl.msi</a>]</p>
+
+<p>Mysql下载地址（mysql-5.5.19-win32.msi）[<a href="http://downloads.mysql.com/archives/mysql-5.5/mysql-5.5.19-win32.msi">http://downloads.mysql.com/archives/mysql-5.5/mysql-5.5.19-win32.msi</a>]</p>
+
+<p>PHP下载地址（php-5.3.28-nts-Win32-VC9-x86.zip）[<a href="http://windows.php.net/downloads/releases/php-5.3.28-nts-Win32-VC9-x86.zip">http://windows.php.net/downloads/releases/php-5.3.28-nts-Win32-VC9-x86.zip</a>]</p>
+
+<p>mod_fcgid下载地址（mod_fcgid-2.3.6-win32-x86.zip）[<a href="http://pan.baidu.com/s/1jGhwFiA">http://pan.baidu.com/s/1jGhwFiA</a>]</p>
+
+<ul>
+<li>mod_fastcgi和mod_fcgid的区别<pre>
+
+mod_fcgid是一个跟mod_fastcgi二进制兼容的Apache module。
+
+原来的mod_fastcgi因为实现方式的限制，所以可能会创建了很多不必要的进程，而实际上只需要更少的进程就能处理同样的请求。 
+mod_fastcgi的另外一个问题是每一个CGI的多个进程都共享同一个管道文件，所有到同一个fastcgi的通讯都通过这个同名的管道
+文件进行， 这样当出现通讯错误的时候，根本不知道正在通讯的是哪一个fastcgi，于是也没有办法将这个有问题的进程杀死。
+
+mod_fcgid尝试使用共享内存来解决这个问题。共享内存里面有当前每个fastcgi进程的信息（包括进程号，进程使用的管道文件名等）
+，当 每次尝试请求fastcgi工作的时候，Apache将会首先在共享内存里面查询，只有在共享内存里面发现确实没有足够的fastcgi进程了
+，才会创建 新的进程，这样可以保证当前创建的进程数量刚好能够处理客户的请求。另外，由于每一个fastcgi进程使用不同名称的管道
+文件，所以可以在通讯失败的时 候知道到底哪个fastcgi进程有问题，而能够尽早的将其剔除。
+程序实现的目标跟mod_fastcgi二进制兼容只要在Apache中用mod_fcgid替换了mod_fastcgi，就能工作。原来的fastcgi程序不用重
+新编译，立即可以工作。
+
+
+更严格的控制进程的创建
+Apache中每一个request handler都能通过共享内存知道当前系统fastcgi运行的情况，这样可以防止过度的创建fastcgi进程，无谓的
+消耗系统的资源。
+
+
+简单清晰的进程创建速度控制策略
+每一个fastcgi都会维护一个计数器，这个计数器在程序创建和程序结束的时候都会增加，而这个计数器每秒会减1，直到0。当计数器的值高于某个 阀值的时候，程序就会停止创建，直到计数器的值回落。这样既可以保证在请求突然增多的时候能够快速反应（特别是Apache刚启动，需要大量创建
+程序的时 候），也能保证当fastcgi程序有问题，不断重起的时候，重起的速度不会过高而消耗过多的系统资源。
+
+
+自动检测出有问题的进程
+因为每个fastcgi使用自己特定的管道文件，所以在通讯错误的时候可以轻易知道哪一个程序出现问题，而尽早的将其剔除。
+
+
+可移植性
+遵照Apache2的习惯，所有可移植的代码都放到一起，所有不可移植的代码都在arch目录下分开存放。当前已经测试过的系统包括 Linux , FreeBSD(已经包含入FreeBSD4和FreeBSD5的port中), Solaris, Windows 2000.
+
+
+支持FastCGI方式运行的PHP
+可以直接支持以FastCGI方式运行的PHP。因为PHP现在还不能保证所有的扩展代码都是线程安全的，所以并不建议在Apache2的线程模式 下使用mod_php。而以FastCGI方式运行的PHP则是其中一个解决办法。另外，使用mod_fcgi还可以在不修改任何PHP代码的情况下，获 得数据库连接池的功能，大大减少PHP进程到数据库的连接。
+
+</pre><h2><a name="id2">第二步：安装文件</a></h2></li>
+</ul>
+
+<ul>
+<li>在要安装的磁盘建一个文件夹。为了以后管理方便我们在D盘的根目录下创建一个WAMP文件夹。 E:\wamp（wamp是 windows+apache+mysql+php的缩写）。</li>
+</ul>
+
+<ul>
+<li>在wamp文件夹下创建一个www文件夹，用来存放你的PHP网站程序。E:\wamp\www。</li>
+</ul>
+
+<ul>
+<li>安装Apache服务器，把Apache服务器安装到 E:\wamp\Apache 文件夹。具体Apache安装过程可以参考文档 Apache安装图解[<a href="http://www.admin10000.com/document/66.html">http://www.admin10000.com/document/66.html</a>]。</li>
+</ul>
+
+<ul>
+<li>把下载的php-5.3.28-nts-Win32-VC9-x86 解压到 E:\wamp\PHP 文件夹。</li>
+</ul>
+
+<ul>
+<li>安装MySql数据库，把Mysql安装到 E:\wamp\mysql文件夹。具体mysql安装过程可以参考文档 mysql安装图解。[<a href="http://www.admin10000.com/document/59.html">http://www.admin10000.com/document/59.html</a>]</li>
+</ul>
+<h2><a name="id3">第三步：配置 Apache</a></h2><pre class="mark">首先使用文本编辑工具（推荐 EditPlus ）打开 D:\WAMP\Apache\conf\httpd.conf 
+文件，这个文件是Apache的配置文件，下面几步都是在修改这个文件的内容。要注意
+的是修改完 httpd.conf 文件需重新启动Apache服务，新设置才会生效。
+</pre>
+<ul>
+<li>设置监听端口<pre class="mark">打开 httpd.conf 文件后，找到 Listen（大概在第46行），将它后面的数字改为8080，如下：
+
+    Listen 8080
+
+这个参数用来设置Apache服务器的监听端口，一般默认为80。修改为8080 是为了避免
+和Windows 2003系统的IIS端口号冲突，如果你没有启用IIS，也可以使用默认的80端口
+号。
+</pre></li>
+</ul>
+
+<ul>
+<li>修改网站存放目录<pre class="mark">我们知道Apache默认的网站存放目录为Apache安装目录下的htdocs文件夹。当你更改
+网站存放目录，就必须修改相应的Apache配置。
+在配置文件 httpd.conf 中查找 DocumentRoot，将其修改为指向网站目录的正确文件夹。
+我们这里改为
+
+    DocumentRoot &quot;E:/wamp/www&quot;
+
+同时，查找 This should be changed to whatever you set DocumentRoot to，在它
+下面有行 &lt;Directoy 默认的DocumentRoot &gt;，将其修改为你自己配置的DocumentRoot 
+路径。我们这里修改
+
+    &lt;Directory &quot;E:/wamp/www&quot;&gt;
+
+</pre></li>
+</ul>
+
+<ul>
+<li>mod_fcgid 配置<pre class="mark">我们将下载的 mod_fcgid-2.3.6-win32-x86.zip 压缩包中的“mod_fcgid.so”文件复制到
+apache的“modules”目录。
+打开 httpd.conf 文件，在最后加入如下配置：
+
+    LoadModule fcgid_module modules/mod_fcgid.so
+    &lt;IfModule mod_fcgid.c&gt;
+        AddHandler fcgid-script .fcgi .php
+        #php.ini的存放目录
+        FcgidInitialEnv PHPRC &quot;E:/wamp/PHP&quot;
+        # 设置PHP_FCGI_MAX_REQUESTS大于或等于FcgidMaxRequestsPerProcess，防止php-cgi进程在处理完所有请求前退出
+        FcgidInitialEnv PHP_FCGI_MAX_REQUESTS 1000
+        #php-cgi每个进程的最大请求数
+        FcgidMaxRequestsPerProcess 1000
+        #php-cgi最大的进程数
+        FcgidMaxProcesses 5
+        #最大执行时间
+        FcgidIOTimeout 120
+        FcgidIdleTimeout 120
+        #php-cgi的路径
+        FcgidWrapper &quot;E:/wamp/PHP/php-cgi.exe&quot; .php
+        AddType application/x-httpd-php .php
+    &lt;/IfModule&gt;
+
+
+修改DocumentRoot 路径的配置为：
+
+    &lt;Directory &quot;E:/wamp/www&quot;&gt;  
+        Options Indexes FollowSymLinks ExecCGI  
+        Order allow,deny  
+        Allow from all  
+        AllowOverride All  
+    &lt;/Directory&gt;  
+
+</pre></li>
+</ul>
+
+<ul>
+<li>修改目录首页文件<pre class="mark">在配置文件 httpd.conf 中查找 DirectoryIndex index.html 将其修改成：
+
+    DirectoryIndex index.html index.htm index.php
+
+DirectoryIndex 指的是当客户浏览器访问的路径是一个目录时，Apache默认执行的文件。
+以我们所修改的为例：当客户浏览器访问一个目录时，Apache会去找该目录下的index.html，
+如果没有再找index.htm，还没有再找 index.php。都找不到则默认显示该目录下的文件列表。
+
+</pre>
+<li>参考文档：如果防止Apache显示文件列表[<a href="http://www.admin10000.com/document/71.html">http://www.admin10000.com/document/71.html</a>]<h2><a name="id4">第四步：配置PHP(修改完php.ini记得重新启动Apache服务)</a></h2></li>
+</li>
+</ul>
+<pre class="mark">    打开PHP安装目录，即E:\wamp\PHP，我们可以看到目录下有两个这样的文件 php.ini-development 
+和 php.ini-production，第一个是开发使用的配置文件，第二个是生产环境的配置，因为我们是在本机
+做开发，所以选择前者。将php.ini-development复制一份到同目录下，并改名为 php.ini。这个php.ini
+就是当前使用的配置文件，以下几步都是在修改这个php.ini文件的内容。要注意的是，修改php.ini文件
+后需重新启动Apache服务，新设置才会生效。
+</pre>
+<ul>
+<li>指定PHP扩展库的存放目录<pre class="mark">在Windows下PHP的扩展库通常以 DLL 形式存放在PHP的ext目录中。
+使用文本工具打开php.ini文件，查找extension_dir = &quot;ext&quot;，也就是
+在 On windows 下面那一行。把它前面的分号“;”去除掉，改为如下：
+
+             extension_dir = &quot;E:/wamp/PHP/ext&quot;
+
+extension_dir 表示PHP扩展库的具体目录，以便调用相应的DLL文件。
+
+</pre>
+<li>开启相应的扩展库<pre class="mark">默认情况下许多PHP的扩展库都是关闭的，比如默认PHP不支持连接
+Mysql数据库，需开启相应的扩展库。这里我们开启一些常用的扩展库.
+查找 ; Windows Extensions（大概在941行），在它的下面是extension
+列表。找到如下扩展：
+
+        ;extension=php_curl.dll
+        ;extension=php_gd2.dll
+        ;extension=php_mbstring.dll
+        ;extension=php_exif.dll
+        ;extension=php_mysql.dll
+        ;extension=php_mysqli.dll
+        ;extension=php_pdo_mysql.dll
+        ;extension=php_pdo_odbc.dll
+        ;extension=php_sockets.dll
+        ;extension=php_xmlrpc.dll
+        ;extension=php_xsl.dll
+
+把以上extension 前面的分号 “;” 去掉。如果你希望加载其它扩展模块，方法相同，
+只要去掉前面的分号即可。
+
+提示1：重启Apache提示 “unable to load dynamic library......php_curl.dll”，
+        加载php_curl.dll错误。解决方法是拷贝 PHP 目录下的 libeay32.dll 和 
+        ssleay32.dll 到 windows 目录或 windows/system32 目录下，只要是
+        系统 Path 环境变量里包含的路径就可以。如果不想拷贝，你也可以直接
+        把 PHP 路径放到系统 Path 环境变量里。 右击我的电脑=&gt;属性=&gt;高级=&gt;环境变量=&gt;系统变量里有个Path，
+        双击打开，把你的PHP路径加个分号“;”再前面（ ;E:\wamp\PHP ），
+        添加进去就OK了。重启Apache不再提示该错误。
+             
+提示2：Exif 扩展是用来显示图片的 exif 信息的，因为该扩展需要 mbstring.dll 
+        支持，所以必须将 extension=php_exif.dll 这一行写到extension=php_mbstring.dll 的后面
+            
+提示3：如果PHP自带的扩展库不能满足你的需要，你可以去 pecl.php.net 查找并
+        下载你需要的库。windows用户可以去 pecl4win.php.net 或者 http://downloads.php.net/pierre/ 
+        下载已经编译好的DLL文件，也可以去http://museum.php.net/php5/ 载PECL集合压缩包。
+            
+提示4：很多人在找php_zip.dll，其实从php5.3开始已经集成了zip扩展，你可以用&lt;?php phpinfo()  ?&gt;
+        找到zip扩展的说明。
+</pre>
+<li>让PHP支持短标签<pre class="mark">在 php.ini 配置文件查找 short_open_tag = Off （大概在266行）把它修改成：short_open_tag = On 让其支持短标签。
+php的代码一般包含在&lt;?php .... ?&gt;的标签内，设置 short_open_tag = On 之后，可以写成更简洁的形式：&lt;? .... ?&gt;。
+</pre></li>
+</li>
+</li>
+</ul>
+
+<ul>
+<li>配置PHP的Session功能<pre class="mark">在使用session功能时，我们必须配置session文件在服务器上的保存目录。
+我们需要为session建立一个可读写的目录，这个目录最好独立于网站目录之外。
+这里把目录上建在了E:\wamp\sessiontmp，然后在 php.ini 配置文件中找 
+;session.save_path = &quot;/tmp&quot; （大概在1467行），去掉前面的分号“;” ，改为如下：
+
+          session.save_path = &quot;E:/wamp/sessiontmp&quot;
+</pre>
+<li>配置PHP的文件上传功能<pre class="mark">同session一样，在使用PHP文件上传功能时，我们必须要指定一个临时文件夹以完成文件上传功能，否则文件上传功能会失败。
+我们建立一个可读写的目录文件夹 E:\wamp\fileuploadtmp，然后在 php.ini 配置文件中找到 
+;upload_tmp_dir = （大概875行），修改为：
+
+         upload_tmp_dir = &quot;E:/wamp/fileuploadtmp&quot;
+</pre>
+<p>PHP默认上传文件大小不超过2M，要想上传大于2M的文件，请参考文档  配置php.ini实现文件上传功能。[<a href="http://www.admin10000.com/document/69.html">http://www.admin10000.com/document/69.html</a>]
+<li>设置时区<pre class="mark">在 php.ini 配置文件查找 ;date.timezone = ，去掉前面的分号“;” 改为如下：
+
+        date.timezone = PRC
+date.timezone是PHP5.1开始新增加的配置参数，用来设置时区。默认date.timezone是被注释掉的，也就是默认时区是UTC格林威治标准时间。
+我们这里改为 date.timezone = PRC（PRC，People’s Republic of China，中华人民共和国），也就是日期使用中国的时区。这样可以解决时间相差八小时的问题。
+</pre><h2><a name="id5">第五步：测试</a></h2>将如下代码保存为index.php文件，放到E:\wamp\www目录下面。<pre class="mark">&lt;?php
+    echo phpinfo();
+?&gt;
+</pre><h2><a name="id6">第六步：安装ZendLoader</a></h2>下载ZendLoader.dll (下载地址 <a href="http://pan.baidu.com/s/11lh9H)">http://pan.baidu.com/s/11lh9H)</a> ，放置在PHP的ext目录下（推荐）编辑php.ini, 修改为<pre>[Zend.loader]
+zend_loader.enable=1
+zend_loader.disable_licensing=0
+zend_loader.obfuscation_level_support=3
+zend_loader.license_path=
+zend_extension=&quot;E:\wamp\PHP\ext\ZendLoader.dll&quot;
+</pre></li>
+</p>
+</li>
+</li>
+</ul>
+
+<p>把php.ini拷贝到C:\Windows (如果没有这步，无法运行加密的)增加环境变量　　
+<ul>
+<li>变量名：PHPRC  　　
+<li>变量值：（你PHP安装路径）：E:\wamp\PHP\  （如何添加环境变量，这里就不解说了）命令窗口 php -v出现<pre>Zend Engine v2.3.0, Copyright (c) 1998-2011 Zend Technologies说明Zend Guard Loader 
+</pre>没有运行起来，配置有问题。出现<pre>Zend Engine v2.3.0, Copyright (c) 1998-2011 Zend Technologies with Zend Guard Loader v3.3, Copyright (c) 1998-2010, by Zend Technologies
+</pre>说明 Zend Guard Loader成功。</li>
+</li>
+</ul>
+</p>
+<h2><a name="id7">最后一步：ecstore安装</a></h2>
+<p>ecstore ego版本的代码是有加密的，所以首先要配置解密工具，其次是获取授权文件，最后才能成功安装ecstore，具体步骤如下</p>
+<h3><a name="id8">获取ecstore源码安装包</a></h3><h3><a name="id9">配置授权文件</a></h3>
+<ul>
+<li>解密文件 developer.zl在安装包中/config/developer.zl下，配置php.ini文件。<pre>;zend_loader.license_path=
+zend_loader.license_path=E:/wamp/www/ecstores/config/developer.zl(这个是我的路径，按照你的路径配置)
+</pre><pre class="quote">    注意：同时运行ecstore1.2与ecstore2.0或者ocs时，请做一下配置，
+    zend_loader.license_path指向一个目录，该目录下同时包含两个developer.zl文件，一个是1.2，一个是2.0的。
+    请避免俩developer.zl文件重名，1.2的developer.zl改名为1.x.zl，2.0的developer.zl改名为2.x.zl，ocs的developer.zl改名为ocs.x.zl。
+    例如：zend_loader.license_path=&quot;d:/data/html/www/&quot;
+    &quot;d:/data/html/www/&quot;目录下存在ocs.150.zl、ecstore.12.zl、ecsotre.20.zl
+</pre>
+<ul>
+<li>重启Apache
+<li>查看phpinfo，看看授权文件是否配置成功</ul>
+
+<ol>
+<li>安装ecstore(dos命令行安装 和 网页安装)</ol>
+
+<ul>
+<li>手动安装采用的是dos命令安装，这个可以查看文档[<a href="http://ec-os.net/quickstart/notebook/new-project.html">http://ec-os.net/quickstart/notebook/new-project.html</a>]，文档里有具体的安装操作步骤
+<li>网页安装是通过网址解析路由来安装，安装网址是您网站的域名后跟”index.php/setup“，例如”localhost/ecstore/index.php/setup“</li>
+</li>
+</ul>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">第一步：下载安装的文件</a>
+    <li><a href="#id2" class="reference internal">第二步：安装文件</a>
+    <li><a href="#id3" class="reference internal">第三步：配置 Apache</a>
+    <li><a href="#id4" class="reference internal">第四步：配置PHP(修改完php.ini记得重新启动Apache服务)</a>
+    <li><a href="#id5" class="reference internal">第五步：测试</a>
+    <li><a href="#id6" class="reference internal">第六步：安装ZendLoader</a>
+    <li><a href="#id7" class="reference internal">最后一步：ecstore安装</a>
+        <ul>
+        <li><a href="#id8" class="reference internal">获取ecstore源码安装包</a>
+        <li><a href="#id9" class="reference internal">配置授权文件</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="window.html"
+                                  title="上一章">iis + windows单机部署(开发版本)</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="nginx_windows2.html"
+                                  title="下一章">nginx + windows单机部署(开发版本)</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="nginx_windows2.html" title="nginx + windows单机部署(开发版本)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="window.html" title="iis + windows单机部署(开发版本)" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ECstore部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      内存存储 cache(需开启MemCache服务) &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="开发手册" href="index.html" />
+
+        <link rel="next" title="kvstore" href="永久存储 kvstore(需开启MongoDB服务).html" />
+        <link rel="prev" title="file" href="文件相关 file(需开启Storage服务).html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="kvstore.html" title="永久存储 kvstore(需开启MongoDB服务)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="file.html" title="文件相关 file(需开启Storage服务)" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECAE</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">开发手册</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 内存存储 cache(需开启MemCache服务)</h1>
+            <h2><a name="id1">ecae_cache_read()</a></h2>
+<p><b>描述</b><pre class="mark">获取指定的$key值, 如果不存在返回 false
+</pre></p>
+
+<p><b>语法</b><pre>ecae_cache_read($key);
+</pre></p>
+
+<table class="docutils">
+<tr>
+<th>参数</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>$key</td>
+
+<td>string</td>
+</tr>
+</table>
+</table>
+
+<p>例子:<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;$key&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'newid'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$val&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">time</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">ecae_cache_write</span><span style="color: #007700">(</span><span style="color: #0000BB">$key</span><span style="color: #007700">,</span><span style="color: #0000BB">$val</span><span style="color: #007700">);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">ecae_cache_read</span><span style="color: #007700">(</span><span style="color: #0000BB">$key</span><span style="color: #007700">));<br /></span>
+</span>
+</code></div></p>
+
+<p>运行结果<pre>string(10) &quot;1319010930&quot;
+</pre></p>
+<h2><a name="id2">ecae_cache_write()</a></h2>
+<p><b>描述</b><pre class="mark">设置指定$key的值为$value, 返回值为 true 或 false
+</pre></p>
+
+<p><b>语法</b><pre>ecae_cache_write($key,$value)
+</pre></p>
+
+<table class="docutils">
+<tr>
+<th>参数</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>$key</td>
+
+<td>string 不可以为空</td>
+</tr>
+
+<tr>
+<td>$value</td>
+
+<td>string 可以为空</td>
+</tr>
+</table>
+</table>
+
+<p>例子:<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;$key&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'newid'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$val&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">time</span><span style="color: #007700">();<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">ecae_cache_write</span><span style="color: #007700">(</span><span style="color: #0000BB">$key</span><span style="color: #007700">,</span><span style="color: #0000BB">$val</span><span style="color: #007700">));<br /></span>
+</span>
+</code></div></p>
+
+<p>运行结果<pre>bool(true)
+</pre></p>
+<h2><a name="id3">ecae_cache_stats()</a></h2>
+<p><b>描述</b><pre class="mark">返回当前memcache的状态, 成功返回Array失败返回false
+</pre></p>
+
+<p><b>语法</b><pre>ecae_cache_stats()
+</pre></p>
+
+<table class="docutils">
+<tr>
+<th>返回数组的key</th>
+
+<th>相关说明</th>
+</tr>
+
+<tr>
+<td>pid</td>
+
+<td>Process id of this server process</td>
+</tr>
+
+<tr>
+<td>uptime</td>
+
+<td>Number of seconds this server has been running</td>
+</tr>
+
+<tr>
+<td>time</td>
+
+<td>Current UNIX time according to the server</td>
+</tr>
+
+<tr>
+<td>version</td>
+
+<td>Version string of this server</td>
+</tr>
+
+<tr>
+<td>rusage_user</td>
+
+<td>Accumulated user time for this process</td>
+</tr>
+
+<tr>
+<td>rusage_system</td>
+
+<td>Accumulated system time for this process</td>
+</tr>
+
+<tr>
+<td>curr_items</td>
+
+<td>Current number of items stored by the server</td>
+</tr>
+
+<tr>
+<td>total_items</td>
+
+<td>Total number of items stored by this server ever since it started</td>
+</tr>
+
+<tr>
+<td>bytes</td>
+
+<td>Current number of bytes used by this server to store items</td>
+</tr>
+
+<tr>
+<td>curr_connections</td>
+
+<td>Number of open connections</td>
+</tr>
+
+<tr>
+<td>total_connections</td>
+
+<td>Total number of connections opened since the server started running</td>
+</tr>
+
+<tr>
+<td>connection_structures</td>
+
+<td>Number of connection structures allocated by the server</td>
+</tr>
+
+<tr>
+<td>cmd_get</td>
+
+<td>Cumulative number of retrieval requests</td>
+</tr>
+
+<tr>
+<td>cmd_set</td>
+
+<td>Cumulative number of storage requests</td>
+</tr>
+
+<tr>
+<td>get_hits</td>
+
+<td>Number of keys that have been requested and found present</td>
+</tr>
+
+<tr>
+<td>get_misses</td>
+
+<td>Number of items that have been requested and not found</td>
+</tr>
+
+<tr>
+<td>bytes_read</td>
+
+<td>Total number of bytes read by this server from network</td>
+</tr>
+
+<tr>
+<td>bytes_written</td>
+
+<td>Total number of bytes sent by this server to network</td>
+</tr>
+
+<tr>
+<td>limit_maxbytes</td>
+
+<td>Number of bytes this server is allowed to use for storage</td>
+</tr>
+</table>
+</table>
+
+<p>例子<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">ecae_cache_stats</span><span style="color: #007700">());<br /></span>
+</span>
+</code></div></p>
+
+<p>返回结果<pre>array(2) {
+  [&quot;192.168.11.10:20022&quot;]=&gt;
+  array(39) {
+    [&quot;pid&quot;]=&gt;
+    string(5) &quot;15380&quot;
+    [&quot;uptime&quot;]=&gt;
+    string(5) &quot;81155&quot;
+    [&quot;time&quot;]=&gt;
+    string(10) &quot;1318997580&quot;
+    [&quot;version&quot;]=&gt;
+    string(5) &quot;1.4.6&quot;
+    [&quot;libevent&quot;]=&gt;
+    string(13) &quot;1.4.13-stable&quot;
+    [&quot;pointer_size&quot;]=&gt;
+    string(2) &quot;64&quot;
+    [&quot;rusage_user&quot;]=&gt;
+    string(8) &quot;0.007998&quot;
+    [&quot;rusage_system&quot;]=&gt;
+    string(8) &quot;0.011998&quot;
+    [&quot;curr_connections&quot;]=&gt;
+    string(2) &quot;10&quot;
+    [&quot;total_connections&quot;]=&gt;
+    string(3) &quot;113&quot;
+    [&quot;connection_structures&quot;]=&gt;
+    string(2) &quot;19&quot;
+    [&quot;cmd_get&quot;]=&gt;
+    string(2) &quot;21&quot;
+    [&quot;cmd_set&quot;]=&gt;
+    string(1) &quot;7&quot;
+    [&quot;cmd_flush&quot;]=&gt;
+    string(1) &quot;0&quot;
+    [&quot;get_hits&quot;]=&gt;
+    string(2) &quot;11&quot;
+    [&quot;get_misses&quot;]=&gt;
+    string(2) &quot;10&quot;
+    [&quot;delete_misses&quot;]=&gt;
+    string(1) &quot;0&quot;
+    [&quot;delete_hits&quot;]=&gt;
+    string(1) &quot;0&quot;
+    [&quot;incr_misses&quot;]=&gt;
+    string(1) &quot;0&quot;
+    [&quot;incr_hits&quot;]=&gt;
+    string(1) &quot;0&quot;
+    [&quot;decr_misses&quot;]=&gt;
+    string(1) &quot;0&quot;
+    [&quot;decr_hits&quot;]=&gt;
+    string(1) &quot;0&quot;
+    [&quot;cas_misses&quot;]=&gt;
+    string(1) &quot;0&quot;
+    [&quot;cas_hits&quot;]=&gt;
+    string(1) &quot;0&quot;
+    [&quot;cas_badval&quot;]=&gt;
+    string(1) &quot;0&quot;
+    [&quot;auth_cmds&quot;]=&gt;
+    string(1) &quot;0&quot;
+    [&quot;auth_errors&quot;]=&gt;
+    string(1) &quot;0&quot;
+    [&quot;bytes_read&quot;]=&gt;
+    string(4) &quot;4031&quot;
+    [&quot;bytes_written&quot;]=&gt;
+    string(5) &quot;63567&quot;
+    [&quot;limit_maxbytes&quot;]=&gt;
+    string(8) &quot;16777216&quot;
+    [&quot;accepting_conns&quot;]=&gt;
+    string(1) &quot;1&quot;
+    [&quot;listen_disabled_num&quot;]=&gt;
+    string(1) &quot;0&quot;
+    [&quot;threads&quot;]=&gt;
+    string(1) &quot;4&quot;
+    [&quot;conn_yields&quot;]=&gt;
+    string(1) &quot;0&quot;
+    [&quot;bytes&quot;]=&gt;
+    string(2) &quot;70&quot;
+    [&quot;curr_items&quot;]=&gt;
+    string(1) &quot;1&quot;
+    [&quot;total_items&quot;]=&gt;
+    string(1) &quot;7&quot;
+    [&quot;evictions&quot;]=&gt;
+    string(1) &quot;0&quot;
+    [&quot;reclaimed&quot;]=&gt;
+    string(1) &quot;0&quot;
+  }
+...
+...
+...
+</pre></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">ecae_cache_read()</a>
+    <li><a href="#id2" class="reference internal">ecae_cache_write()</a>
+    <li><a href="#id3" class="reference internal">ecae_cache_stats()</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="file.html"
+                                  title="上一章">文件相关 file(需开启Storage服务)</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="kvstore.html"
+                                  title="下一章">永久存储 kvstore(需开启MongoDB服务)</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="kvstore.html" title="永久存储 kvstore(需开启MongoDB服务)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="file.html" title="文件相关 file(需开启Storage服务)" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECAE</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">开发手册</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

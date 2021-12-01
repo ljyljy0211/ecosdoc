@@ -1,0 +1,742 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      订单 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="未归档" href="../index.html" />
+
+        <link rel="next" title="../desktop_controller" href="desktop_controller.html" />
+        <link rel="prev" title="../webshell" href="webshell.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../desktop_controller.html" title="desktop_controller" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../webshell.html" title="webshell" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 订单</h1>
+            <h2><a name="id1">保存订单时的数据结构</a></h2><pre>Array
+(
+    [order_id] =&gt; 20120220129928                                              //订单id
+    [member_id] =&gt; 10                                                         //购买会员id
+    [confirm] =&gt; N                                                            //
+    [status] =&gt; active
+    [pay_status] =&gt; 0
+    [ship_status] =&gt; 0
+    [is_delivery] =&gt; Y
+    [createtime] =&gt; 1329712821
+    [last_modified] =&gt; 1329712821
+    [memo] =&gt; 
+    [ip] =&gt; 127.0.0.1
+    [title] =&gt; 订单明细介绍
+    [shipping] =&gt; Array
+        (
+            [shipping_id] =&gt; 1
+            [is_protect] =&gt; false
+            [shipping_name] =&gt; 快递
+            [cost_shipping] =&gt; 10.00
+            [cost_protect] =&gt; 0.00
+        )
+
+    [payinfo] =&gt; Array
+        (
+            [pay_app_id] =&gt; deposit
+            [cost_payment] =&gt; 0.00
+        )
+
+    [currency] =&gt; CNY
+    [cur_rate] =&gt; 1.0000
+    [is_tax] =&gt; false
+    [tax_title] =&gt; 
+    [weight] =&gt; 0
+    [itemnum] =&gt; 4
+    [cost_item] =&gt; 584.00
+    [cost_tax] =&gt; 0
+    [total_amount] =&gt; 537.28
+    [cur_amount] =&gt; 537.28
+    [pmt_goods] =&gt; 0.00
+    [pmt_order] =&gt; 56.72
+    [discount] =&gt; 0.00
+    [payed] =&gt; 0.00
+    [score_u] =&gt; 0
+    [score_g] =&gt; 11680
+    [consignee] =&gt; Array
+        (
+            [name] =&gt; 123
+            [addr] =&gt; 上海市卢湾区123
+            [zip] =&gt; 
+            [telephone] =&gt; 
+            [mobile] =&gt; 123
+            [email] =&gt; 
+            [area] =&gt; mainland:上海/上海市/卢湾区:24
+            [r_time] =&gt; 任意日期任意时间段
+            [meta] =&gt; Array
+                (
+                )
+
+        )
+
+    [order_objects] =&gt; Array
+        (
+            [0] =&gt; Array
+                (
+                    [order_id] =&gt; 20120220129928
+                    [obj_type] =&gt; goods
+                    [obj_alias] =&gt; 商品区块
+                    [goods_id] =&gt; 12
+                    [bn] =&gt; P4C85ACA92DCE7
+                    [name] =&gt; TATA民族风小碎花坡跟凉鞋
+                    [price] =&gt; 298.000
+                    [quantity] =&gt; 1
+                    [amount] =&gt; 0.00
+                    [weight] =&gt; 0.00
+                    [score] =&gt; 5960.00
+                    [order_items] =&gt; Array
+                        (
+                            [0] =&gt; Array
+                                (
+                                    [products] =&gt; Array
+                                        (
+                                            [product_id] =&gt; 175
+                                        )
+
+                                    [goods_id] =&gt; 12
+                                    [order_id] =&gt; 20120220129928
+                                    [item_type] =&gt; product
+                                    [bn] =&gt; P4C85ACA92DCE7
+                                    [name] =&gt; TATA民族风小碎花坡跟凉鞋
+                                    [type_id] =&gt; 5
+                                    [cost] =&gt; 168.000
+                                    [quantity] =&gt; 1.00
+                                    [sendnum] =&gt; 0
+                                    [amount] =&gt; 298.00
+                                    [score] =&gt; 5960.00
+                                    [price] =&gt; 298.00
+                                    [g_price] =&gt; 298.00
+                                    [weight] =&gt; 
+                                    [addon] =&gt; a:1:{s:12:&quot;product_attr&quot;;a:2:{i:1;a:2:{s:5:&quot;label&quot;;s:6:&quot;颜色&quot;;s:5:&quot;value&quot;;s:9:&quot;米黄色&quot;;}i:3;a:2:{s:5:&quot;label&quot;;s:6:&quot;尺码&quot;;s:5:&quot;value&quot;;s:2:&quot;35&quot;;}}}
+                                )
+
+                        )
+
+                )
+
+            [1] =&gt; Array
+                (
+                    [order_id] =&gt; 20120220129928
+                    [obj_type] =&gt; goods
+                    [obj_alias] =&gt; 商品区块
+                    [goods_id] =&gt; 61
+                    [bn] =&gt; P4C933FC5D97E6
+                    [name] =&gt; 抽绳连体背带短裤
+                    [price] =&gt; 99.000
+                    [quantity] =&gt; 1
+                    [amount] =&gt; 0.00
+                    [weight] =&gt; 0.00
+                    [score] =&gt; 1980.00
+                    [order_items] =&gt; Array
+                        (
+                            [0] =&gt; Array
+                                (
+                                    [products] =&gt; Array
+                                        (
+                                            [product_id] =&gt; 444
+                                        )
+
+                                    [goods_id] =&gt; 61
+                                    [order_id] =&gt; 20120220129928
+                                    [item_type] =&gt; product
+                                    [bn] =&gt; P4C933FC5D97E6
+                                    [name] =&gt; 抽绳连体背带短裤
+                                    [type_id] =&gt; 2
+                                    [cost] =&gt; 0.000
+                                    [quantity] =&gt; 1.00
+                                    [sendnum] =&gt; 0
+                                    [amount] =&gt; 99.00
+                                    [score] =&gt; 1980.00
+                                    [price] =&gt; 99.00
+                                    [g_price] =&gt; 99.00
+                                    [weight] =&gt; 
+                                    [addon] =&gt; a:1:{s:12:&quot;product_attr&quot;;a:2:{i:1;a:2:{s:5:&quot;label&quot;;s:6:&quot;颜色&quot;;s:5:&quot;value&quot;;s:6:&quot;黑色&quot;;}i:2;a:2:{s:5:&quot;label&quot;;s:6:&quot;尺码&quot;;s:5:&quot;value&quot;;s:1:&quot;L&quot;;}}}
+                                )
+
+                        )
+
+                )
+
+        )
+
+    [order_pmt] =&gt; Array
+        (
+            [0] =&gt; Array
+                (
+                    [pmt_id] =&gt; 1
+                    [order_id] =&gt; 20120220129928
+                    [pmt_type] =&gt; order
+                    [pmt_amount] =&gt; 46.72
+                    [pmt_memo] =&gt; 全场购物满100打8折！
+                    [pmt_describe] =&gt; 全场购物满100打8折
+                )
+
+            [1] =&gt; Array
+                (
+                    [pmt_id] =&gt; 3
+                    [order_id] =&gt; 20120220129928
+                    [pmt_type] =&gt; coupon
+                    [pmt_amount] =&gt; 10
+                    [pmt_memo] =&gt; 优惠劵规则-测试1
+                    [pmt_describe] =&gt; 所有订单免运费
+                )
+
+        )
+
+)
+
+</pre>
+<p>以下为数据结构具体解析</p>
+
+<table class="docutils">
+<tr>
+<th>键值</th>
+
+<th>类型</th>
+
+<th>说明</th>
+
+<th>示例</th>
+</tr>
+
+<tr>
+<td>order_id</td>
+
+<td></td>
+
+<td>订单id</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>member_id</td>
+
+<td></td>
+
+<td>会员id</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>confirm</td>
+
+<td></td>
+
+<td></td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>status</td>
+
+<td></td>
+
+<td>订单状态</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>pay_status</td>
+
+<td></td>
+
+<td>支付状态</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>ship_status</td>
+
+<td></td>
+
+<td>送货状态</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>is_delivery</td>
+
+<td></td>
+
+<td></td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>createtime</td>
+
+<td></td>
+
+<td>创建时间</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>last_modified</td>
+
+<td></td>
+
+<td>最后更新时间</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>memo</td>
+
+<td></td>
+
+<td></td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>ip</td>
+
+<td></td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>title</td>
+
+<td></td>
+
+<td>定点描述</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>shipping</td>
+
+<td></td>
+
+<td>配送方式信息</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>payinfo</td>
+
+<td></td>
+
+<td>支付方式信息</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>currency</td>
+
+<td></td>
+
+<td>货币</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>cur_rate</td>
+
+<td></td>
+
+<td>货币比率</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>is_tax</td>
+
+<td></td>
+
+<td></td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>tax_title</td>
+
+<td></td>
+
+<td></td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>weight</td>
+
+<td></td>
+
+<td>货物称重</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>itemnum</td>
+
+<td></td>
+
+<td>购买数量</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>cost_item</td>
+
+<td></td>
+
+<td>成本费</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>cost_tax</td>
+
+<td></td>
+
+<td>成本税金</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>total_amount</td>
+
+<td></td>
+
+<td>订单总价格</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>cur_amount</td>
+
+<td></td>
+
+<td>支付总金额</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>pmt_goods</td>
+
+<td></td>
+
+<td>商品优惠额</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>pmt_order</td>
+
+<td></td>
+
+<td>订单优惠额</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>discount</td>
+
+<td></td>
+
+<td>折扣</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>payed</td>
+
+<td></td>
+
+<td>已支付金额</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>score_u</td>
+
+<td></td>
+
+<td></td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>score_g</td>
+
+<td></td>
+
+<td></td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>consignee</td>
+
+<td></td>
+
+<td>送货信息</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>order_objects</td>
+
+<td></td>
+
+<td>订单区域块</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>order_pmt</td>
+
+<td></td>
+
+<td></td>
+
+<td></td>
+</tr>
+</table>
+</table>
+<h2><a name="id2">支付订单时的数据结构</a></h2><pre>Array
+(
+    [order_id] =&gt; 20120220115385
+    [payinfo] =&gt; Array
+        (
+            [pay_app_id] =&gt; alipay
+            [cost_payment] =&gt; 0.00
+        )
+
+    [total_amount] =&gt; 601.56
+    [cur_amount] =&gt; 601.56
+)
+Array
+(
+    [order_id] =&gt; 20120220115385
+    [money] =&gt; 601.56
+    [currency] =&gt; CNY
+    [cur_money] =&gt; 601.56
+    [cur_rate] =&gt; 1.0000
+    [cur_def] =&gt; ￥
+    [pay_app_id] =&gt; alipay
+    [cost_payment] =&gt; 0.000
+    [cur_amount] =&gt; 601.56
+    [memo] =&gt; 
+    [payment_id] =&gt; 13298189406354
+    [member_id] =&gt; 10
+    [pay_object] =&gt; order
+    [shopName] =&gt; 点此设置您商店的名称
+    [total_amount] =&gt; 601.560
+    [payed] =&gt; 0.000
+    [payinfo] =&gt; Array
+        (
+            [cost_payment] =&gt; 0.000
+        )
+
+    [rel_id] =&gt; 20120220115385
+    [return_url] =&gt; /ecstore_bugfix/index.php/paycenter-result-13298189406354.html
+    [status] =&gt; ready
+    [account] =&gt; 点此设置您商店的名称
+    [bank] =&gt; 支付宝
+    [pay_account] =&gt; 非会员顾客
+    [paycost] =&gt; 0.000
+    [pay_type] =&gt; online
+    [pay_name] =&gt; 支付宝
+    [pay_ver] =&gt; 1.0
+    [op_id] =&gt; 10
+    [ip] =&gt; 127.0.0.1
+    [t_begin] =&gt; 1329818941
+    [t_payed] =&gt; 1329818941
+    [t_confirm] =&gt; 1329818941
+    [trade_no] =&gt; 
+    [orders] =&gt; Array
+        (
+            [0] =&gt; Array
+                (
+                    [rel_id] =&gt; 20120220115385
+                    [bill_type] =&gt; payments
+                    [pay_object] =&gt; order
+                    [bill_id] =&gt; 13298189406354
+                    [money] =&gt; 601.56
+                )
+
+        )
+
+)
+
+</pre>
+<table class="docutils">
+<tr>
+<th>键值</th>
+
+<th>类型</th>
+
+<th>说明</th>
+
+<th>示例</th>
+</tr>
+</table>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">保存订单时的数据结构</a>
+    <li><a href="#id2" class="reference internal">支付订单时的数据结构</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../webshell.html"
+                                  title="上一章">webshell</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../desktop_controller.html"
+                                  title="下一章">desktop_controller</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../desktop_controller.html" title="desktop_controller" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../webshell.html" title="webshell" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

@@ -1,0 +1,242 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      集群概述 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="集群部署文档" href="index.html" />
+
+        <link rel="next" title="network" href="配置网络.html" />
+        <link rel="prev" title="index" href="集群部署文档.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="network.html" title="配置网络" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="集群部署文档" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">集群部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 集群概述</h1>
+            <h2><a name="id1">时间节点</a></h2>
+<p>2011年
+<ul>
+<li>11/28 安装centos5.5 配置网络
+<li>11/29 搭建lnmp服务器，安装配置lvs
+<li>11/30 安装配置memcache
+<li>11/31 安装配置flare
+<li>12/1~12/7 部署ecstore</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</p>
+
+<p>部署ecstore过程中出现mysql主从同步问题, 花了一天时间解决, 在文档中有注意事项. 再来部署ecstore在同步方法上最终选择使用rsync脚本同步.</p>
+<h2><a name="id2">角色分配</a></h2>
+<p>一共三台机器, 操作系统为CENTOS 5.5 其中双网卡的机器ecos01(外网ip:192.168.51.119/内网ip:10.0.0.1)作内网跳板机, 也作为负载均衡机.</p>
+
+<p>另外两台机器ecos02(ip:10.0.0.2) ecos03(ip:10.0.0.3)为Web服务器, 当中的ecos02为mysql主服务器  ecos03为flare主服务器.</p>
+
+<p>服务器角色
+<table class="docutils">
+<tr>
+<th>服务名称</th>
+
+<th>软件名称</th>
+
+<th>机器分配</th>
+</tr>
+
+<tr>
+<td>负载均衡设备</td>
+
+<td>lvs(vs/nat)</td>
+
+<td>ecos01</td>
+</tr>
+
+<tr>
+<td>php应用服务器</td>
+
+<td>nginx php fastcgi</td>
+
+<td>ecos02/ecos03</td>
+</tr>
+
+<tr>
+<td>数据库服务器</td>
+
+<td>mysql</td>
+
+<td>ecos02主/ecos03从</td>
+</tr>
+
+<tr>
+<td>缓存服务</td>
+
+<td>memcached</td>
+
+<td>ecos02/ecos03</td>
+</tr>
+
+<tr>
+<td>图片存储 / kv存储数据库</td>
+
+<td>flare</td>
+
+<td>ecos03主/ecos02从</td>
+</tr>
+
+<tr>
+<td>网站数据同步</td>
+
+<td>rsync</td>
+
+<td>ecos01</td>
+</tr>
+
+<tr>
+<td>Mysql数据同步</td>
+
+<td>mysqldump</td>
+
+<td>ecos01</td>
+</tr>
+</table>
+</p>
+</table>
+<h2><a name="id3">应用部署图</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="imgs/server.png" /></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">时间节点</a>
+    <li><a href="#id2" class="reference internal">角色分配</a>
+    <li><a href="#id3" class="reference internal">应用部署图</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">集群部署文档</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="network.html"
+                                  title="下一章">配置网络</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="network.html" title="配置网络" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="集群部署文档" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">集群部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

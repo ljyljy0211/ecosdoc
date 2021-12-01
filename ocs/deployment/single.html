@@ -1,0 +1,328 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      OCS - 安装部署手册 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="系统部署" href="index.html" />
+
+        <link rel="next" title="cluster" href="OCS - 集群部署手册.html" />
+        <link rel="prev" title="index" href="系统部署.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="cluster.html" title="OCS - 集群部署手册" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="系统部署" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">OCS开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">系统部署</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> OCS - 安装部署手册</h1>
+            <h2><a name="id1">OCS系统安装环境说明</a></h2>
+<p>与一般的软件不同，运行OCS需要特殊的环境支持，如果环境不适合，则安装会无法进行。本小节包括5部分，通过本节说明，您可以了解到OCS运行的具体环境要求与参数。</p>
+
+<ul>
+<li>安装环境要求
+<li>php环境下必须要启用的函数
+<li>Nginx下配置环境的需求
+<li>目录结构说明
+<li>安装过程中出现zend乱码的原因</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+<h3><a name="id2">安装环境要求</a></h3>
+<ul>
+<li>服务器环境：Linux、Unix均可，推荐Linux
+<li>Web环境：Apache、Nginx均可，推荐Nginx
+<li>语言环境：PHP 5.3.0 及以上
+<li>数据库：MySQL 5.0 及以上（如果采用MySQL数据库）
+<li>其他：Zend Guard Loader 5.5.0及以上</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+
+<p>推荐使用软件环境：Linux + Nginx + PHP5.3* + MySQL5.1*</p>
+<h3><a name="id3">PHP环境下必须要启用的函数</a></h3>
+<p>在Php配置文件php.ini中设置开启如下函数，如果不开启，则某些功能会有影响
+<ul>
+<li>allow_url_fopen，
+<li>GD扩展库
+<li>MySQL扩展库
+<li>系统函数 —— phpinfo、dir</li>
+</li>
+</li>
+</li>
+</ul>
+</p>
+<h3><a name="id4">Nginx下配置环境的需求</a></h3>
+<p>OCS采用pathinfo做资源定位，所以要求$_SERVER环境变量中必须要有PATHINFO或则ORGI_PATHINFO</p>
+
+<p>一般在apache或者iis下都没有什么问题，但是在nginx下需要对配置文件做一些设置才可以</p>
+
+<p>这些设置主要是在php fast cgi的配置文件中，设置代码为</p>
+<pre>set $real_script_name $fastcgi_script_name;
+if ($fastcgi_script_name ~ &quot;(.+?\.php)(/.+)&quot;) {
+set $real_script_name $1;
+set $path_info $2; }
+fastcgi_param SCRIPT_FILENAME $document_root$real_script_name;
+fastcgi_param SCRIPT_NAME $real_script_name;
+fastcgi_param PATH_INFO $path_info;
+</pre><h3><a name="id5">基本目录结构说明</a></h3><pre>/
+../app 基于ECOS上建立的所有的app的集合
+../config 系统配置文件目录，需要设置为可写
+../data 系统运行过程中产生的数据缓存
+../public 用于存放上传的图片、文本
+../script 存放ocs脚本，包含集群部署的升级脚本以及后台定时脚本等
+</pre><h3><a name="id6">安装过程中出现zend乱码的原因</a></h3>
+<p>安装OCS系统时，有时会出现以下乱码问题：<br /><img border="0" alt="" align="middle" src="images/s-001.png" /></p>
+
+<p>说明：OCS核心程序用zend guard进行了加密，安装的服务器必须安装Zend Optimizer 2.5.7以上版本进行解密后才能正常解析并运行OCS程序。</p>
+
+<p>出现上述问题的可能原因：</p>
+
+<ul>
+<li>服务器未安装zend，此情况多出现在国外服务器
+<li>服务器中已安装的zend失效
+<li>服务器中已安装的zend版本过低</li>
+</li>
+</li>
+</ul>
+<h2><a name="id7">单机环境下安装OCS系统</a></h2>
+<p>OCS系统只有安装后才可以正常使用，一般情况下只要满足如下三个条件就可以正常安装了。
+<ul>
+<li>能够支持OCS系统运行的系统环境：php环境、mysql环境。
+<li>一个可以访问到系统的域名。
+<li>拥有服务器FTP权限或者SSH权限、数据库信息。</li>
+</li>
+</li>
+</ul>
+</p>
+
+<p>本小节包括7部分，通过本节操作，您可以在服务器上顺利安装OCS，并可进行后续操作。
+<ul>
+<li>获得OCS系统安装程序
+<li>获得服务器FTP权限或者SSH权限，并将代码上传至web目录
+<li>设置定时脚本
+<li>输入系统绑定的域名开始安装
+<li>填写获得的数据用户名及密码
+<li>安装系统运行所需要组件
+<li>完成安装</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</p>
+<h3><a name="id8">获得OCS系统安装程序</a></h3>
+<p>通过ShopEx网站提供的链接或通道，获得OCS安装程序，并解压做好上传准备。</p>
+<h3><a name="id9">获得服务器FTP权限或者SSH权限及数据库信息，并上传代码准备安装</a></h3>
+<p>一般系统运维人员会给出服务器的FTP权限或者SSH权限供您上传代码文件，登录服务器后，将文件正确的传输到系统设定的web目录下。如果采用FTP方式传输文件，请注意文件必须使用二进制模式传输。以FlashFXP为例：</p>
+
+<p>依次点击 选项-参数设置</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/s-002.png" /></p>
+
+<p>然后在界面中点击 传送，设置传送方式为二进制</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/s-003.png" /></p>
+
+<p>如果安装时出现 Unable to read 12321 bytes…..这样的提示，则上传方式肯定不是二进制，请重新设</p>
+<pre class="quote">注意：代码文件中config、data、public目录必须有可写权限
+</pre><h3><a name="id10">设置定时脚本</a></h3>
+<p>询问系统运维，获取SSH权限，在服务器上设置定时脚本，方式如下：</p>
+<h4><a name="id11">Linux设置方式</a></h4>
+<p>以root权限执行crontab –u web用户 -e<pre>* * * * * sh /data/httpd/ocs/script/cronjob/crontab.sh /usr/local/php/bin/php &gt;/dev/null
+</pre></p>
+<pre class="quote">红色部分是系统web服务的用户名、ocs系统的web路径以及php命令执行路径，请配置正确。
+</pre><h3><a name="id12">输入系统绑定的域名开始安装</a></h3>
+<p><br /><img border="0" alt="" align="middle" src="images/s-004.png" /></p>
+
+<p>点击“开始安装”</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/s-005.png" /></p>
+
+<p>浏览协议后继续</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/s-006.png" /></p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/s-007.png" /></p>
+
+<p>请填写相应的数据库配置信息以及管理员账户的设置</p>
+
+<ul>
+<li>说明
+<ul>
+<li>如果数据库信息不正确，此界面中不会出现数据库名，需要与系统运维确认。
+<li>此处设置的管理员拥有系统最高权限。</li>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>安装中</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/s-008.png" /></p>
+
+<p>安装完成，填写ShopEx通行证</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/s-009.png" /></p>
+
+<p>登录成功</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/s-010.png" /></p>
+
+<p>安装完成</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/s-011.png" /></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">OCS系统安装环境说明</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">安装环境要求</a>
+        <li><a href="#id3" class="reference internal">PHP环境下必须要启用的函数</a>
+        <li><a href="#id4" class="reference internal">Nginx下配置环境的需求</a>
+        <li><a href="#id5" class="reference internal">基本目录结构说明</a>
+        <li><a href="#id6" class="reference internal">安装过程中出现zend乱码的原因</a>
+    </ul>
+    <li><a href="#id7" class="reference internal">单机环境下安装OCS系统</a>
+        <ul>
+        <li><a href="#id8" class="reference internal">获得OCS系统安装程序</a>
+        <li><a href="#id9" class="reference internal">获得服务器FTP权限或者SSH权限及数据库信息，并上传代码准备安装</a>
+        <li><a href="#id10" class="reference internal">设置定时脚本</a>
+            <ul>
+            <li><a href="#id11" class="reference internal">Linux设置方式</a>
+        </ul>
+        <li><a href="#id12" class="reference internal">输入系统绑定的域名开始安装</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">系统部署</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="cluster.html"
+                                  title="下一章">OCS - 集群部署手册</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="cluster.html" title="OCS - 集群部署手册" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="系统部署" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">OCS开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">系统部署</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

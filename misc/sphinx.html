@@ -1,0 +1,435 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      sphinx &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="未归档" href="index.html" />
+
+        <link rel="next" title="ued/index" href="后台finder JS运用.html" />
+        <link rel="prev" title="export-import" href="导入导出.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="ued/index.html" title="后台finder JS运用" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="export-import.html" title="导入导出" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> sphinx</h1>
+            <h3><a name="id1">sphinx 相关介绍</a></h3>
+<ul>
+<li>什么是sphinx ?<pre class="mark">Sphinx是一个基于SQL的全文检索引擎，可以结合MySQL或PostgreSQL做全文搜索，它可以提供比数据库本身更专业的搜索功能，
+使得应用程序更容易实现专业化的全文检索。Sphinx特别为一些脚本语言设计搜索API接口，如PHP,Python,Perl,Ruby等，
+同时为MySQL也设计了一个存储引擎插件。
+</pre>
+<li>sphinx 特性<pre class="mark"> 高速索引 (在新款CPU上,近10 MB/秒);
+ 高速搜索 (2-4G的文本量中平均查询速度不到0.1秒
+ 高可用性 (单CPU上最大可支持100 GB的文本,100M文档);
+ 提供良好的相关性排名
+ 支持分布式搜索;
+ 提供文档摘要生成;
+ 提供从MySQL内部的插件式存储引擎上搜索
+ supports boolean, phrase, and word proximity queries;
+ 支持每个文档多个全文检索域(默认最大32个);
+ 支持每个文档多属性;
+ 支持断词;
+ 支持单字节编码与UTF-8编码;
+ supports English stemming, Russian stemming, and Soundex for morphology;
+ 支持MySQL(MyISAM和InnoDB 表都支持);
+ 支持PostgreSQL.
+</pre>
+<li>sphinx  支持平台 和应用范围<pre class="mark"> 1 Linux Window  freeBS   Solari  Mac OS   几乎所有的系统平台都可以布署sphinx
+ 2 一般会用在 CMS文章 论坛BBS  电子商务产品 产品类 数据统计
+</pre></li>
+</li>
+</li>
+</ul>
+
+<ul>
+<li>获取安装包<pre class="mark">  Sphinx 可以从官方网站 http://www.sphinxsearch.com/ 下载,支持中文分词的 Sphinx 可以从
+  http://www.coreseek.com/ 下载
+</pre></li>
+</ul>
+
+<ul>
+<li>安装包含的软件<pre class="mark"> indexer: 用于创建全文索引;
+ search:  一个简单的命令行(CLI) 的测试程序,用于测试全文索引;
+ searchd: 一个守护进程,其他软件可以通过这个守护进程进行全文检索;
+ sphinxapi: 一系列 searchd 的客户端 API 库,用于流行的 Web 脚本开发语言(PHP, Python, Perl, Ruby)
+</pre></li>
+</ul>
+<h3><a name="id2">sphinx.conf 配置</a></h3>
+<ul>
+<li>sphinx-min.conf</li>
+</ul>
+
+<p>先看看最简单的配置 也就是一些必要的配置<pre>source src1 #源名称  指定数据源
+{
+type = mysql #数据来源 数据库类型
+sql_host = localhost #数据库主机地址(如果是外网,请确保防火墙允许链接)
+sql_user = root # 数据库用户名
+sql_pass =    # 数据库密码
+sql_db	= twitter #所调用的数据库名称
+sql_port = 3306	# optional, default is 3306
+
+#预先设置查询数据库编码为utf8
+sql_query_pre           = SET NAMES utf8
+
+#根据以下sql语句建立索引
+sql_query	= 	SELECT twitter_id, user_id,content FROM sdb_twitter_twitter
+#声明无符号整数属性(attribute)。可选项。仅适用于SQL 数据源(mysql 和 pgsql)。
+sql_attr_uint	= user_id
+
+#文档信息查询 仅对mysql数据源有效 用于调试目的
+sql_query_info	= SELECT * FROM sdb_twitter_twitter WHERE twitter_id=$id
+}
+
+index test1 #索引名称
+{
+source	= src1 #数据源名称
+path	= /usr/local/webserver/csft/var/data/test1 #索引记录存放的目录
+docinfo	= extern #文档信息存放模式 可选项
+
+#中文分词配置
+charset_type  = zh_cn.utf-8 #默认启用中文分词功能；否则中文分词功能无效，使用sphinx的其他处理模式。
+charset_dictpath  = /data/software/mmseg-3.1/src/win32/ #词典文件的目录，该目录下必须有uni.lib词典文件存在
+ngram_len=0 #取消默认的一元字符切分模式，不对中文分词产生干扰
+#charset_table  如果使用了中文分词此项都要注释掉
+}
+
+indexer
+{
+mem_limit = 32M #索引过程内存使用限制 可选项 默认为32M
+}
+searchd
+{
+log	= /usr/local/webserver/csft/var/log/searchd.log  #searchd 运行时事件会被记录在这个日志文件中
+query_log = /usr/local/webserver/csft/var/log/query.log  #全部搜索查询会被记录在此文件中 默认为空
+max_children = 30 #子进程的最大数量(或者说,并行执行的搜索的数目 默认为0 不限制
+pid_file = /usr/local/webserver/csft/var/log/searchd.pid  #searchd 进程 ID 文件名  必选
+}
+</pre></p>
+
+<ul>
+<li>主索引 增量索引配置</li>
+</ul>
+
+<ul>
+<li>一些能提升性能的配置</li>
+</ul>
+<h3><a name="id3">sphinx 测试</a></h3>
+<ul>
+<li>初始化索引<pre class="mark"> 运行indexer 初始化配置文件中的所有index
+ /usr/local/webserver/csft/bin/indexer --all
+
+如果出现如下信息这表示创建成功
+
+Coreseek Full Text Server 3.1
+ Copyright (c) 2006-2008 coreseek.com
+ using config file '/usr/local/webserver/csft/etc/csft.conf'...
+ indexing index 'test1'...
+ collected 4 docs, 0.0 MB
+ sorted 0.0 Mhits, 100.0% done
+ total 4 docs, 52 bytes
+ total 0.016 sec, 3302.85 bytes/sec, 254.07 docs/sec
+ total 3 reads, 0.0 sec, 10.7 kb/read avg, 0.0 msec/read avg
+ total 7 writes, 0.0 sec, 0.1 kb/write avg, 0.0 msec/write avg
+
+</pre></li>
+</ul>
+
+<ul>
+<li>运行search 命令对索引进行检索</li>
+</ul>
+<pre class="mark">执行下面命令：
+sudo /usr/local/webserver/csft/bin/search 中文
+Coreseek Full Text Server 3.1
+ Copyright (c) 2006-2008 coreseek.com
+ using config file '/usr/local/webserver/csft/etc/csft.conf'...
+ index 'test1': query '中文 ': returned 1 matches of 1 total in 0.006 sec
+
+ displaying matches:
+ 1. document=3, weight=1, user_id=2
+     twitter_id=3
+     user_id=2
+     content=中文 我的是
+     tdate=1307925620
+     twitter_type=original
+     transmit_twitter_id=(NULL)
+
+    words:
+    1. '中文': 1 documents, 1 hits
+sql_query_pre           = SET NAMES utf8
+</pre>
+<ul>
+<li>使用API调用sphinx<pre class="mark">1 要保证searchd 守护进程运行
+
+开启searchd
+[wuwei@ecos7 ~]$ sudo /usr/local/webserver/csft/bin/searchd
+Coreseek Full Text Server 3.1
+ Copyright (c) 2006-2008 coreseek.com
+ using config file '/usr/local/webserver/csft/etc/csft.conf'...
+ listening on all interfaces, port=3312   //这是端口号 在连接服务器的时候要用的到,在新版本中端口号为 9312
+
+2 需要将 API 文件(位于 api/sphinxapi.php) 包含进你自己的脚本
+
+</pre></li>
+</ul>
+<h3><a name="id4">sphinx  API调用</a></h3>
+<p>在ecos中使用的是sphinx API 调用方式</p>
+<h4><a name="id5">sphinx 在ecos 中简单应用</a></h4>
+<p>此简单的对于sphin 在ecos中的使用,是一个测试例子在ecos中使用sphinx 一般情况下有两种常用的方式,一种是把sphinx集成到我们自己的app中.另一种是把sphinx做成一个独立的app<pre class="mark"> 场景：我们自己开发的一个app，这个app是twitter,我们需要跟一些简单的词语，句子，和一些条件能够搜索到相关的twitter.
+</pre></p>
+
+<ul>
+<li>sphinx集成到我们自己的app</li>
+</ul>
+
+<p>1. 配置我还是用的是前面的那个配置，因为只是一个简单的测试</p>
+
+<p>要搜索的表的结构如下图：<br /><img border="0" alt="" align="middle" src="image/1.png" />sql_query_pre           = SET NAMES utf82. 把sphinx集成到我们名为twitter的app中</p>
+<pre class="mark">  1. twitter/lib 下建立一个sphinx文件夹，
+  2. 在sphinx中建立两个文件,一个sphinx的接口文件sphinxapi.php，文件可以直接拷贝过来
+     一个则是根据sphinxapi方法封装的类search.php,如：连接sphinx服务器方法，搜索条件处理方法,
+     按照功能封装的搜索方法，搜索后返回去处理方法等。
+  3. 另外如果有需要可以把需要扩展的与sphinx相关的放在这里面
+
+</pre>
+<p>3. search.php 连接sphinx服务器</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">twitter_sphinx_search&nbsp;</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$name&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'sphinx搜索'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$servicename&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'twitter'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$description&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'基于sphinx开发的搜索引擎'</span><span style="color: #007700">;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">__construct</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(!</span><span style="color: #0000BB">class_exists</span><span style="color: #007700">(</span><span style="color: #DD0000">'sphinxclient'</span><span style="color: #007700">,</span><span style="color: #0000BB">false</span><span style="color: #007700">)){&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;这里第二个一定要用false,&nbsp;原因看class_exists方法<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">require(</span><span style="color: #0000BB">dirname</span><span style="color: #007700">(</span><span style="color: #0000BB">__FILE__</span><span style="color: #007700">).</span><span style="color: #DD0000">'/sphinxapi.php'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;下面这是获取配置信息&nbsp;因为是做测试所以把配置文件写死了哈,就没用到下面的配置<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;我们可以自己写规则&nbsp;用setConf定义配置信息，然后用getConf取出来就好<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/*<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$searchConf&nbsp;=&nbsp;unserialize(app::get('sphinx')-&gt;getConf('sphinxt_twitter_twitter'));<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$this-&gt;hosts&nbsp;=&nbsp;preg_split('/[,;\s]+/',&nbsp;$searchConf['sphinx_server']);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$this-&gt;index&nbsp;=&nbsp;$searchConf['sphinx_index'];<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$this-&gt;timeout&nbsp;=&nbsp;$searchConf['sphinx_time']?$searchConf['sphinx_time']:3;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$this-&gt;max_limit&nbsp;=&nbsp;$searchConf['sphinx_max_limit']&nbsp;?&nbsp;$searchConf['sphinx_max_limit']&nbsp;:&nbsp;1000;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">obj&nbsp;</span><span style="color: #007700">=&nbsp;new&nbsp;</span><span style="color: #0000BB">sphinxClient</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br /><br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">link</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">/*hosts&nbsp;=&nbsp;**&nbsp;*/<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">obj</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">SetServer</span><span style="color: #007700">(</span><span style="color: #DD0000">'192.168.51.119'</span><span style="color: #007700">,</span><span style="color: #0000BB">3312</span><span style="color: #007700">);&nbsp;</span><span style="color: #FF8000">//这是我的服务器所在地址，后面是端口号<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">obj</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">setMatchMode</span><span style="color: #007700">(</span><span style="color: #0000BB">SPH_MATCH_EXTENDED2</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br /></span>
+</span>
+</code></div>
+<p>在sphinxapi中提供了判断是否连接成功的方法status()，</p>
+
+<p>4. 连接好了现在开始搜索</p>
+
+<p>在controller中调用自己封装好的twitter_sphinx_search类 search.PHP,<pre>  public function index() {
+        //$_POST['keyword'],要搜索的词语
+        kernel::single('twitter_sphinx_search')-&gt;search_twitter($_POST['keyword']);
+    }
+</pre></p>
+
+<p>看看在 twitter_sphinx_search 类中封装好的search_twitter方法<pre>
+//一些有关搜索的sphinx API 方法可以看sphinx使用手册
+    function search_twitter($str){
+        $this-&gt;index = test1;
+        $this-&gt;link();
+        $data = $this-&gt;obj-&gt;Query($str,$this-&gt;index);
+        echo &quot;&lt;pre&gt;&quot;;
+        print_r($arr);
+    }
+
+</pre>这样我们可以得到一下结构数据：<pre class="mark">Array
+(
+    [error] =&gt;
+    [warning] =&gt;
+    [status] =&gt; 0
+    [fields] =&gt; Array
+        (
+            [0] =&gt; content
+        )
+
+    [attrs] =&gt; Array
+        (
+            [user_id] =&gt; 1sql_query_pre           = SET NAMES utf8
+        )
+
+    [matches] =&gt; Array
+        (
+            [2] =&gt; Array
+                (
+                    [weight] =&gt; 1466
+                    [attrs] =&gt; Array
+                        (
+                            [user_id] =&gt; 2
+                        )
+                )
+
+            [3] =&gt; Array
+                (
+                    [weight] =&gt; 1466
+                    [attrs] =&gt; Array
+                        (
+                            [user_id] =&gt; 2
+                        )
+                )
+            ......
+            .....
+            .....
+        )
+
+    [total] =&gt; 4
+    [total_found] =&gt; 4
+    [time] =&gt; 0.006
+    [words] =&gt; Array
+        (
+            [中文] =&gt; Array
+                (
+                    [docs] =&gt; 4
+                    [hits] =&gt; 4
+                )
+
+        )
+
+)
+</pre>这可以看出来我们只是把主键ID和user_id搜索出来了，要得到的具体的数据还是要处理完这个值，再根据ID到数据库中查询所要的数据</p>
+<pre class="mark">注: 因为这只是一个简单的测试，这只是能够使用。如果要做复杂的搜索，那么可以去看sphin提供的API看手册，手册上很详细了。
+    或者可以看下一的电子商务网站实例进行参考。
+</pre>
+<ul>
+<li>把sphinx做成一个单独的app(待补充)</li>
+</ul>
+
+<p>如果把sphinx做成一个单独的app，在配置 扩展中可以灵活很多，所以推荐把sphinx做成一个单独的app</p>
+
+<p>其中的写法和集成到一个app中差不多,这就不多做介绍</p>
+<h4><a name="id6">sphinx 中以API调用  在电子商务网站实例</a></h4>
+<p>项目分析</p>
+
+<ul>
+<li>在电子商务网站中商品数量多，数据量大:需要根据商品名称搜索
+<li>一些商品可能会属于多个商品种类:需要根据商品类型分组
+<li>每件商品会有多个属性:需要根据商品属性进行分组
+<li>需要根据价格区间搜索
+<li>需要根据价格，时间，销售数量，等属性进行排序</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+<pre class="mark">待续
+</pre>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+        <ul>
+        <li><a href="#id1" class="reference internal">sphinx 相关介绍</a>
+        <li><a href="#id2" class="reference internal">sphinx.conf 配置</a>
+        <li><a href="#id3" class="reference internal">sphinx 测试</a>
+        <li><a href="#id4" class="reference internal">sphinx  API调用</a>
+            <ul>
+            <li><a href="#id5" class="reference internal">sphinx 在ecos 中简单应用</a>
+            <li><a href="#id6" class="reference internal">sphinx 中以API调用  在电子商务网站实例</a>
+        </ul>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="export-import.html"
+                                  title="上一章">导入导出</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="ued/index.html"
+                                  title="下一章">后台finder JS运用</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="ued/index.html" title="后台finder JS运用" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="export-import.html" title="导入导出" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

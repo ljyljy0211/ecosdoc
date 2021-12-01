@@ -1,0 +1,1775 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      前端组件 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../../doc.html" />
+    <link rel="up" title="视图(view)" href="../v.html" />
+
+        <link rel="next" title="../c" href="控制器(controller).html" />
+        <link rel="prev" title="../v" href="视图(view).html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../c.html" title="控制器(controller)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../v.html" title="视图(view)" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">MVC框架</a> &raquo;
+        </li>
+                <li>
+          <a href="../v.html">视图(view)</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 前端组件</h1>
+            
+<p>在视图层, 出于对性能和易用性的平衡, 没有直接采用smarty, 而是用了自行开发的tramsy模板机制, 语法上基本忠于smarty, smarty的几种类型插件同样支持. 扩展方式采用service机制进行扩展.</p>
+
+<p>我们目前支持的smarty的语法和插件:</p>
+<h2><a name="id1">inline function</a></h2><h3><a name="id2">assign</a></h3><pre class="mark">概述:       用于在模板被执行时为模板变量赋值.
+</pre>
+<table class="docutils">
+<tr>
+<td>属性</td>
+
+<td>类型</td>
+
+<td>是否必须</td>
+
+<td>描述</td>
+</tr>
+
+<tr>
+<td>var</td>
+
+<td>string</td>
+
+<td>yes</td>
+
+<td>被赋值的变量名</td>
+</tr>
+
+<tr>
+<td>value</td>
+
+<td>string</td>
+
+<td>yes</td>
+
+<td>赋给变量的值</td>
+</tr>
+</table>
+</table>
+
+<p>assign 演示<pre>&lt;{assign var=&quot;age&quot; value=20}&gt;
+&lt;{$age}&gt;
+输出：
+    20
+
+&lt;{assign var=&quot;arr&quot; value=array(&quot;s&quot;,&quot;b&quot;)}&gt;
+&lt;{dump var=$arr}&gt;
+输出：
+array
+  0 =&gt; string 's' (length=1)
+  1 =&gt; string 'b' (length=1)
+
+</pre></p>
+<h3><a name="id3">foreach foreachelse</a></h3><pre class="mark">概述:       用于在模板被执行时循环
+</pre>
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>from</td>
+
+<td>string</td>
+
+<td>yes</td>
+
+<td>待循环数组的名称</td>
+</tr>
+
+<tr>
+<td>item</td>
+
+<td>string</td>
+
+<td>yes</td>
+
+<td>当前处理元素的变量名称</td>
+</tr>
+
+<tr>
+<td>key</td>
+
+<td>string</td>
+
+<td>on</td>
+
+<td>当前处理元素的键名</td>
+</tr>
+
+<tr>
+<td>name</td>
+
+<td>string</td>
+
+<td>on</td>
+
+<td>该循环的名称，用于访问该循环</td>
+</tr>
+</table>
+</table>
+
+<p><b>foreach</b> 必须和 <b>/foreach</b> 成对使用，且必须指定 <b>from</b> 和 <b>item</b> 属性.<b>name</b> 属性可以任意指定.<b>foreach</b> 可以嵌套，但必须保证嵌套中的 <b>foreach</b> 名称唯一.<b>from</b> 属性(通常是数组)决定循环的次数。<b>foreachelse</b> 语句在 <b>from</b> 变量没有值的时候被执行.<pre>% 输出数组$array中所有元素
+&lt;{foreach from=$array item=value key=key}&gt;
+		&lt;{$key}&gt; : &lt;{$value}&gt;&lt;br&gt;
+&lt;{/foreach}&gt;
+输出：
+    a : c#
+    b : php
+    c : java
+
+% 当输出为空时, 输出foreachelse的值
+&lt;{foreach from=$array item=value key=key}&gt;
+		&lt;{$key}&gt; : &lt;{$value}&gt;&lt;br&gt;
+&lt;{foreachelse}
+        empty
+&lt;{/foreach}&gt;
+输出:
+    empty
+   
+</pre></p>
+<h3><a name="id4">include</a></h3><pre class="mark">概述:       加载app级模板, 加载网店级模板可以用require
+</pre><pre>&lt;{include file='site/product/goods_js.html' app=b2c}&gt;
+</pre><h3><a name="id5">if,elseif,else</a></h3><pre class="mark">概述:       条件判断
+</pre>
+<table class="docutils">
+<tr>
+<th>修饰符</th>
+
+<th>备用词</th>
+
+<th>语法用例</th>
+
+<th>说明</th>
+
+<th>php等同表达式</th>
+</tr>
+
+<tr>
+<td>==</td>
+
+<td>eq,is</td>
+
+<td>$a eq $b</td>
+
+<td>equals</td>
+
+<td>==</td>
+</tr>
+
+<tr>
+<td>!=</td>
+
+<td>ne,neq</td>
+
+<td>$a neq $b</td>
+
+<td>not equals</td>
+
+<td>!=</td>
+</tr>
+
+<tr>
+<td>&gt;</td>
+
+<td>gt</td>
+
+<td>$a gt $b</td>
+
+<td>greater than</td>
+
+<td>&gt;</td>
+</tr>
+
+<tr>
+<td>&lt;</td>
+
+<td>lt</td>
+
+<td>$a lt $b</td>
+
+<td>less than</td>
+
+<td>&lt;</td>
+</tr>
+
+<tr>
+<td>&gt;=</td>
+
+<td>gte,ge</td>
+
+<td>$a ge $b</td>
+
+<td>greater than or equal</td>
+
+<td>&gt;=</td>
+</tr>
+
+<tr>
+<td>&lt;=</td>
+
+<td>lte,le</td>
+
+<td>$a le $b</td>
+
+<td>less than or equal</td>
+
+<td>&lt;=</td>
+</tr>
+
+<tr>
+<td>===</td>
+
+<td></td>
+
+<td>$a === 0</td>
+
+<td>check for identity</td>
+
+<td>===</td>
+</tr>
+
+<tr>
+<td>!</td>
+
+<td>not</td>
+
+<td>not $a</td>
+
+<td>negation(unary)</td>
+
+<td>!</td>
+</tr>
+
+<tr>
+<td>%</td>
+
+<td>mod</td>
+
+<td>$a mod $b</td>
+
+<td>modulous</td>
+
+<td>%</td>
+</tr>
+
+<tr>
+<td>is [not] odd</td>
+
+<td></td>
+
+<td>$a is not odd</td>
+
+<td>[not] an odd number(unary)</td>
+
+<td>$a%2!=0</td>
+</tr>
+
+<tr>
+<td>is [not] even</td>
+
+<td></td>
+
+<td>$a is not even</td>
+
+<td>[not] an even number(unary)</td>
+
+<td>$a%2=0</td>
+</tr>
+</table>
+</table>
+
+<p>每一个{if}必须与一个{/if}成对出现，允许使用{else}和{elseif}，所有php条件和函数在这里同样适用，诸如||、or、&amp;&amp;、and、is_array()等等</p>
+
+<p>下面是一串有效的限定符，它们的左右必须用空格分隔开，注意列出的清单中方括号是可选的，在适用情况下使用相应的等号（全等或不全等）。</p>
+<pre>&lt;{if $name eq &quot;yi&quot;}&gt;
+...
+&lt;{elseif $name eq &quot;yu&quot;}&gt;
+...
+&lt;{else}&gt;
+...
+&lt;{/if}&gt;
+
+{if $name == 'Fred' || $name == 'Wilma'}
+...
+{/if}
+% 允许使用圆括号
+{if ( $amount &lt; 0 or $amount &gt; 1000 ) and $volume &gt;= #minVolAmt#}
+...
+{/if}
+% 可以嵌入函数 
+{if count($var) gt 0}
+...
+{/if}
+% 数组检查 
+{if is_array($foo) }
+.....
+{/if}
+% 是否空值检查 
+{if isset($foo) }
+.....
+{/if}
+% 测试值为偶数还是奇数
+{if $var is even}
+...
+{/if}
+{if $var is odd}
+...
+{/if}
+{if $var is not odd}
+...
+{/if}
+% 测试var能否被4整除 
+</pre><h3><a name="id6">ldelim,rdelim</a></h3><pre class="mark">概述:       ldelim 和 rdelim 用于输出分隔符，也就是大括号 &quot;&lt;{&quot; 和 &quot;}&gt;&quot;. 模板引擎总是尝试解释大括号内的内容
+</pre><h3><a name="id7">switch</a></h3><h3><a name="id8">dump</a></h3><h2><a name="id9">compiler function</a></h2><h3><a name="id10">math</a></h3><pre class="mark">所属类:     base_view_compiler
+概述:       在模板中进行运算
+</pre>
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>equation</td>
+
+<td>string</td>
+
+<td>yes</td>
+
+<td>计算表达式</td>
+</tr>
+
+<tr>
+<td>assign</td>
+
+<td>string</td>
+
+<td>no</td>
+
+<td>被赋值的变量名</td>
+</tr>
+
+<tr>
+<td>format</td>
+
+<td>string</td>
+
+<td>no</td>
+
+<td>输出格式</td>
+</tr>
+</table>
+</table>
+<pre>
+&lt;{math equation=&quot;x*2+y&quot; format=&quot;--%03d--&quot; assign=&quot;newkey&quot; x=10 y=3}&gt;
+&lt;{$newkey}&gt;
+输出：
+    --023--
+    --023--
+
+&lt;{math equation=&quot;x*2+y&quot; assign=&quot;newkey&quot; x=10 y=3}&gt;
+输出：
+    23
+</pre><h3><a name="id11">require</a></h3><pre class="mark">所属类:     site_view_compiler
+概述:       加载当前模板目录下模板文件
+</pre>
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>file</td>
+
+<td>string</td>
+
+<td>yes</td>
+
+<td>指定模板文件路径</td>
+</tr>
+</table>
+</table>
+<pre>&lt;{require file=&quot;block/header.html&quot;}&gt;
+输出：
+    加载当前模板目录下block/header.html文件
+</pre><h3><a name="id12">ecos_logo</a></h3><pre class="mark">所属类:     base_view_compiler
+概述:       显示ecos logo 
+</pre><pre>&lt;{ecos_logo}&gt;
+输出：
+    Powered By ECOS 
+</pre><h3><a name="id13">main</a></h3><pre class="mark">所属类:     site_view_compiler
+概述:       模板系统级区域
+</pre>
+<table class="docutils">
+<tr>
+<td>属性</td>
+
+<td>类型</td>
+
+<td>是否必须</td>
+
+<td>描述</td>
+</tr>
+
+<tr>
+<td>view</td>
+
+<td>string</td>
+
+<td>no</td>
+
+<td>指定主区域模板路径</td>
+</tr>
+</table>
+</table>
+<pre>&lt;{main}&gt;
+输出：
+    使用系统内置的主区域模板进行渲染, 并输出主区域内容
+
+&lt;{main view=&quot;abc.html&quot;}&gt;
+输出：
+    使用{$ecstore_root}/themes/{$template_name}/abc.html 作为主区域模板进行渲染, 并输出主区域内容
+
+</pre><h3><a name="id14">widget</a></h3><pre class="mark">所属类:     site_view_compiler
+概述:       单个widget实例调用
+可用：      否
+
+</pre>
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>id</td>
+
+<td>string</td>
+
+<td>no</td>
+
+<td>挂件区域唯一标识, 一旦设定请勿轻易改动</td>
+</tr>
+
+<tr>
+<td>name</td>
+
+<td>string</td>
+
+<td>no</td>
+
+<td>挂件区域唯一标识, 一旦设定请勿轻易改动</td>
+</tr>
+</table>
+</table>
+<h3><a name="id15">widgets</a></h3><pre class="mark">所属类:     site_view_compiler
+概述:       模板挂件区域
+</pre>
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>id</td>
+
+<td>string</td>
+
+<td>no</td>
+
+<td>挂件区域唯一标识, 一旦设定请勿轻易改动</td>
+</tr>
+</table>
+</table>
+<pre>&lt;{widgets id='index-banner'}&gt;
+输出：
+    为模板页面增加了一个挂件区域, 可通过后台模板可是化编辑中挂载挂件
+</pre><h2><a name="id16">compiler variable modifer</a></h2><h3><a name="id17">default</a></h3><pre class="mark">所属类:     base_view_compiler
+功能:       设置默认值      
+</pre><pre>&lt;{assign var=&quot;key&quot; value=''}&gt;
+&lt;{$key|default:30}&gt;
+输出:
+    30
+</pre><h3><a name="id18">ship_area</a></h3><pre class="mark">所属类:     site_view_compiler
+概述:       将内部地址转换为, 显示地址
+方式:       modifier
+</pre><pre>&lt;{assign var=&quot;ship_area&quot; value=&quot;mainland:广东/广州市/东山区:425&quot;}&gt;
+&lt;{$ship_area|ship_area}&gt;
+输出:
+    广东广州市东山区
+</pre><h3><a name="id19">order_remark</a></h3><pre class="mark">所属类:     b2c_view_compiler
+概述:       将内部地址转换为, 显示地址, 是用复杂,暂仅供内部使用
+方式:       modifier
+</pre><h3><a name="id20">ship_name</a></h3><pre class="mark">所属类:     b2c_view_compiler
+概述:       通过配货方式表主键id号, 显示配货地址名称
+建议:       仅建议在后台使用
+方式:       modifier
+</pre><pre>&lt;{2|ship_name}&gt;
+输出:
+    货到付款
+</pre><h3><a name="id21">gimage</a></h3><pre class="mark">所属类:     b2c_view_compiler
+概述:       用处不明
+</pre><h3><a name="id22">cur/cur_odr</a></h3><pre class="mark">所属类:     ectools_view_compiler
+概述:       将货币价格(默认系统里价格为基准货币价格)转换成当前货币价格, 并以当前货币格式输出
+别名:       cur_odr
+</pre><pre>% 当前货币和基准货币价格一致, 并且基准价格为人民币
+&lt;{40|cur}&gt;
+输出:
+    ￥40.00
+</pre><h3><a name="id23">cur_name</a></h3><pre class="mark">所属类:     ectools_view_compiler
+概述:       通过货币表主键id号, 显示货币名称
+建议:       仅建议在后台使用
+</pre><pre>&lt;{1|cur_name}&gt;
+输出:
+    人民币
+</pre><h3><a name="id24">pay_name</a></h3><pre class="mark">所属类:     ectools_view_compiler
+概述:       通过支付方式主键id号, 显示货币名称
+建议:       仅建议在后台使用
+</pre><pre>&lt;{1|pay_name}&gt;
+输出:
+    人民币
+</pre><h2><a name="id25">function</a></h2><h3><a name="id26">counter</a></h3><pre class="mark">所属类:     base_view_helper
+概述:       用于显示一个计数器
+</pre>
+<p><b>counter</b> 用于输出一个记数过程. counter 保存了每次记数时的当前记数值. 用户可以通过调节 interval 和 direction 调节该值. 也可以决定是否输出该值. 如果需要同时运行多个计数器，必须为它们指定不同的名称. 如果没有指定名称，模板引擎使用 &quot;default&quot; 作为缺省值.如果指定了 &quot;assign&quot; 这个特殊属性，该计数器的输出值将被赋给由 assign 指定的模板变量，而不是直接输出.</p>
+
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>默认值</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>name</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>default</td>
+
+<td>计数器的名称</td>
+</tr>
+
+<tr>
+<td>start</td>
+
+<td>number</td>
+
+<td>No</td>
+
+<td>1</td>
+
+<td>数器初始值</td>
+</tr>
+
+<tr>
+<td>skip</td>
+
+<td>number	| No</td>
+
+<td>1</td>
+
+<td>记数器间隔、步长</td>
+</tr>
+
+<tr>
+<td>direction</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>up</td>
+
+<td>记数器方向，(增/减)</td>
+</tr>
+
+<tr>
+<td>print</td>
+
+<td>boolean</td>
+
+<td>No</td>
+
+<td>true</td>
+
+<td>是否输出值</td>
+</tr>
+
+<tr>
+<td>assign</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>n/a</td>
+
+<td>输出值将被赋给模板变量的名称</td>
+</tr>
+</table>
+</table>
+<pre>% counter 例子：
+0-&lt;{counter name=&quot;wocao&quot; start=6 skip=3 direction=down print=false}&gt;&lt;br /&gt;
+1-&lt;{counter name=&quot;wocao&quot;}&gt;&lt;br /&gt;
+2-&lt;{counter name=&quot;wocao&quot;}&gt;&lt;br /&gt;
+3-&lt;{counter name=&quot;wocao&quot; assign=&quot;result&quot;}&gt;&lt;br /&gt;
+4-&lt;{counter name=&quot;wocao&quot;}&gt;&lt;br /&gt;
+5-&lt;{$result}&gt;&lt;br /&gt;
+-----                
+&lt;br /&gt;                
+0-&lt;{counter name=&quot;kkk&quot; start=6 skip=2 direction=down print=false}&gt;&lt;br /&gt;
+1-&lt;{counter name=&quot;kkk&quot;}&gt;&lt;br /&gt;
+2-&lt;{counter name=&quot;kkk&quot;}&gt;&lt;br /&gt;
+3-&lt;{counter name=&quot;kkk&quot; assign=&quot;result&quot;}&gt;&lt;br /&gt;
+4-&lt;{counter name=&quot;kkk&quot;}&gt;&lt;br /&gt;
+5-&lt;{$result}&gt;&lt;br /&gt;  
+
+&lt;{counter start=6 skip=3 direction=down print=false}&gt;&lt;br /&gt;
+&lt;{counter}&gt;&lt;br /&gt;
+&lt;{counter}&gt;&lt;br /&gt;
+&lt;{counter assign=&quot;www&quot;}&gt;&lt;br /&gt;
+&lt;{$counter}&gt;
+输出：
+    0-
+    1-3
+    2-0
+    3-
+    4--6
+    5--3
+    ----- 
+    0-
+    1-4
+    2-2
+    3-
+    4--2
+    5-0
+</pre><h3><a name="id27">html_options</a></h3><pre class="mark">所属类:     base_view_helper
+概述:       生成HTML的&lt;select&gt;&lt;option&gt;标签
+建议:       详细用法可参考smarty文档
+</pre>
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>默认值</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>values</td>
+
+<td>array</td>
+
+<td>Yes, 除非使用 options 属性</td>
+
+<td>n/a</td>
+
+<td>下拉框值的数组</td>
+</tr>
+
+<tr>
+<td>output</td>
+
+<td>array</td>
+
+<td>Yes, 除非使用 options 属性</td>
+
+<td>n/a</td>
+
+<td>下拉框显示的数组</td>
+</tr>
+
+<tr>
+<td>selected</td>
+
+<td>string/array</td>
+
+<td>No</td>
+
+<td>empty</td>
+
+<td>选中的项</td>
+</tr>
+
+<tr>
+<td>options</td>
+
+<td>数组</td>
+
+<td>Yes, 除非使用 values 和 output</td>
+
+<td>n/a</td>
+
+<td>键值对的数组，用于下拉框</td>
+</tr>
+
+<tr>
+<td>name</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>empty</td>
+
+<td>select组的名称</td>
+</tr>
+</table>
+</table>
+
+<ul>
+<li>必要的属性是values 和 output, 除非你使用组合的options来代替。
+<li>除非提供了可选属性name， 才会创建 &lt;select&gt;&lt;/select&gt;标签， 不然，只会生成&lt;option&gt;列表。
+<li>如果设置的value是数组，会当作HTML的&lt;optgroup&gt;，并且显示该下拉组。 &lt;optgroup&gt;是支持递归的。
+<li>其他不在上面列表中的键值对参数，会直接在输出的 &lt;select&gt; 标签中显示成 名称=值 的属性。 如果可选参数name没有设置，那么它们将被忽略。
+<li>全部的输出都符合XHTML的。</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+<pre>&lt;{assign var=&quot;options&quot; value=array('a'=&gt;'php','b'=&gt;'c#','c'=&gt;'java')}&gt;
+&lt;{html_options name='bb' options=$options }&gt;
+输出：
+    &lt;select name=&quot;bb&quot;&gt;
+    &lt;option label=&quot;php&quot; value=&quot;a&quot;&gt;php&lt;/option&gt;
+    &lt;option label=&quot;c#&quot; value=&quot;b&quot;&gt;c#&lt;/option&gt;
+    &lt;option label=&quot;java&quot; value=&quot;c&quot;&gt;java&lt;/option&gt;
+    &lt;/select&gt;
+</pre><h3><a name="id28">html_table</a></h3><pre class="mark">所属类:     base_view_helper
+概述:       可使用数组形式的数据来创建一个HTML的&lt;table&gt;, 此plugin是smarty的html_table简化版
+建议:       详细用法可参考smarty文档
+</pre>
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>默认值</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>loop</td>
+
+<td>array</td>
+
+<td>Yes</td>
+
+<td>n/a</td>
+
+<td>循环赋值的数组</td>
+</tr>
+
+<tr>
+<td>cols</td>
+
+<td>mixed</td>
+
+<td>No</td>
+
+<td>3</td>
+
+<td>表格的列数，或者是逗号分隔的列头文字列表，或是列头文字的数组。 如果cols属性为空，但设置了rows，将以rows数量和显示元素的总数进行计算得出列数， 以便每列能显示全部的元素。 如果rows和cols都设置了，那么cols会忽略默认值3. 如果设置cols为一个列表或数组，那么列数将取决于列表或数组的元素个数。</td>
+</tr>
+
+<tr>
+<td>table_attr</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>border=&quot;1&quot;</td>
+
+<td>&lt;table&gt;标签的属性</td>
+</tr>
+
+<tr>
+<td>tr_attr</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>empty</td>
+
+<td>&lt;tr&gt;标签的属性 (循环)</td>
+</tr>
+
+<tr>
+<td>td_attr</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>empty</td>
+
+<td>&lt;td&gt;标签的属性 (循环)</td>
+</tr>
+
+<tr>
+<td>trailpad</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>&amp;nbsp;</td>
+
+<td>在最后行空单元格中填充的字符(如果有的话)</td>
+</tr>
+</table>
+</table>
+<pre>&lt;{assign var=&quot;loop&quot; value=array(1,2,3,4,5,6,7,8,9,10)}&gt;
+&lt;{html_table  loop=$loop cols=3 }&gt;
+输出：
+    &lt;table border=&quot;1&quot;&gt;
+    &lt;tr&gt;&lt;td&gt;1&lt;/td&gt;&lt;td&gt;2&lt;/td&gt;&lt;td&gt;3&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;4&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;&lt;td&gt;6&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;7&lt;/td&gt;&lt;td&gt;8&lt;/td&gt;&lt;td&gt;9&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+</pre><h3><a name="id29">json</a></h3><pre class="mark">所属类:     base_view_helper
+概述:       对变量进行JSON编码
+</pre>
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>默认值</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>from</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>null</td>
+
+<td>需要进行JSON编码的变量</td>
+</tr>
+</table>
+</table>
+<pre class="mark">% $array 要进行JSON编码的变量
+&lt;{assign var=&quot;array&quot; value=array(1,2,3,4,array(2,4,5))}&gt;
+&lt;{json from=$array}&gt;
+输出:
+    [1,2,3,4,[2,4,5]]
+</pre><h3><a name="id30">mailto</a></h3><pre class="mark">所属类:     base_view_helper
+概述:       可以自动创建一个mailto:链接，而且可以选择编码方式。 对邮件编码可以使邮件地址更难以被网络爬虫抓取
+</pre>
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>默认值</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>address</td>
+
+<td>string</td>
+
+<td>Yes</td>
+
+<td>n/a</td>
+
+<td>电邮地址</td>
+</tr>
+
+<tr>
+<td>text</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>n/a</td>
+
+<td>显示的文字，默认是电邮地址</td>
+</tr>
+
+<tr>
+<td>encode</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>none</td>
+
+<td>如何编码电邮。可以是none,hex,javascript或者javascript_charcode.</td>
+</tr>
+
+<tr>
+<td>cc</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>n/a</td>
+
+<td>抄送的电邮地址，用逗号隔开</td>
+</tr>
+
+<tr>
+<td>bcc</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>n/a</td>
+
+<td>暗送的地址，用逗号隔开。</td>
+</tr>
+
+<tr>
+<td>subject</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>n/a</td>
+
+<td>邮件标题</td>
+</tr>
+
+<tr>
+<td>newsgroups</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>n/a</td>
+
+<td>发送到的新闻组地址，用逗号隔开。</td>
+</tr>
+
+<tr>
+<td>followupto</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>n/a</td>
+
+<td>回执地址，用逗号隔开。</td>
+</tr>
+
+<tr>
+<td>extra</td>
+
+<td>string</td>
+
+<td>No</td>
+
+<td>n/a</td>
+
+<td>任何附加的链接信息，如样式表等</td>
+</tr>
+</table>
+</table>
+<pre>&lt;{mailto address=&quot;me@domain.com&quot;}&gt;&lt;br /&gt;
+&lt;{mailto address=&quot;me@domain.com&quot; text=&quot;send me some mail&quot; subject=&quot;Hello to you!&quot;
+         cc=&quot;you@domain.com,they@domain.com&quot; extra='class=&quot;email&quot;'}&gt;&lt;br /&gt;
+&lt;{mailto address=&quot;me@domain.com&quot; encode=&quot;javascript&quot;}&gt;&lt;br /&gt;
+&lt;{mailto address=&quot;me@domain.com&quot; encode=&quot;hex&quot;}&gt;&lt;br /&gt;
+
+输出：
+    &lt;a href=&quot;mailto:me@domain.com&quot; &gt;me@domain.com&lt;/a&gt;&lt;br /&gt;
+
+    &lt;a href=&quot;mailto:me@domain.com?cc=you@domain.com%2Cthey@domain.com&amp;subject=Hello%20to%20you%21&quot;
+    class=&quot;email&quot;&gt;send me some mail&lt;/a&gt;&lt;br /&gt;
+
+    &lt;script type=&quot;text/javascript&quot; language=&quot;javascript&quot;&gt;
+    eval(unescape('%64%6f%63%75%6d%65%6e%74%2e%77%72%69%74%65%28%27%3c%61%20%68%72%65%66%3d%22%6d%
+    61%69%6c%74%6f%3a%6d%65%40%64%6f%6d%61%69%6e%2e%63%6f%6d%22%20%3e%6d%65%40%64%6f%6d%61%69%6e%
+    2e%63%6f%6d%3c%2f%61%3e%27%29%3b'))&lt;/script&gt;&lt;br /&gt;
+
+    &lt;a href=&quot;mailto:%6d%65@%64%6f%6d%61%69%6e.%63%6f%6d&quot; &gt;
+    &amp;#x6d;&amp;#x65;&amp;#x40;&amp;#x64;&amp;#x6f;&amp;#x6d;&amp;#x61;&amp;#x69;&amp;#x6e;&amp;#x2e;&amp;#x63;&amp;#x6f;&amp;#x6d;&lt;/a&gt;&lt;br /&gt;
+</pre><h3><a name="id31">appconf</a></h3><pre class="mark">所属类:     base_view_helper
+概述:       变相的使用app::get($app_id)-&gt;getConf($key)取数据
+</pre>
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>默认值</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>app</td>
+
+<td>string</td>
+
+<td>Yes</td>
+
+<td>empty</td>
+
+<td>app_id</td>
+</tr>
+
+<tr>
+<td>key</td>
+
+<td>string</td>
+
+<td>Yes</td>
+
+<td>empty</td>
+
+<td>key</td>
+</tr>
+</table>
+</table>
+<pre>&lt;{appconf app=&quot;site&quot; key=&quot;site.name&quot;}&gt;
+输出:
+    商店名称
+</pre><h3><a name="id32">pager</a></h3><pre class="mark">所属类:     base_view_helper
+概述:       简单分页组件
+</pre>
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>默认值</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>data</td>
+
+<td>array</td>
+
+<td>Yes</td>
+
+<td></td>
+
+<td>paper数据</td>
+</tr>
+</table>
+</table>
+
+<p>data格式:
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>默认值</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>current</td>
+
+<td>int</td>
+
+<td>Yes</td>
+
+<td></td>
+
+<td>需要进行JSON编码的变量</td>
+</tr>
+
+<tr>
+<td>total</td>
+
+<td>int</td>
+
+<td>Yes</td>
+
+<td></td>
+
+<td>需要进行JSON编码的变量</td>
+</tr>
+
+<tr>
+<td>link</td>
+
+<td>string</td>
+
+<td>Yes</td>
+
+<td></td>
+
+<td>需要进行JSON编码的变量</td>
+</tr>
+
+<tr>
+<td>token</td>
+
+<td>string</td>
+
+<td>Yes</td>
+
+<td></td>
+
+<td>需要进行JSON编码的变量</td>
+</tr>
+</table>
+</p>
+</table>
+<pre>分配变量
+
+$this-&gt;pagedata['pagers'] = array(
+    'current' =&gt; 33,
+    'total' =&gt; 3333,
+    'token' =&gt; '_PPP_'
+    'link'=&gt;'index.php/shopadmin/#app=ecbook&amp;ctl=admin_dbeav&amp;act=index&amp;p=_PPP_',
+);
+
+html中调用
+&lt;{assign var=data value=array('current=&gt;33,'total
+&lt;{pagers data=$pagers}&gt;
+</pre><h3><a name="id33">pagers</a></h3><pre class="mark">所属类:     b2c_view_helper
+概述:       分页组件
+</pre>
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>默认值</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>data</td>
+
+<td>array</td>
+
+<td>Yes</td>
+
+<td></td>
+
+<td>paper数据</td>
+</tr>
+</table>
+</table>
+
+<p>data格式
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>默认值</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>data</td>
+
+<td>array</td>
+
+<td>Yes</td>
+
+<td></td>
+
+<td>需要进行JSON编码的变量</td>
+</tr>
+</table>
+</p>
+</table>
+<pre class="mark">pager   current 当前页
+        total   总页数
+        link    连接地址
+</pre><pre>&lt;{assign var=&quot;data&quot; value=array('current'=&gt;35,'total'=&gt;3333,'token'=&gt;'@@@','link'=&gt;'http://a/@@@')}&gt;
+&lt;{pagers data=$data}&gt;
+
+ &lt;{pager  current=1 total=30 link='index.php/shopadmin/#app=ecbook&amp;ctl=admin_dbeav&amp;act=index' }&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="../../images/pager.png" /></p>
+
+<ul>
+<li>pagers<pre class="mark">pagers  data  参数数组
+</pre><pre>分配变量
+
+$this-&gt;pagedata['pagers'] = array(
+    'current'=&gt;2,
+    'total'=&gt;20,
+    'link'=&gt;'index.php/shopadmin/#app=ecbook&amp;ctl=admin_dbeav&amp;act=index',
+);
+
+html中调用
+
+&lt;{pagers data=$pagers}&gt;
+</pre></li>
+</ul>
+<h4><a name="id34">toinput隐藏框</a></h4><pre class="mark">参数： from 包含隐藏框的name和value的关联数组
+</pre><pre>先分配数据：
+         $this-&gt;pagedata['toinput'] = array('a'=&gt;'c#','b'=&gt;'php','c'=&gt;'java');
+         $this-&gt;page('list.html');
+
+	 list.html：
+            &lt;{toinput from=$toinput}&gt;&lt;br /&gt;
+	 输出：
+	    &lt;input type=&quot;hidden&quot; name=&quot;a&quot; value=&quot;c#&quot; /&gt;
+	    &lt;input type=&quot;hidden&quot; name=&quot;b&quot; value=&quot;php&quot; /&gt;
+	    &lt;input type=&quot;hidden&quot; name=&quot;c&quot; value=&quot;java&quot; /&gt;
+</pre><h2><a name="id35">modifier修饰符</a></h2><h4><a name="id36">amount</a></h4>
+<p>商店货币显示修饰符<pre class="mark">参数    第一个参数：货币币种(货币代码) 默认为人民币
+        第二个参数：是否为基本数据格式 false|true
+        第三个参数：是否需要改变费率   false|true
+
+注意    此方法是继承ectools的，所以要调用必须安装ectools。
+</pre><pre> &lt;{123466789|amount:'CNY'}&gt;
+
+ 输出效果：￥123,466,789.00
+</pre></p>
+<h4><a name="id37">storager</a></h4>
+<p>根据image_id对图片显示进行修饰<pre class="mark">参数    l   大图
+        m   中图
+        s   小图
+
+默认显示原图
+</pre><pre>&lt;{$image_id|storager:'s'}&gt;
+</pre></p>
+<h4><a name="id38">cdate控制日期输出</a></h4><pre class="mark">参数:   FDATE        Y-m-d
+        SDATE        y-m-d
+        DATE         m-d
+        FDATE_FTIME  Y-m-d H:i:s
+        FDATE_STIME  Y-m-d H:i
+        SDATE_FTIME  y-m-d H:i:s
+        SDATE_STIME  y-m-d H:i
+        DATE_FTIME   m-d H:i:s
+        DATE_STIME   m-d H:i
+        默认：FDATE_FTIME
+</pre><pre>先分配数据：
+     $this-&gt;pagedata['time'] = time();
+     $this-&gt;page('list.html');
+
+     list.html:
+     &lt;{$time|cdate:FDATE}&gt;
+     输出：
+     2011-01-06
+</pre><h4><a name="id39">cut控制字符串输出</a></h4><pre class="mark"> 参数：第一个参数 输出几个字符   默认是80
+       第二个参数 后三个代替字符 默认是 ...
+</pre><pre>先分配数据：
+     $this-&gt;pagedata['string'] = 'abcdefghijklmno';
+     $this-&gt;page('list.html');
+
+     list.html:
+       &lt;{$string|cut:10}&gt;&lt;br /&gt;
+       &lt;{$string|cut:10:'+++'}&gt;&lt;br /&gt;
+输出：
+   abcdefg...
+   abcdefg+++
+</pre><h4><a name="id40">date</a></h4><pre class="mark">参数：参照php中date函数写参数
+</pre><pre>先分配数据：
+     $this-&gt;pagedata['time'] = time();
+     $this-&gt;page('list.html');
+
+     list.html:
+       &lt;{$time|date:'r'}&gt;&lt;br /&gt;
+输出：
+    Thu, 06 Jan 2011 17:53:26 +0800
+</pre><h4><a name="id41">date_format</a></h4><pre class="mark">参数： 参数php中strftime函数写参数
+</pre><pre>先分配数据：
+    $this-&gt;pagedata['time'] = time();
+	$this-&gt;page('list.html');
+
+    list.html:
+    &lt;{$time|date_format:'%Y年'}&gt;&lt;br /&gt;
+输出：
+    2011年
+</pre><h4><a name="id42">escape</a></h4><h4><a name="id43">gender</a></h4><pre class="mark">把‘male’转换为‘男’，把‘female转换为‘女’
+</pre><pre>&lt;{'male'|gender}&gt; 输出：男
+&lt;{'female'|gender}&gt; 输出：女
+</pre><h4><a name="id44">t 将所要修饰的字符串调用语言包格式输出</a></h4><pre class="mark">参数:   appid
+</pre><pre> alt=$___b2c=&quot;删除&quot;|t:'b2c'
+</pre><h4><a name="id45">number</a></h4>
+<p>对$number数据进行格式化<pre class="mark">参数    0   把$number强制转换为int型原样输出
+        1   判断$number是否小于1,如果小于1则输出‘低于1’,否则如果是整数则原样输出，小数则进1位输出
+        2   判断$number是否小于1,如果小1则输出'超过99'，否则输出100-$number
+        3   判断$number是否小于1,如果小于1则输出'低于1',否则输出对小数四舍五入的值
+</pre><pre>&lt;{1234.247|number:3}&gt;  //1234.3
+</pre></p>
+<h4><a name="id46">paddingleft向前填充</a></h4><pre class="mark">参数：第一个参数 填充的次数
+      第二个参数 填充的字符
+</pre><pre>先分配数据：
+    $this-&gt;pagedata['p'] = 'abcd';
+	$this-&gt;page('list.html');
+
+    list.html:
+    &lt;{$p|paddingleft:5:'-'}&gt;&lt;br /&gt;
+输出：
+    -----abcd
+</pre><h4><a name="id47">regex_replace正则替换</a></h4><pre class="mark">参数：第一参数：替换正则表达式.
+      第二参数：用来替换的文本字符串
+</pre><pre>先分配数据：
+    $this-&gt;pagedata['articleTitle'] = &quot;Infertility unlikely to\nbe passed on, experts say.&quot;;
+    $this-&gt;page('list.html');
+
+    list.html:
+    &lt;{$articleTitle}&gt;&lt;br /&gt;
+    &lt;{$articleTitle|regex_replace:&quot;/[\r\t\n]/&quot;:&quot; &quot;}&gt;
+输出：
+    Infertility unlikely to
+    be passed on, experts say.
+    Infertility unlikely to be passed on, experts say.
+</pre><h4><a name="id48">region</a></h4><pre class="mark">对ECOS框架中input的地区组件传的值进行修饰
+</pre><pre>&lt;{'mainland:上海/上海市/徐汇区:25'|region}&gt;     //上海-上海市-徐汇区
+</pre><h4><a name="id49">replace字符串替换</a></h4><pre class="mark">参数：第一参数 被替换的字符串
+      第二参数 用来替换的字符串
+</pre><pre>先分配数据：
+        $this-&gt;pagedata['region'] = &quot;afsd/fsd:bbcd/czxc:fsd&quot;;
+	$this-&gt;page('list.html');
+
+        list.html:
+            &lt;{$region}&gt;&lt;br /&gt;
+            &lt;{$region|replace:'/':'-'}&gt;&lt;br /&gt;
+输出：
+    afsd/fsd:bbcd/czxc:fsd
+    afsd-fsd:bbcd-czxc:fsd
+</pre><h4><a name="id50">strip替换空格</a></h4><pre class="mark">参数：替换空格的字符
+</pre><pre>先分配数据：
+    $this-&gt;pagedata['strip'] = &quot;ss  fbsd fsd   fs &quot;;
+	$this-&gt;page('list.html');
+
+    list.html:
+    &lt;{$strip}&gt;&lt;br /&gt;
+    &lt;{$strip|strip:''}&gt;&lt;br /&gt;
+输出：
+    ss fbsd fsd fs
+    ssfbsdfsdfs
+</pre><h2><a name="id51">base_view_input</a></h2><pre class="mark">ECOS系统对表单进行了简单的验证处理:
+
+vtype   验证的js文件在 desktop/statics/js/coms/validate.js中验证
+        提示文字在desktop/lang/zh-cn/ls/lang.js中定义
+
+
+表单属性                                文字提示
+
+vtype='required'                        本项必填
+vtype='number'                          请录入数值
+vtype='required&amp;&amp;email'                 请录入正确的Email地址
+vtype='digits'                          请录入整数
+vtype='unsignedint'                     请录入正整数
+vtype='unsigned'                        请输入大于等于0的数值
+vtype='positive'                        请输入大于0的数值
+vtype='alpha'                           请输入英文字母
+vtype='alphaint'                        请输入英文字母或数字
+vtype='alphanum'                        请输入英文字母,中文及数字
+vtype='date'                            请录入日期格式yyyy-mm-dd
+vtype='url'                             请录入正确的网址
+vtype='area'                            请选择完整的地区 (用在ectools中的地区input组件中)
+vtype='greater'                         不能小于前一项
+vtype='requiredonly'                    必须选择一项
+</pre><pre>&lt;{input type='text' name='test' vtype='required'}&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="images/input_01.png" /></p>
+<pre>&lt;{input type='text'  id='email' name='email'  vtype='required&amp;&amp;email' }&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="images/email.png" /></p>
+<h4><a name="id52">input_bool</a></h4><pre>&lt;{input type=&quot;bool&quot; name='name' value=&quot;ture&quot; id=&quot;bool&quot;}&gt;&lt;hr /&gt;
+输出：
+    &lt;input value=&quot;true&quot; checked=&quot;checked&quot; type=&quot;radio&quot; name=&quot;name&quot; id=&quot;bool-t&quot; check=&quot;#&quot; /&gt;
+    &lt;label for=&quot;bool-t&quot;&gt;是&lt;/label&gt;
+    &lt;input value=&quot;false&quot; type=&quot;radio&quot; name=&quot;name&quot; id=&quot;bool-f&quot; check=&quot;#&quot; /&gt;
+    &lt;label for=&quot;bool-f&quot;&gt;否&lt;/label&gt;&lt;input type=&quot;hidden&quot; name=&quot;_DTYPE_BOOL[]&quot; value=&quot;name&quot; /&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="images/input1.jpg" /></p>
+<h4><a name="id53">input_color</a></h4>
+<p>调出调色板<pre>&lt;{input type='color' id='yc' value='#cccccc' size=7 maxlength=7}&gt;
+</pre><br /><img border="0" alt="" align="middle" src="images/color.png" /></p>
+<h4><a name="id54">input_label</a></h4><pre>&lt;{input type=&quot;label&quot; value=&quot;test&quot;}&gt;
+输出：
+&lt;span&gt;test&lt;/span&gt;
+</pre><h4><a name="id55">input_date</a></h4><pre>&lt;{input type=&quot;date&quot; value=&quot;date&quot;}&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="images/input2.jpg" /></p>
+<h4><a name="id56">input_default</a></h4><pre>&lt;{input value=&quot;text&quot;}&gt;
+输出：
+&lt;input autocomplete=&quot;off&quot; class=&quot;x-input &quot; value=&quot;text&quot; id=&quot;dom_el_006b022&quot; type=&quot;text&quot; /&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="images/input3.jpg" /></p>
+<h4><a name="id57">input_gender</a></h4><pre class="mark">性别’男‘，’女‘单选
+
+value='male' //男  value='female' // 女
+</pre><pre>&lt;{input type='gender' value='female' id='sex' name='gender'}&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="images/input8.jpg" /></p>
+<h4><a name="id58">input_intbool</a></h4><pre class="mark">显示‘是’，‘否’，单选
+
+value=1 //是 value=0 //否  只有竖排这一种样式
+</pre><pre>&lt;{input type='intbool' value='1' id='bool' name='intbool'}&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="images/input9.jpg" /></p>
+<h4><a name="id59">input_tinybool</a></h4><pre class="mark">显示'是‘，’否‘，单选。其效果和input_intbool一样，只是value值不样
+
+value='Y' //是  value='N' //否
+</pre><pre>&lt;{input type='tinybool' value='Y' id='bool' name='tinybool'}&gt;
+</pre><h4><a name="id60">input_radio</a></h4><pre>&lt;{assign var=&quot;opt&quot; value=array(1988,1989,1990,1991,1992,1993)}&gt;
+
+&lt;{input type=&quot;radio&quot; options=$opt name=&quot;radio&quot;}&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="images/input7.jpg" /></p>
+<h4><a name="id61">input_select</a></h4><pre>&lt;{assign var=&quot;opt&quot; value=array(1988,1989,1990,1991,1992,1993)}&gt;
+
+&lt;{input type=&quot;select&quot; options=$opt}&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="images/input6.jpg" /></p>
+<h4><a name="id62">input_textarea</a></h4><pre>&lt;{input type=&quot;textarea&quot; value=&quot;test&quot;}&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="images/input5.jpg" /></p>
+<h4><a name="id63">input_time</a></h4><pre>&lt;{input type=&quot;time&quot;  name=&quot;to_time&quot;}&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="images/input4.jpg" /></p>
+<h2><a name="id64">desktop 扩展</a></h2><h3><a name="id65">desktop_view_input</a></h3><h4><a name="id66">input_image</a></h4><pre class="mark">后台图片上传
+
+value 是 image_id  可预览图片
+</pre><pre>&lt;{input type='image' name='uploader_image' width=100 height=100 value=$image_id}&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="images/img.png" /></p>
+<h4><a name="id67">input_html</a></h4><pre class="mark">调用编辑框
+</pre><pre>&lt;{input type='html' name='html'}&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="images/html.png" /></p>
+<h4><a name="id68">后台图片显示调用</a></h4><pre>&lt;{img src=&quot;bundle/handle-show.gif&quot; alt=$___b2c=&quot;收起子分类&quot;|t:'b2c' title=$___b2c=&quot;展开子分类&quot;|t:'b2c' class=&quot;handle-show&quot; app='desktop'}&gt;
+</pre><h2><a name="id69">ectools_view_input</a></h2><h4><a name="id70">input_region地区三级联动</a></h4><pre>&lt;{input app=ectools type=&quot;region&quot; name='region' vtype='area'}&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="images/region.png" /></p>
+<h4><a name="id71">input_object</a></h4><pre class="mark">获取另一个finder数据
+</pre><pre>&lt;{input type='object'  object='members' name='name' textcol='shipping,member_id' value=$value multiple=true filter=''}&gt;
+</pre>
+<p>具体参数作用可以参照：app/desktop/lib/view/input.php</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">inline function</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">assign</a>
+        <li><a href="#id3" class="reference internal">foreach foreachelse</a>
+        <li><a href="#id4" class="reference internal">include</a>
+        <li><a href="#id5" class="reference internal">if,elseif,else</a>
+        <li><a href="#id6" class="reference internal">ldelim,rdelim</a>
+        <li><a href="#id7" class="reference internal">switch</a>
+        <li><a href="#id8" class="reference internal">dump</a>
+    </ul>
+    <li><a href="#id9" class="reference internal">compiler function</a>
+        <ul>
+        <li><a href="#id10" class="reference internal">math</a>
+        <li><a href="#id11" class="reference internal">require</a>
+        <li><a href="#id12" class="reference internal">ecos_logo</a>
+        <li><a href="#id13" class="reference internal">main</a>
+        <li><a href="#id14" class="reference internal">widget</a>
+        <li><a href="#id15" class="reference internal">widgets</a>
+    </ul>
+    <li><a href="#id16" class="reference internal">compiler variable modifer</a>
+        <ul>
+        <li><a href="#id17" class="reference internal">default</a>
+        <li><a href="#id18" class="reference internal">ship_area</a>
+        <li><a href="#id19" class="reference internal">order_remark</a>
+        <li><a href="#id20" class="reference internal">ship_name</a>
+        <li><a href="#id21" class="reference internal">gimage</a>
+        <li><a href="#id22" class="reference internal">cur/cur_odr</a>
+        <li><a href="#id23" class="reference internal">cur_name</a>
+        <li><a href="#id24" class="reference internal">pay_name</a>
+    </ul>
+    <li><a href="#id25" class="reference internal">function</a>
+        <ul>
+        <li><a href="#id26" class="reference internal">counter</a>
+        <li><a href="#id27" class="reference internal">html_options</a>
+        <li><a href="#id28" class="reference internal">html_table</a>
+        <li><a href="#id29" class="reference internal">json</a>
+        <li><a href="#id30" class="reference internal">mailto</a>
+        <li><a href="#id31" class="reference internal">appconf</a>
+        <li><a href="#id32" class="reference internal">pager</a>
+        <li><a href="#id33" class="reference internal">pagers</a>
+            <ul>
+            <li><a href="#id34" class="reference internal">toinput隐藏框</a>
+        </ul>
+    </ul>
+    <li><a href="#id35" class="reference internal">modifier修饰符</a>
+        <ul>
+            <ul>
+            <li><a href="#id36" class="reference internal">amount</a>
+            <li><a href="#id37" class="reference internal">storager</a>
+            <li><a href="#id38" class="reference internal">cdate控制日期输出</a>
+            <li><a href="#id39" class="reference internal">cut控制字符串输出</a>
+            <li><a href="#id40" class="reference internal">date</a>
+            <li><a href="#id41" class="reference internal">date_format</a>
+            <li><a href="#id42" class="reference internal">escape</a>
+            <li><a href="#id43" class="reference internal">gender</a>
+            <li><a href="#id44" class="reference internal">t 将所要修饰的字符串调用语言包格式输出</a>
+            <li><a href="#id45" class="reference internal">number</a>
+            <li><a href="#id46" class="reference internal">paddingleft向前填充</a>
+            <li><a href="#id47" class="reference internal">regex_replace正则替换</a>
+            <li><a href="#id48" class="reference internal">region</a>
+            <li><a href="#id49" class="reference internal">replace字符串替换</a>
+            <li><a href="#id50" class="reference internal">strip替换空格</a>
+        </ul>
+    </ul>
+    <li><a href="#id51" class="reference internal">base_view_input</a>
+        <ul>
+            <ul>
+            <li><a href="#id52" class="reference internal">input_bool</a>
+            <li><a href="#id53" class="reference internal">input_color</a>
+            <li><a href="#id54" class="reference internal">input_label</a>
+            <li><a href="#id55" class="reference internal">input_date</a>
+            <li><a href="#id56" class="reference internal">input_default</a>
+            <li><a href="#id57" class="reference internal">input_gender</a>
+            <li><a href="#id58" class="reference internal">input_intbool</a>
+            <li><a href="#id59" class="reference internal">input_tinybool</a>
+            <li><a href="#id60" class="reference internal">input_radio</a>
+            <li><a href="#id61" class="reference internal">input_select</a>
+            <li><a href="#id62" class="reference internal">input_textarea</a>
+            <li><a href="#id63" class="reference internal">input_time</a>
+        </ul>
+    </ul>
+    <li><a href="#id64" class="reference internal">desktop 扩展</a>
+        <ul>
+        <li><a href="#id65" class="reference internal">desktop_view_input</a>
+            <ul>
+            <li><a href="#id66" class="reference internal">input_image</a>
+            <li><a href="#id67" class="reference internal">input_html</a>
+            <li><a href="#id68" class="reference internal">后台图片显示调用</a>
+        </ul>
+    </ul>
+    <li><a href="#id69" class="reference internal">ectools_view_input</a>
+        <ul>
+            <ul>
+            <li><a href="#id70" class="reference internal">input_region地区三级联动</a>
+            <li><a href="#id71" class="reference internal">input_object</a>
+        </ul>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../v.html"
+                                  title="上一章">视图(view)</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../c.html"
+                                  title="下一章">控制器(controller)</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../c.html" title="控制器(controller)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../v.html" title="视图(view)" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">MVC框架</a> &raquo;
+        </li>
+                <li>
+          <a href="../v.html">视图(view)</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      APP数据初始化类 - base_initial &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../doc.html" />
+    <link rel="up" title="常用类库" href="index.html" />
+
+        <link rel="next" title="base_demo" href="系统演示数据初始化类 - base_demo.html" />
+        <link rel="prev" title="base_xml" href="xml工具类 - base_xml.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="base_demo.html" title="系统演示数据初始化类 - base_demo" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="base_xml.html" title="xml工具类 - base_xml" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">常用类库</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> APP数据初始化类 - base_initial</h1>
+            <h2><a name="id1">功能描述</a></h2>
+<p>对于APP的开发和维护者而言, 需要为APP安装时准备初始化数据. 本类提供了APP的初始化数据安装.目前支持数据类型:</p>
+
+<ul>
+<li>数据库表数据
+<li>配置参数,<a href="../app/setting.html">setting</a></li>
+</li>
+</ul>
+
+<p>如果需要其他数据类型的支持, 需要自行开发并继承base_initial.</p>
+<h2><a name="id2">应用场景</a></h2>
+<p>需要为APP初始化数据时. 最常用的场景是在app/{$app_id}/task.php的post_install回调函数中进行APP的数据初始化</p>
+<h2><a name="id3">使用指南</a></h2>
+<p>初始化数据需放置在app/{$app_id}/initial目录下. 目前支持两种类型的文件格式:</p>
+
+<ul>
+<li>存放数据表初始化数据, 扩展名为sdf.
+<p>例如: 文件名,base.ectools.sdf 存放的为 sdb_base_ectools表的备份数据
+<li>存放setting数据, 扩展名为php, 格式为{$app_id}.setting.php.　例如: base.setting.php, 代表存放为base app所提供的setting 初始化数据<pre>  &lt;?php
+   
+  return array(
+      'spec.image.height'=&gt;30,
+      'spec.image.width'=&gt;30,
+      'spec.default.pic'=&gt;'836290ea15d0200199eedc9f3b5b677f',
+  );  
+</pre></li>
+</p>
+</li>
+</ul>
+
+<p>文件生成:
+<ul>
+<li>sdf格式: 目前生成不太方便. 可以通过后台(控制面板-&gt;其他-&gt;数据备份与还原)进行备份,　然后下载tar包解压后获得
+<li>php格式: 需要手写,　格式见上文</li>
+</li>
+</ul>
+</p>
+<h2><a name="id4">函数接口</a></h2><h3><a name="id5">init</a></h3>
+<p>init函数会根据initial目录下的两种文件类型分别会调用init_sdf函数和init_setting函数</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">b2c_task</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">post_install</span><span style="color: #007700">(</span><span style="color: #0000BB">$options</span><span style="color: #007700">)<br />&nbsp;&nbsp;&nbsp;&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'base_demo'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">init</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;...<br />}<br /></span>
+</span>
+</code></div><pre class="mark">参数:
+    无
+返回:
+    无
+</pre><h3><a name="id6">init_setting</a></h3>
+<p>初始化setting数据<pre class="mark">参数:
+    string $app_id 应用ID号
+    array $setting setting数据, 格式与{$app_id}.setting.php返回的数组格式一致
+返回:
+    无
+</pre></p>
+<h3><a name="id7">init_sdf</a></h3>
+<p>初始化数据库表数据</p>
+
+<p>参数:string $app_id 应用ID号$model model简称, 例如: 真实model名 b2c_mdl_cart, 简称则为cart.$file sdf文件地址返回:无</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">功能描述</a>
+    <li><a href="#id2" class="reference internal">应用场景</a>
+    <li><a href="#id3" class="reference internal">使用指南</a>
+    <li><a href="#id4" class="reference internal">函数接口</a>
+        <ul>
+        <li><a href="#id5" class="reference internal">init</a>
+        <li><a href="#id6" class="reference internal">init_setting</a>
+        <li><a href="#id7" class="reference internal">init_sdf</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="base_xml.html"
+                                  title="上一章">xml工具类 - base_xml</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="base_demo.html"
+                                  title="下一章">系统演示数据初始化类 - base_demo</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="base_demo.html" title="系统演示数据初始化类 - base_demo" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="base_xml.html" title="xml工具类 - base_xml" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">常用类库</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

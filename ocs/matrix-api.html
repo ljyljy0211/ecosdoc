@@ -1,0 +1,257 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      matrix对接接口说明 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="OCS开发指南" href="index.html" />
+
+        <link rel="next" title="data-dictionary" href="数据库字典.html" />
+        <link rel="prev" title="product-initial/product-initial" href="OCS初始化数据手册.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="data-dictionary.html" title="数据库字典" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="product-initial/product-initial.html" title="OCS初始化数据手册" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">OCS开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> matrix对接接口说明</h1>
+            <h2><a name="id1">概述</a></h2>
+<p>本文档旨在说明OCS系统在和矩阵的交互过程中，访问了到了哪些矩阵接口，矩阵接口的详细描述可以在给出的在线文档中查询Product operating manual<a href="http://open.shopex.cn/wiki/index.php?title=API">开放平台API文档地址</a></p>
+<h2><a name="id2">OSC使用到的开放平台接口</a></h2><h3><a name="id3">商品类</a></h3>
+<ul>
+<li>store.items.quantity.list.update	库存批量更新</li>
+</ul>
+<h3><a name="id4">店铺类</a></h3>
+<ul>
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.payment_type.list.get">store.shop.payment_type.list.get</a> 获取店铺支付方式列表</li>
+</ul>
+<h3><a name="id5">交易类</a></h3>
+<ul>
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.aftersale.add">store.trade.aftersale.add</a> 添加一笔交易的售后申请
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.aftersale.status.update">store.trade.aftersale.status.update</a> 修改一笔交易售后申请状态
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.buyer_message.add">store.trade.buyer_message.add</a> 添加一笔交易的买家留言
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.memo.add">store.trade.memo.add</a> 添加一笔交易备注
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.memo.update">store.trade.memo.update</a> 修改一笔交易备注
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.payment.add">store.trade.payment.add</a> 添加交易付款单
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.refund.add">store.trade.refund.add</a> 添加交易退款单
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.reship.add">store.trade.reship.add</a> 添加交易退货单
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.shipping.add">store.trade.shipping.add	</a> 添加交易发货单
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.shippingaddress.update">store.trade.shippingaddress.update</a> 修改一笔交易的收货地址
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.status.update">store.trade.status.update</a> 更新交易状态
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.update">store.trade.update	</a> 修改单笔交易信息
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.reship.status.update">store.trade.reship.status.update</a> 更新交易退货单状态
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.ship_status.update">store.trade.ship_status.update</a> 更新交易发货状态
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.shipping.status.update">store.trade.shipping.status.update	</a> 更新交易发货单状态
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.shipping.update">store.trade.shipping.update</a> 修改交易发货单
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.delivery.send">store.trade.delivery.send</a> 交易发货处理
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.pay_status.update">store.trade.pay_status.update</a> 更新交易支付状态
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.payment.status.update">store.trade.payment.status.update</a> 更新交易支付单状态
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.trade.refund.status.update">store.trade.refund.status.update</a> 更新交易退款单状态</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+<h3><a name="id6">物流类</a></h3>
+<ul>
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.wms.item.add">store.wms.item.add</a> 添加商品
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.wms.item.update">store.wms.item.update</a> 修改商品
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.wms.item.query">store.wms.item.query</a> 根据商家商品编码查询商品信息
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.wms.inorder.create">store.wms.inorder.create</a> 创建入库单
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.wms.inorder.cancel">store.wms.inorder.cancel</a> 撤销入库单
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.wms.outorder.create">store.wms.outorder.create</a> 创建出库单
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.wms.outorder.cancel">store.wms.outorder.cancel</a> 撤销出库单
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.wms.saleorder.create">store.wms.saleorder.create</a> 创建发货单
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.wms.saleorder.cancel">store.wms.saleorder.cancel</a> 撤销发货单
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.wms.returnorder.create">store.wms.returnorder.create	</a> 创建退货单
+<li><a href="http://open.shopex.cn/wiki/index.php?title=store.wms.returnorder.cancel">store.wms.returnorder.cancel	</a> 撤销退货单</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+
+<ul>
+<li>业务实例
+<ul>
+<li>* 业务流程
+<li></li>
+</li>
+</ul>
+</li>
+</ul>
+
+<p>需求汇总表</p>
+</ul>
+
+<ul>
+<li>技术体系 12
+<ul>
+<li>webser db php</ul>
+
+<li>开发技术趋势 12
+<li>技术架构 2
+<li>二次开发手册 1
+<li>安全 1
+<li>it 架构</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">概述</a>
+    <li><a href="#id2" class="reference internal">OSC使用到的开放平台接口</a>
+        <ul>
+        <li><a href="#id3" class="reference internal">商品类</a>
+        <li><a href="#id4" class="reference internal">店铺类</a>
+        <li><a href="#id5" class="reference internal">交易类</a>
+        <li><a href="#id6" class="reference internal">物流类</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="product-initial/product-initial.html"
+                                  title="上一章">OCS初始化数据手册</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="data-dictionary.html"
+                                  title="下一章">数据库字典</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="data-dictionary.html" title="数据库字典" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="product-initial/product-initial.html" title="OCS初始化数据手册" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">OCS开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

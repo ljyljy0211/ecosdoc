@@ -1,0 +1,476 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      codecube &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="codecube" href="index.html" />
+
+        <link rel="next" title="reviewboard" href="review board.html" />
+        <link rel="prev" title="index" href="codecube.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="reviewboard.html" title="review board" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="codecube" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">codecube</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> codecube</h1>
+            <h2><a name="id1">简介</a></h2>
+<p>codecube是图形化的svn管理平台。这里你可以了解codecube是如何安装并配置的。</p>
+<h3><a name="id2">软件列表</a></h3>
+<p>操作系统 CENTOS 5.5codecube
+<ul>
+<li>mysql-5.5.17
+<li>httpd-2.2.22
+<li>subserver-1.6.16
+<li>php-5.3.10
+<li>nginx-1.0.8
+<li>cc(codecube项目)</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</p>
+
+<p>[点击取得codecube] 解压/data/tmp目录，方便管理</p>
+
+<p>创建相关路径
+<ul>
+<li>web目录  /data/www
+<li>svn目录  /data/svn
+<li>源码目录 /data/tmp</li>
+</li>
+</li>
+</ul>
+</p>
+<h3><a name="id3">安装编译所需的库</a></h3><pre>yum -y install yum-utils
+yum -y install gcc gcc-c++ ncurses ncurses-devel autoconf libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel libxml2 libxml2-devel zlib zlib-devel glibc glibc-devel glib2 glib2-devel bzip2 bzip2-devel curl curl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel openldap openldap-devel pcre-devel expat-devel cmake bison
+
+groupadd mysql
+useradd -g mysql mysql
+
+groupadd www
+useradd -g www www
+mkdir -pv /data/www
+chown www:www -R /data/www
+
+groupadd svn
+useradd -g svn svn
+mkdir -pv /data/svn
+chown svn:svn -R /data/svn
+
+mkdir -pv /data/tmp
+</pre><h3><a name="id4">mysql</a></h3><pre>wget http://www.cmake.org/files/v2.8/cmake-2.8.4.tar.gz
+tar zxvf cmake-2.8.4.tar.gz
+cd cmake-2.8.4
+./bootstrap
+make
+make install
+cd ..
+
+wget http://ftp.gnu.org/gnu/bison/bison-2.5.tar.gz
+tar zxvf bison-2.5.tar.gz
+cd bison-2.5
+./configure
+make
+make install
+cd ..
+
+tar xvf /data/tmp/codecube/mysql-5.5.17.tar.gz
+cd mysql-5.5.17/
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
+-DMYSQL_UNIX_ADDR=/tmp/mysql.sock \
+-DDEFAULT_CHARSET=utf8 \
+-DDEFAULT_COLLATION=utf8_general_ci \
+-DWITH_EXTRA_CHARSETS:STRING=utf8,gbk,gb2312 \
+-DWITH_MYISAM_STORAGE_ENGINE=1 \
+-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+-DWITH_MEMORY_STORAGE_ENGINE=1 \
+-DWITH_READLINE=1 \
+-DENABLED_LOCAL_INFILE=1 \
+-DMYSQL_USER=mysql
+make
+make install
+
+ln -s /usr/local/mysql/lib/libmysqlclient.so.18 /usr/lib/libmysqlclient.so.18
+
+cd support-files/
+cp my-large.cnf /etc/my.cnf
+cp mysql.server /etc/rc.d/init.d/mysqld
+cd ../../
+
+chown -R mysql:mysql /usr/local/mysql
+chmod +w /usr/local/mysql
+chmod +x /etc/init.d/mysqld
+
+#service mysqld start 失败的话运行下面命令
+#/usr/local/mysql/scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data &amp;
+</pre>
+<p>设置开机启动<pre>chkconfig --add mysqld
+chkconfig mysqld on
+</pre></p>
+<h3><a name="id5">apache</a></h3><pre>tar xvf /data/tmp/codecube/httpd-2.2.22.tar.gz
+cd httpd-2.2.22/
+cp -rf /data/tmp/codecube/cc/app/codecube/scripts/apache2_authn_allow .
+./configure --prefix=/usr/local/apache2 -enable-dav -enable-so -enable-maintainer-mode -enable-rewrite --with-modules=apache2_authn_allow/
+make
+make install
+# 安装模块
+cd apache2_authn_allow
+make
+make install
+cd ../../
+</pre>
+<p>编辑httpd.conf<pre>vim /usr/local/apache2/conf/httpd.conf
+</pre>在里面添加<pre>LoadModule authn_allow_module modules/mod_authn_allow.so
+</pre>找到下面的内容<pre>User daemon
+Group daemon
+DocumentRoot &quot;/usr/local/apache2/htdocs&quot;
+&lt;Directory &quot;/usr/local/apache2/htdocs&quot;&gt;
+</pre>改为<pre>User www
+Group www
+DocumentRoot &quot;/data/svn&quot;
+&lt;Directory &quot;/data/svn&quot;&gt;
+</pre>站点认证配置<pre>cp -f /data/tmp/codecube/cc/app/codecube/scripts/apache.conf /usr/local/apache2/conf/
+cat &gt;&gt; httpd.conf &lt;&lt;&quot;EOF&quot;
+ServerName localhost
+Include conf/apache.conf
+EOF
+</pre>服务配置<pre>vim  /usr/local/apache2/bin/apachectl
+</pre>在第二行添加两行<pre># chkconfig: 2345 85 15
+# description: Activates/Deactivates Apache Web Server
+</pre>复制脚本文件<pre>cp -f /usr/local/apache2/bin/apachectl /etc/init.d/
+</pre></p>
+
+<p>设置开机启动<pre>chkconfig --add httpd
+chkconfig httpd on
+</pre></p>
+<h3><a name="id6">subversion</a></h3>
+<p>版本必须是1.6.16。把mod_authz_svn替换掉。<pre>tar xvf /data/tmp/codecube/subversion-1.6.16.tar.bz2
+cd subversion-1.6.16.tar.bz2
+
+wget http://www.webdav.org/neon/neon-0.29.6.tar.gz
+tar xvzf neon-0.29.6.tar.gz
+mv neon-0.29.6 neon
+
+cp -rf /data/tmp/codecube/cc/app/codecube/scripts/subversion_authz_svn/* /data/tmp/subversion-1.6.16/subversion/mod_authz_svn
+./configure --prefix=/usr/local/svn --with-apxs=/usr/local/apache2/bin/apxs
+make
+make install
+cd ../../
+</pre>安装完成后httpd.conf文件会自动增加模块<pre>LoadModule dav_svn_module modules/mod_dav_svn.so
+LoadModule authz_svn_module modules/mod_authz_svn.so
+</pre></p>
+
+<p>如果前面都编译正确会显示一下三个so文件<pre>ls /usr/local/apache2/modules/
+    httpd.exp mod_authn_allow.so mod_authz_svn.so mod_dav_svn.so
+</pre></p>
+<h3><a name="id7">php</a></h3>
+<p>安装PHP参照<a href="http://ec-os.net/xbox/server/lnmp/php.html">lnmp服务器</a>，php版本请选择装最新的php5.3.10</p>
+
+<p>安装php的svn扩展<pre>wget http://pear.php.net/go-pear.phar
+php go-pear.phar
+
+wget http://pecl.php.net/get/svn-1.0.1.tgz
+tar xvf svn-1.0.1.tgz
+cd svn-1.0.1
+phpize
+./configure --with-svn=/usr/local/svn --with-libdir=/usr/local/svn/lib
+make LDFLAGS=-L/usr/local/svn/lib
+make install
+cd ../
+</pre>编辑php.ini<pre>cat &gt;&gt; /usr/local/php/etc/php.ini &lt;&lt;&quot;EOF&quot;
+extenstion=svn.so
+EOF
+</pre>设置开机启动<pre>chkconfig --add php-fpm
+chkconfig php-fpm on
+</pre></p>
+<h3><a name="id8">nginx</a></h3>
+<p>配置参照<a href="http://ec-os.net/xbox/server/lnmp/nginx.html">lnmp服务器</a></p>
+
+<p>编译nginx的时候注意：<pre>tar xvf /data/tmp/codecube/nginx-1.0.8.tar.gz
+cd nginx-1.0.8
+cp -rf /data/tmp/codecube/cc/app/codecube/scripts/nginx_auth_mysql .
+./configure --user=www --group=www --prefix=/usr/local/nginx --with-http_ssl_module --add-module=nginx_auth_mysql
+make
+make install
+cd ../
+</pre></p>
+
+<p>codecube站点配置<pre>cp -f /data/tmp/codecube/cc/app/codecube/scripts/nginx.conf /usr/local/nginx/conf/site/codecube.conf
+</pre></p>
+
+<p>nginx启动脚本<pre>cat &gt; /etc/init.d/nginx &lt;&lt;&quot;EOF&quot;
+#!/bin/sh
+#
+# nginx - this script starts and stops the nginx daemin
+#
+# chkconfig:   - 85 15
+# description:  Nginx is an HTTP(S) server, HTTP(S) reverse \
+#               proxy and IMAP/POP3 proxy server
+# processname: nginx
+# config:      /usr/local/nginx/conf/nginx.conf
+# pidfile:     /usr/local/nginx/logs/nginx.pid
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ &quot;$NETWORKING&quot; = &quot;no&quot; ] &amp;&amp; exit 0
+
+nginx=&quot;/usr/local/nginx/sbin/nginx&quot;
+prog=$(basename $nginx)
+
+NGINX_CONF_FILE=&quot;/usr/local/nginx/conf/nginx.conf&quot;
+
+lockfile=/var/lock/subsys/nginx
+
+start() {
+    [ -x $nginx ] || exit 5
+    [ -f $NGINX_CONF_FILE ] || exit 6
+    echo -n $&quot;Starting $prog: &quot;
+    daemon $nginx -c $NGINX_CONF_FILE
+    retval=$?
+    echo
+    [ $retval -eq 0 ] &amp;&amp; touch $lockfile
+    return $retval
+}
+
+stop() {
+    echo -n $&quot;Stopping $prog: &quot;
+    killproc $prog -QUIT
+    retval=$?
+    echo
+    [ $retval -eq 0 ] &amp;&amp; rm -f $lockfile
+    return $retval
+}
+
+restart() {
+    configtest || return $?
+    stop
+    start
+}
+
+reload() {
+    configtest || return $?
+    echo -n $&quot;Reloading $prog: &quot;
+    killproc $nginx -HUP
+    RETVAL=$?
+    echo
+}
+
+force_reload() {
+    restart
+}
+
+configtest() {
+  $nginx -t -c $NGINX_CONF_FILE
+}
+
+rh_status() {
+    status $prog
+}
+
+rh_status_q() {
+    rh_status &gt;/dev/null 2&gt;&amp;1
+}
+
+case &quot;$1&quot; in
+    start)
+        rh_status_q &amp;&amp; exit 0
+        $1
+        ;;
+    stop)
+        rh_status_q || exit 0
+        $1
+        ;;
+    restart|configtest)
+        $1
+        ;;
+    reload)
+        rh_status_q || exit 7
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+            ;;
+    *)
+        echo $&quot;Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload|configtest}&quot;
+        exit 2
+esac
+EOF
+</pre></p>
+
+<p>设置开机启动<pre>chkconfig --add nginx
+chkconfig nginx on
+</pre></p>
+<h2><a name="id9">安装codecube</a></h2>
+<ul>
+<li>创建数据库<pre>mysql -uroot -p
+mysql&gt; CREATE DATABSE codecube
+</pre>
+<li>安装app<pre>cp -rf /data/tmp/codecube/cc /data/www
+/data/www/cc/app/base/cmd install codecube
+</pre>
+<li>svn hook<pre>cd /data/svn
+tar xvf /data/tmp/codecube/hook-runner.tar
+</pre></li>
+</li>
+</li>
+</ul>
+
+<p>访问站点<pre>http://192.168.51.118:667
+</pre>如果访问不了检查下iptables是否为开启状态，关闭他。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">简介</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">软件列表</a>
+        <li><a href="#id3" class="reference internal">安装编译所需的库</a>
+        <li><a href="#id4" class="reference internal">mysql</a>
+        <li><a href="#id5" class="reference internal">apache</a>
+        <li><a href="#id6" class="reference internal">subversion</a>
+        <li><a href="#id7" class="reference internal">php</a>
+        <li><a href="#id8" class="reference internal">nginx</a>
+    </ul>
+    <li><a href="#id9" class="reference internal">安装codecube</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">codecube</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="reviewboard.html"
+                                  title="下一章">review board</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="reviewboard.html" title="review board" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="codecube" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">codecube</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      ecstore 布署 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="ecstore 布署方案及性能指标" href="index.html" />
+
+        <link rel="next" title="performance" href="ecstore 性能指标.html" />
+        <link rel="prev" title="index" href="ecstore 布署方案及性能指标.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="performance.html" title="ecstore 性能指标" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="ecstore 布署方案及性能指标" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore 布署方案及性能指标</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> ecstore 布署</h1>
+            <h2><a name="id1">软件配置　</a></h2>
+<p>linux + nginx + php + mysql + memcache + mongodb + zend guard loader</p>
+<h2><a name="id2">config.php</a></h2>
+<p>mongo 配置:</p>
+<pre>define('KVSTORE_STORAGE', 'base_kvstore_mongodb');
+define('MONGODB_SERVER_CONFIG', 'mongodb://localhost:27017');
+</pre>
+<p>memcahed　配置　:</p>
+<pre>define('CACHE_STORAGE', 'base_cache_memcache');
+define('CACHE_MEMCACHE_CONFIG', '127.0.0.1:11211');
+</pre><h2><a name="id3">mongo index</a></h2><pre>use ecos
+db.defalut.ensureIndex({key:1})
+</pre><h2><a name="id4">nginx pathinfo</a></h2><pre>set $real_script_name $fastcgi_script_name;
+if ($fastcgi_script_name ~ &quot;^(.+?\.php)(/.+)$&quot;) {
+	set $real_script_name $1;
+	set $path_info $2;
+}
+fastcgi_param SCRIPT_FILENAME  $document_root$real_script_name;
+fastcgi_param SCRIPT_NAME $real_script_name;
+fastcgi_param PATH_INFO $path_info;
+</pre><h2><a name="id5">zend guard loader</a></h2>
+<p>扩展安装：</p>
+<pre>1. Extract the Zend Loader package.
+
+2. Locate and extract the ZendGuardLoader.so (Linux) or ZendLoader.dll (Windows) that corresponds to your php version.
+
+3. Add the following line to your php.ini file for loading the ZendGuardLoader:
+   Linux and Mac OS X:      zend_extension=&lt;full_path_to_ZendGuardLoader.so&gt;
+   Windows non-thread safe: zend_extension=&lt;full_path_to_ZendLoader.dll&gt;
+      
+4. Add an aditional line to your php.ini for enabling ZendGuardLoader
+  ; Enables loading encoded scripts. The default value is On
+  zend_loader.enable=1
+     
+5. Optional: following lines can be added your php.ini file for ZendGuardLoader configuration:
+
+   ; Disable license checks (for performance reasons)
+     zend_loader.disable_licensing=0
+   ; The Obfuscation level supported by Zend Guard Loader. The levels are detailed in the official Zend Guard Documentation. 0 - no obfuscation is enabled
+     zend_loader.obfuscation_level_support=3
+   ; Path to where licensed Zend products should look for the product license. For more information on how to create a license file, see the Zend Guard User Guide
+     zend_loader.license_path= 
+
+6. If you use Zend debugger as well, please make sure to load it after the Zend guard Loader
+
+7. If you use ioncube loader, please make sure to load it before Zend guard Loader
+
+8. Restart your Web server.
+</pre>
+<p>license文件设置:</p>
+<pre>zend_loader.license_path= /path/to/license.zl
+</pre><h2><a name="id6">系统调优</a></h2>
+<p>1. 关闭不需要的tty<pre>     $ vim /etc/inittab
+     
+     1:2345:respawn:/sbin/mingetty tty1
+     2:2345:respawn:/sbin/mingetty tty2
+     #3:2345:respawn:/sbin/mingetty tty3
+     #4:2345:respawn:/sbin/mingetty tty4
+     #5:2345:respawn:/sbin/mingetty tty5
+     #6:2345:respawn:/sbin/mingetty tty6
+
+     $ initq
+</pre></p>
+
+<p>2. 对TCP/IP网络参数进行调整<pre>     $ echo 'net.ipv4.tcp_syncookies = 1' &gt;&gt; /etc/sysctl.conf
+     $ sysctl -p
+</pre>3. 修改shell命令的history 记录个数<pre>     $ vim /etc/profile
+     
+     HISTSIZE=100
+</pre>4. 定时校正服务器时间<pre>     $ yum install ntp
+     $ crontab -e
+     */5 * * * * ntpdate ntp.api.bz
+</pre>5. 停止打印服务<pre>     $ /etc/rc.d/init.d/cups stop
+     $ chkconfig --list cups 确认是否关闭
+</pre>6. 停止ipv6<pre>     $ ifconfig -a
+     $ vim /etc/modprobe.conf
+       alias net -pf -10 off
+       alias ipv6 off
+     $ echo &quot;IPV6INIT = no &quot; &gt;&gt; /etc/sysconfig/network-scripts/ifconfig-eth0
+     $ shutdown -r now 
+</pre>7. 调整linux 最大文件打开数<pre>     $ vim /etc/rc.local
+       ulimit -SHn 65535
+</pre>8. 关闭写磁盘I/0功能<pre>     $ vim /etc/fstab
+       /dev/sda5 /data/ ext3 noatime,nodiratime 0 0
+</pre>9. 优化内核TCP参数<pre>     $ vim /etc/sysctl.conf
+           net.ipv4.tcp_fin_timeout = 30
+           net.ipv4.tcp_keepalive_time = 1200
+           net.ipv4.tcp_syncookies = 1
+           net.ipv4.tcp_tw_reuse = 1
+           net.ipv4.tcp_tw_recycle = 1
+           net.ipv4.ip_local_port_range = 1024 65000
+           net.ipv4.tcp_max_syn_backlog = 8192
+           net.ipv4.tcp_max_tw_buckets = 5000
+     $ sysctl -p
+</pre><h2><a name="id7">nginx 调优</a></h2><pre>  worker_processes  8;
+  worker_cpu_affinity 00000001 00000010 00000100 00001000 00010000 00100000 01000000 10000000;
+  worker_connections 65535;
+  keepalive_timeout 60;
+  client_header_buffer_size 8k;
+  worker_rlimit_nofile 65535;
+</pre></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">软件配置　</a>
+    <li><a href="#id2" class="reference internal">config.php</a>
+    <li><a href="#id3" class="reference internal">mongo index</a>
+    <li><a href="#id4" class="reference internal">nginx pathinfo</a>
+    <li><a href="#id5" class="reference internal">zend guard loader</a>
+    <li><a href="#id6" class="reference internal">系统调优</a>
+    <li><a href="#id7" class="reference internal">nginx 调优</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">ecstore 布署方案及性能指标</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="performance.html"
+                                  title="下一章">ecstore 性能指标</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="performance.html" title="ecstore 性能指标" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="ecstore 布署方案及性能指标" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore 布署方案及性能指标</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      b2c.order.detail 查询订单详情 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="ecstore  被外部系统请求的api接口" href="index.html" />
+
+        <link rel="next" title="result" href="订单详情返回值(json(array)).html" />
+        <link rel="prev" title="b2c.order.search" href="b2c.order.search 搜索订单.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="result.html" title="订单详情返回值(json(array))" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="b2c.order.search.html" title="b2c.order.search 搜索订单" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../api.html">API</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore  被外部系统请求的api接口</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> b2c.order.detail 查询订单详情</h1>
+            <h2><a name="id1">API应用级输入参数</a></h2>
+<table class="docutils">
+<tr>
+<th>参数</th>
+
+<th>类型</th>
+
+<th>长度</th>
+
+<th>是否必须</th>
+
+<th>说明 及 示例</th>
+</tr>
+
+<tr>
+<td>tid</td>
+
+<td>string</td>
+
+<td>16</td>
+
+<td>Y</td>
+
+<td>订单号 (20140218196737)</td>
+</tr>
+</table>
+</table>
+<h2><a name="id2">API应用级返回结果</a></h2>
+<p>成功：<pre class="mark">data 为json数据
+Array
+(
+    [rsp] =&gt; succ
+    [data] =&gt; {&quot;rsp&quot;:&quot;succ&quot;,&quot;data&quot;:null,&quot;res&quot;:&quot;\u8be5\u8bf7\u6c42\u5df2\u7ecf\u5904\u7406\uff0c\u4e0d\u80fd\u5728\u5904\u7406\u4e86\uff01&quot;}{&quot;rsp&quot;:&quot;succ&quot;,&quot;data&quot;:{&quot;tid&quot;:&quot;20140218196737&quot;,&quot;title&quot;:&quot;Order Create&quot;,&quot;created&quot;:&quot;2014-02-18 19:01:10&quot;,&quot;modified&quot;:&quot;2014-02-18 19:01:18&quot;,&quot;lastmodify&quot;:&quot;2014-02-18 19:01:18&quot;,&quot;status&quot;:&quot;TRADE_ACTIVE&quot;,&quot;pay_status&quot;:&quot;PAY_FINISH&quot;,&quot;ship_status&quot;:&quot;SHIP_NO&quot;,&quot;has_invoice&quot;:false,&quot;invoice_title&quot;:&quot;&quot;,&quot;invoice_fee&quot;:&quot;0.000&quot;,&quot;total_goods_fee&quot;:&quot;88.20&quot;,&quot;total_trade_fee&quot;:&quot;44.200&quot;,&quot;discount_fee&quot;:&quot;0.000&quot;,&quot;goods_discount_fee&quot;:&quot;0.000&quot;,&quot;orders_discount_fee&quot;:&quot;0.000&quot;,&quot;payed_fee&quot;:&quot;44.200&quot;,&quot;currency&quot;:&quot;CNY&quot;,&quot;currency_rate&quot;:&quot;1.0000&quot;,&quot;total_currency_fee&quot;:&quot;44.200&quot;,&quot;buyer_obtain_point_fee&quot;:&quot;0.000&quot;,&quot;point_fee&quot;:&quot;44.000&quot;,&quot;total_weight&quot;:&quot;0.000&quot;,&quot;receiver_time&quot;:&quot;\u4efb\u610f\u65e5\u671f\u4efb\u610f\u65f6\u95f4\u6bb5&quot;,&quot;shipping_tid&quot;:&quot;1&quot;,&quot;shipping_type&quot;:&quot;\u5feb\u9012&quot;,&quot;shipping_fee&quot;:&quot;0.000&quot;,&quot;is_protect&quot;:&quot;false&quot;,&quot;protect_fee&quot;:&quot;0.000&quot;,&quot;payment_tid&quot;:&quot;deposit&quot;,&quot;payment_type&quot;:&quot;\u9884\u5b58\u6b3e&quot;,&quot;is_cod&quot;:&quot;false&quot;,&quot;receiver_name&quot;:&quot;123&quot;,&quot;receiver_email&quot;:&quot;&quot;,&quot;receiver_mobile&quot;:&quot;123&quot;,&quot;receiver_state&quot;:&quot;\u4e0a\u6d77&quot;,&quot;receiver_city&quot;:&quot;\u4e0a\u6d77\u5e02&quot;,&quot;receiver_district&quot;:&quot;\u6768\u6d66\u533a&quot;,&quot;receiver_address&quot;:&quot;\u4e0a\u6d77\u5e02\u6768\u6d66\u533a123&quot;,&quot;receiver_zip&quot;:&quot;&quot;,&quot;receiver_phone&quot;:&quot;&quot;,&quot;pay_cost&quot;:&quot;0.000&quot;,&quot;buyer_memo&quot;:&quot;&quot;,&quot;orders_number&quot;:1,&quot;buyer_uname&quot;:&quot;demo&quot;,&quot;buyer_name&quot;:&quot;&quot;,&quot;buyer_address&quot;:&quot;&quot;,&quot;buyer_mobile&quot;:&quot;&quot;,&quot;buyer_phone&quot;:&quot;&quot;,&quot;buyer_email&quot;:&quot;demo@demo.2&quot;,&quot;buyer_zip&quot;:null,&quot;orders&quot;:{&quot;order&quot;:[{&quot;oid&quot;:&quot;31&quot;,&quot;orders_bn&quot;:&quot;P4C92CFA31E88A&quot;,&quot;type&quot;:&quot;goods&quot;,&quot;type_alias&quot;:&quot;\u5546\u54c1\u533a\u5757&quot;,&quot;iid&quot;:&quot;31&quot;,&quot;title&quot;:&quot;\u5168\u68c9\u4e94\u5206\u8896\u7ed1\u7ef3\u8fde\u5e3d\u77ed\u6b3e\u9488\u7ec7\u886b&quot;,&quot;items_num&quot;:1,&quot;order_status&quot;:&quot;SHIP_NO&quot;,&quot;price&quot;:&quot;88.200&quot;,&quot;total_order_fee&quot;:88.2,&quot;sale_price&quot;:88.2,&quot;discount_fee&quot;:0,&quot;consign_time&quot;:&quot;&quot;,&quot;order_items&quot;:{&quot;item&quot;:[{&quot;sku_id&quot;:&quot;303&quot;,&quot;iid&quot;:&quot;47&quot;,&quot;bn&quot;:&quot;P4C92CFA31E88A&quot;,&quot;name&quot;:&quot;\u5168\u68c9\u4e94\u5206\u8896\u7ed1\u7ef3\u8fde\u5e3d\u77ed\u6b3e\u9488\u7ec7\u886b&quot;,&quot;sku_properties&quot;:&quot;\u989c\u8272:\u9ed1\u8272;\u5c3a\u7801:S&quot;,&quot;weight&quot;:null,&quot;score&quot;:&quot;0&quot;,&quot;price&quot;:&quot;88.200&quot;,&quot;num&quot;:&quot;1&quot;,&quot;sendnum&quot;:&quot;0&quot;,&quot;total_item_fee&quot;:88.2,&quot;sale_price&quot;:&quot;88.200&quot;,&quot;item_type&quot;:&quot;product&quot;,&quot;item_status&quot;:&quot;normal&quot;,&quot;discount_fee&quot;:0}]},&quot;weight&quot;:&quot;0&quot;}]},&quot;trade_memo&quot;:null},&quot;res&quot;:&quot;&quot;}
+    [res] =&gt; 
+)
+</pre></p>
+
+<ul>
+    <li><a href="result.html" class="">订单详情返回值(json(array))</a>
+</ul>
+
+<p>失败：<pre class="mark">Array
+(
+    [rsp] =&gt; fail
+    [data] =&gt; &quot;xxx错误&quot;
+    [res] =&gt; &quot;错误码&quot;
+)
+</pre></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">API应用级输入参数</a>
+    <li><a href="#id2" class="reference internal">API应用级返回结果</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="b2c.order.search.html"
+                                  title="上一章">b2c.order.search 搜索订单</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="result.html"
+                                  title="下一章">订单详情返回值(json(array))</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="result.html" title="订单详情返回值(json(array))" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="b2c.order.search.html" title="b2c.order.search 搜索订单" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../api.html">API</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore  被外部系统请求的api接口</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

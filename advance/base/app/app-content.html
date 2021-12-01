@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      资源探测器 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../doc.html" />
+    <link rel="up" title="app机制" href="../app.html" />
+
+        <link rel="next" title="dev-application" href="维护app的生命周期.html" />
+        <link rel="prev" title="application" href="app包管理.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="dev-application.html" title="维护app的生命周期" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="application.html" title="app包管理" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../app.html">app机制</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 资源探测器</h1>
+            <h2><a name="id1">资源探测器是什么?</a></h2>
+<p>在Ecos系统里, 每个APP会有很多的资源, 例如:service.xml, dbschema定义文件, site.xml等. 系统支持的资源会在APP进行安装 更新 卸载 暂停 启用时, 进行相应的安装,卸载等相应的资源.</p>
+
+<p>Ecos对于资源的识别和管理, 是通过资源探测器来完成的.</p>
+<h2><a name="id2">两种类型的资源探测器</a></h2>
+<ul>
+<li>xml文件资源探测器, 例如: app.xml, services.xml.
+<li>目录资源探测器, 例如: dbschema定义目录, 语言包等</li>
+</li>
+</ul>
+<h2><a name="id3">系统里都有什么资源探测器</a></h2>
+<p>系统里会内置多个核心的资源</p>
+
+<ul>
+<li>数据库定义目录资源探测器-base_application_dbtable  关注dbschema
+<li>service资源探测器-base_application_service 关注services.xml
+<li>语言包资源探测器-base_application_lang
+<li>缓存更新探测器-base_application_cache_expires</li>
+</li>
+</li>
+</li>
+</ul>
+
+<p>其余的资源探测器, 都通过service的形式进行注册, 注册点为app_content_detctor</p>
+
+<p>先来看看系统里目前已注册的资源探测器</p>
+<pre>./cmd dev:show services | grep -i app_content_detector
+</pre><h2><a name="id4">资源探测器开发</a></h2><h3><a name="id5">资源探测器基类</a></h3><pre class="mark">sh: dot: command not found
+</pre>
+<p>base_application_prototype_xml(xml文件资源探测器)类提供了可以遍历xml文件下某个节点下所有子节点的接口</p>
+
+<p>base_application_prototype_filepath(目录资源探测器)类提供了可以遍历目录里所有文件或目录的接口</p>
+<pre class="quote">补充知识:
+
+如果你希望支持其他类型的资源探测器,需要你自己进行扩展了.
+开发需要预先学习[Iterator http://cn.php.net/manual/cn/class.iterator.php]
+然后参考一下base_application_prototype_xml类和base_application_prototype_filepath类
+</pre>
+<p>因为最底层的基类implements <a href="http://cn.php.net/manual/cn/class.iterator.php">Iterator</a>, 所以对于Iterator, 还是要有个基本的了解</p>
+<h3><a name="id6">如何开发xml文件资源探测器</a></h3>
+<p>这里拿desktop app的后台权限探测器做个例子. 后台菜单探测器针对的是desktop.xml内寻取permissions下的所有pemission子节点.</p>
+<h4><a name="id7">建立类文件</a></h4>
+<p>首先要确认用哪种类型的探测器. 在本例中, 是针对xml类型的文件, 因此...</p>
+<pre class="quote">补充知识:
+
+资源探测器存放的位置, 按照管理放在app/{$app_id}/lib/application目录下
+</pre><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">desktop_application_permission&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">base_application_prototype_xml&nbsp;</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br />}<br /><br /><br /></span>
+</span>
+</code></div>
+<p>文件位置: app/desktop/lib/application/permission.php</p>
+<h4><a name="id8">注册成service</a></h4>
+<p>首先需要在service中进行注册, 在desktop app中有一组针对desktop.xml的探测器.</p>
+
+<p>app/desktop/desktop.xml<pre>&lt;services&gt;
+   ...
+   &lt;service id=&quot;app_content_detector&quot;&gt;
+        &lt;class&gt;desktop_application_permission&lt;/class&gt;   
+        &lt;class&gt;desktop_application_menu&lt;/class&gt;
+        &lt;class&gt;desktop_application_workground&lt;/class&gt;
+        &lt;class&gt;desktop_application_panelgroup&lt;/class&gt;
+        &lt;class&gt;desktop_application_adminpanel&lt;/class&gt;
+        &lt;class&gt;desktop_application_theme&lt;/class&gt;
+        &lt;class&gt;desktop_application_widgets&lt;/class&gt;
+    &lt;/service&gt;
+    ...
+&lt;/services&gt;
+</pre><h4><a name="id9">确认所关注的xml资源和节点</a></h4>这里会用到 $xml, $xsd, $path<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">desktop_application_permission&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">base_application_prototype_xml&nbsp;</span><span style="color: #007700">{<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$xml</span><span style="color: #007700">=</span><span style="color: #DD0000">'desktop.xml'</span><span style="color: #007700">;&nbsp;</span><span style="color: #FF8000">//指定关注的xml资源,&nbsp;本例中会调取app/desktop/desktop.xml,&nbsp;本属性支持路径,&nbsp;例如:&nbsp;'abc/kkk.xml'<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">var&nbsp;</span><span style="color: #0000BB">$xsd</span><span style="color: #007700">=</span><span style="color: #DD0000">'desktop_content'</span><span style="color: #007700">;&nbsp;</span><span style="color: #FF8000">//指定xml对应的xsd位置,&nbsp;本例中为&nbsp;app/desktop/xmlschema/content.xsd<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">var&nbsp;</span><span style="color: #0000BB">$path&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'permissions/permission'</span><span style="color: #007700">;&nbsp;</span><span style="color: #FF8000">//设定关注的xml的节点,&nbsp;采用xpath的方式获取.&nbsp;本例中意味着会在desktop.xml寻取permissions下的所有pemission子节点.<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">...<br />}<br /></span>
+</span>
+</code></div><h4><a name="id10">编写回调函数</a></h4></p>
+<h5><a name="id11">current</a></h5>
+<p>设置当前遍历子节点的内容($current)和当前元素的键($key)</p>
+
+<p>通过$this-&gt;iterator()-&gt;current(), 可以获得当前xml子节点的array数据.</p>
+
+<p>在本例中$this-&gt;iterator()-&gt;current()返回的是遍历到的当前permissions/permission/节点数据.</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">desktop_application_permission&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">base_application_prototype_xml&nbsp;</span><span style="color: #007700">{<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">current</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">current&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">iterator</span><span style="color: #007700">()-&gt;</span><span style="color: #0000BB">current</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">key&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">current</span><span style="color: #007700">[</span><span style="color: #DD0000">'id'</span><span style="color: #007700">];<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;...<br /></span>
+</span>
+</code></div><h5><a name="id12">install</a></h5>
+<p>资源安装, 在app install时会调用</p>
+
+<p>需要重载</p>
+
+<p>安装当前遍历节点的数据</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">desktop_application_permission&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">base_application_prototype_xml&nbsp;</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">install</span><span style="color: #007700">(){&nbsp;&nbsp;&nbsp;&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">log</span><span style="color: #007700">(</span><span style="color: #DD0000">'Installing&nbsp;'</span><span style="color: #007700">.</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">content_typename</span><span style="color: #007700">().</span><span style="color: #DD0000">'&nbsp;'</span><span style="color: #007700">.</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">key</span><span style="color: #007700">());<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'desktop'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">(</span><span style="color: #DD0000">'menus'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">insert</span><span style="color: #007700">(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">row</span><span style="color: #007700">());<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">row</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$row&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'menu_type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">content_typename</span><span style="color: #007700">(),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'app_id'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">target_app</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app_id</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #DD0000">'menu_title'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">current</span><span style="color: #007700">[</span><span style="color: #DD0000">'value'</span><span style="color: #007700">];<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #DD0000">'display'</span><span style="color: #007700">]&nbsp;=&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">current</span><span style="color: #007700">[</span><span style="color: #DD0000">'display'</span><span style="color: #007700">];<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$access_opct&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'show'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">current</span><span style="color: #007700">[</span><span style="color: #DD0000">'show'</span><span style="color: #007700">],<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'save'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">current</span><span style="color: #007700">[</span><span style="color: #DD0000">'save'</span><span style="color: #007700">],<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #DD0000">'addon'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">serialize</span><span style="color: #007700">(</span><span style="color: #0000BB">$access_opct</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #DD0000">'permission'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">current</span><span style="color: #007700">[</span><span style="color: #DD0000">'id'</span><span style="color: #007700">];&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$row</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;&nbsp;<br /></span>
+</span>
+</code></div><h5><a name="id13">clear_by_app</a></h5>
+<p>资源卸载, 在app uninstall时会调用</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">desktop_application_permission&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">base_application_prototype_xml&nbsp;</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">clear_by_app</span><span style="color: #007700">(</span><span style="color: #0000BB">$app_id</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(!</span><span style="color: #0000BB">$app_id</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'desktop'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">(</span><span style="color: #DD0000">'menus'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">delete</span><span style="color: #007700">(array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'app_id'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$app_id</span><span style="color: #007700">,</span><span style="color: #DD0000">'menu_type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">content_typename</span><span style="color: #007700">()));<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /></span>
+</span>
+</code></div><h5><a name="id14">update</a></h5>
+<p>资源更新, 在app update时会调用</p>
+
+<p>update所有节点, 在基类中的实现会遍历所有节点, 然后对每个节点进行install通常不需要重载</p>
+<h5><a name="id15">active_by_app</a></h5>
+<p>资源卸载, 在app active时会调用</p>
+
+<p>通常不需要重载</p>
+<h5><a name="id16">pause_by_app</a></h5>
+<p>资源暂停, 在app pause时会调用</p>
+
+<p>如果不重载此函数, 默认的情况是调用clear_by_app</p>
+
+<p>通常不需要重载</p>
+<h3><a name="id17">如何开发目录型资源探测器</a></h3>
+<p>和开发xml文件资源探测器的方式基本一致，区别在于:</p>
+
+<ul>
+<li>去掉了$xml和$xsd属性. $path路径用来标识关注的目录, 目录支持路径
+<li>增加了filter()函数, 可以只遍历$path目录下关注的文件和目录
+<li>current()函数无需重载, 基类提供的函数默认设置$key为文件名/目录名
+<li>增加getPathname()函数, 可以取得当前节点的目录名
+<li>增加getFilename()函数, 可以取得当前节点的文件名</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+
+<p>可以参考: site_application_widgets类</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">资源探测器是什么?</a>
+    <li><a href="#id2" class="reference internal">两种类型的资源探测器</a>
+    <li><a href="#id3" class="reference internal">系统里都有什么资源探测器</a>
+    <li><a href="#id4" class="reference internal">资源探测器开发</a>
+        <ul>
+        <li><a href="#id5" class="reference internal">资源探测器基类</a>
+        <li><a href="#id6" class="reference internal">如何开发xml文件资源探测器</a>
+            <ul>
+            <li><a href="#id7" class="reference internal">建立类文件</a>
+            <li><a href="#id8" class="reference internal">注册成service</a>
+            <li><a href="#id9" class="reference internal">确认所关注的xml资源和节点</a>
+            <li><a href="#id10" class="reference internal">编写回调函数</a>
+                <ul>
+                <li><a href="#id11" class="reference internal">current</a>
+                <li><a href="#id12" class="reference internal">install</a>
+                <li><a href="#id13" class="reference internal">clear_by_app</a>
+                <li><a href="#id14" class="reference internal">update</a>
+                <li><a href="#id15" class="reference internal">active_by_app</a>
+                <li><a href="#id16" class="reference internal">pause_by_app</a>
+            </ul>
+        </ul>
+        <li><a href="#id17" class="reference internal">如何开发目录型资源探测器</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="application.html"
+                                  title="上一章">app包管理</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="dev-application.html"
+                                  title="下一章">维护app的生命周期</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="dev-application.html" title="维护app的生命周期" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="application.html" title="app包管理" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../app.html">app机制</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

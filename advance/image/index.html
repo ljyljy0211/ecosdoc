@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      图片管理 - image &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="Ecos手册" href="../index.html" />
+
+        <link rel="next" title="../content/index" href="内容管理(CMS) - content.html" />
+        <link rel="prev" title="../desktop/dev" href="desktop开发指南.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../content/index.html" title="内容管理(CMS) - content" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../desktop/dev.html" title="desktop开发指南" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 图片管理 - image</h1>
+            <h3><a name="id1">概述</a></h3>
+<p>image集成了图片的管理功能，即图片的上传、修改（生成大中小图、缩略图、添加水印等）、储存等功能。</p>
+<h3><a name="id2">运行机制</a></h3>
+<p>通过模板标签，打开图片上传页面，返回图片唯一标识符或者原图地址。再通过表单传到后台。当需要调用图片的时候，通过唯一标识符从数据库中读取原图地址，通过img标签显示。</p>
+
+<p><b>图片添加水印处理过程</b>：当向系统提交图片处理，并不是立即处理，而是先将要进行的图片处理任务提交到系统队列，以每次两张的速度进行处理（队列默认速度为30秒）。在处理过程中watermark方法会调用image_clip类中的image_watermark方法（该方法中通过set_tools获取本文开头部分四个工具中的某一个，如果系统ECAE_MODE被宏定义过且不为false，则选用ecae工具，否则由IMAGE_TOOL参数定义，如果以上参数均未定义或者，则默认用php最基本的GD工具库。并调用相关工具的watermark方法），最后返回image的数据流。</p>
+<h3><a name="id3">图片处理工具</a></h3>
+<p>image工具中，内置了四个图像处理工具（修改大小和合成水印），实现image_interface_tool接口（目前只提供修改大小的resize方法和添加水印的watermark方法）。在实际使用中，因为已经封装在image_clip类中，所以在实际使用中需要调用image_clip类的image_resize方法和image_watermark方法，而不是直接调用工具。</p>
+
+<p><b>ecae</b></p>
+
+<p>ECAE平台中为了提高图片处理的性能舍弃了原有的GD类库提供了一款比GD库性能更高、效果更佳的图片处理方式。</p>
+
+<p><b>GD</b></p>
+
+<p>php处理图形的扩展库，GD库提供了一系列用来处理图片的API，使用GD库可以处理图片，或者生成图片。 在网站上GD库通常用来生成缩略图，或者用来对图片加水印，或者用来生成汉字验证码，或者对网站数据生成报表等。</p>
+
+<p><b>imagick</b></p>
+
+<p>一个可以供PHP调用ImageMagick功能的PHP扩展。使用这个扩展可以使PHP具备和ImageMagick相同的功能。能够读写、操作185种基本格式图片文件。</p>
+
+<p><b>magickwand</b></p>
+
+<p>是PHP的一个扩展程序，通过它建立起与ImageMagick的交互，进行图片的处理。它是默认的GD图象函数库的绝佳替代方案。从安全性和易用性来说，在PHP中使用MagickWand比使用命令行ImageMagick要安全快捷的多。另外 imagick也可用于PHP中作为ImageMagick的替代方案。</p>
+<h2><a name="id4">image使用方法</a></h2><h3><a name="id5">图片上传</a></h3>
+<p>页面提交表单中，需要加入如下input标签：<pre> &lt;{input type=&quot;image&quot; name=&quot;$name&quot; width=160 height=90}&gt;
+</pre><br /><img border="0" alt="" align="middle" src="images/screenshot1.png" /></p>
+
+<p>点击‘选择’后就可以打开图片上传页面：</p>
+
+<p>或者是使用<tt class="docutils literal"><span class="pre">image_button</span></tt>类型的input标签：</p>
+<pre> &lt;{input type=&quot;image_button&quot; name=&quot;$name&quot;}&gt;
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="images/screenshot6.png" /></p>
+
+<p>点击“上传图片”按钮同样可以打开图片上传页面。</p>
+
+<p>本地上传方式、现有图片选择方式、网络图片选择方式。</p>
+
+<p>需要注意的地方：<pre class="mark">该标签为模板标签，所以不支持css样式，如果需要修改大小，需要用标签的width属性和height属性。
+</pre></p>
+<h3><a name="id6">后台接收</a></h3>
+<p>使用该input标签上传到控制器的内容为一条图片的唯一标识字符串（图片保存在“项目名/public/images”目录下）。</p>
+
+<p>控制器中接收到的数据是String(32)类型的变量（如图所示）。<br /><img border="0" alt="" align="middle" src="images/screenshot5.png" /></p>
+<h3><a name="id7">图片获取</a></h3>
+<p>在控制器中，可以通过<tt class="docutils literal"><span class="pre">base_storager::image_path($image_id,$image_size)</span></tt>方法获得图片的真实地址。</p>
+
+<p>在开发过程中，如需使用图片，在数据库中记录该唯一标识符即可。</p>
+<pre>$image_src=base_storager::image_path($image_id);//原图路径
+$image_src=base_storager::image_path($image_id,$image_size);//对应尺寸缩略图
+</pre>
+<p>参数为：图片唯一标识符，图片大小（为字符串类型：'l'代表大图，'m'代表中图，'s'代表小图）。</p>
+
+<p>在模板中，通过如下方法获取图片：<pre>&lt;img src=&quot;$image_src&quot;&gt;//通过控制器获取图片地址再传到前台
+&lt;img src=&quot;&lt;{$image_id|storager}&gt;&quot;&gt;//获取原图
+&lt;img src=&quot;&lt;{$image_id|storager:'l'}&gt;&quot;&gt;//获取大图
+&lt;img src=&quot;&lt;{$image_id|storager:'m'}&gt;&quot;&gt;//获取中图
+&lt;img src=&quot;&lt;{$image_id|storager:'s'}&gt;&quot;&gt;//获取小图
+</pre></p>
+<h2><a name="id8">图片管理</a></h2><h3><a name="id9">图形化管理界面</a></h3>
+<p>图片管理位于“控制面板”-&gt;“图片管理”。</p>
+
+<p>包括“图片管理”和“商品图片配置”分别对应“数据库图片表”和<tt class="docutils literal"><span class="pre">kvstore</span></tt>中的<tt class="docutils literal"><span class="pre">image</span></tt>设置。（图片关联表在商品图片设置等其它设置类似设置地方修改）</p>
+<h3><a name="id10">Shell管理</a></h3>
+<p>image应用为我们提供了两条命令来维护图片<pre>image:resize filesystem                 filesystem图片重新生成
+image:resize refreshmodify              强制刷新图片最新更新时间
+</pre><pre>image:resize filesystem [large|middle|small] [$image_id]
+</pre>其中：<tt class="docutils literal"><span class="pre">image:resize filesystem</span></tt>为命令开头，<tt class="docutils literal"><span class="pre">[large|middle|small]</span></tt>表示重新生成的缩略图为大图、中图、小图，[$image_id]为需要修改的图片的唯一标识符（数据库主键参数）。</p>
+<pre>image:resize refreshmodify [$image_id]
+</pre>
+<p>其中：<tt class="docutils literal"><span class="pre">image:resize filesystem</span></tt>为命令开头，[$image_id]为需要修改的图片的唯一标识符（数据库主键参数）。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+        <ul>
+        <li><a href="#id1" class="reference internal">概述</a>
+        <li><a href="#id2" class="reference internal">运行机制</a>
+        <li><a href="#id3" class="reference internal">图片处理工具</a>
+    </ul>
+    <li><a href="#id4" class="reference internal">image使用方法</a>
+        <ul>
+        <li><a href="#id5" class="reference internal">图片上传</a>
+        <li><a href="#id6" class="reference internal">后台接收</a>
+        <li><a href="#id7" class="reference internal">图片获取</a>
+    </ul>
+    <li><a href="#id8" class="reference internal">图片管理</a>
+        <ul>
+        <li><a href="#id9" class="reference internal">图形化管理界面</a>
+        <li><a href="#id10" class="reference internal">Shell管理</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../desktop/dev.html"
+                                  title="上一章">desktop开发指南</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../content/index.html"
+                                  title="下一章">内容管理(CMS) - content</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../content/index.html" title="内容管理(CMS) - content" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../desktop/dev.html" title="desktop开发指南" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

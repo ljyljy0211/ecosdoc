@@ -1,0 +1,380 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      创建项目目录并安装 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="创建一个带后端的留言版" href="index.html" />
+
+        <link rel="next" title="basic" href="创建数据表，实现基本功能代码.html" />
+        <link rel="prev" title="index" href="创建一个带后端的留言版.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="basic.html" title="创建数据表，实现基本功能代码" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="创建一个带后端的留言版" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">快速入门</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">创建一个带后端的留言版</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 创建项目目录并安装</h1>
+            <h2><a name="id1">初始化项目</a></h2>
+<ul>
+<li>首先，我们需ecos的源码。 获取方式参见：<a href="../../prepare/get.html">如何获取ECOS</a></li>
+</ul>
+
+<ul>
+<li><b>app/base</b>下提供了一个简单的命令行工具，在使用命令提示符前，要先配置一下环境变量(<i>如果已经配置PHP环境变量，可以省略这一步</i>)。具体操作步骤如下：</ul>
+
+<ol>
+<ol>
+<li>右键单击<b>我的电脑</b>，在弹出的<b>系统属性</b>对话框中，单击<b>高级</b>选项卡下的<b>环境变量</b>按钮，如下图所示：
+<p><br /><img border="0" alt="" align="middle" src="image/cmd02.png" />
+<li>在弹出的<b>环境变量</b>对话框中的<b>系统变量</b>栏选择<b>Path</b>变量，单击<b>编辑</b>按钮，如下图所示：<br /><img border="0" alt="" align="middle" src="image/cmd03.png" />
+<li>在弹出的<b>编辑系统变量</b>对话框中的<b>变量值</b>输入框中添加上<b>PHP</b>的安装路径，如下图所示：<br /><img border="0" alt="" align="middle" src="image/cmd04.png" /></ol>
+
+<ul>
+<li>我们可以在命令提示符输入“<b>help</b>”来验证一下<b>环境变量</b>是否配置成功，效果图如下：<br /><img border="0" alt="" align="middle" src="image/cmd01.png" />
+<li>接下来我们新建一个数据库：<br /><img border="0" alt="" align="middle" src="image/data01.png" /><pre class="quote">在以后的操作中我们会经常用到这个命令行工具。所以，大家最好能记住一些常用命令。
+</pre>
+<li>我们在<b>app</b>目录下新建一个<b>app/notebook</b>，包含文件及文件夹如下如所示：<br /><img border="0" alt="" align="middle" src="image/data02.png" /></li>
+</li>
+</li>
+</ul>
+</li>
+</p>
+</li>
+</ol>
+</ol>
+</ul>
+
+<ul>
+<li>新建<b>app</b>描述文件<b>app/notebook/app.xml</b>,内容如下：<pre>&lt;app&gt;
+    &lt;name&gt;留言本&lt;/name&gt;
+    &lt;description&gt;Pluggable Authentication Modules&lt;/description&gt;
+
+    &lt;author&gt;
+        &lt;name&gt;shopex开发团队&lt;/name&gt;
+        &lt;email&gt;dev@shopex.cn&lt;/email&gt;
+        &lt;url&gt;http://www.shopex.cn&lt;/url&gt;
+    &lt;/author&gt;
+
+    &lt;version&gt;0.1&lt;/version&gt;
+    &lt;license&gt;shopex license&lt;/license&gt;
+
+	&lt;depends&gt;
+		&lt;app&gt;base&lt;/app&gt;
+	&lt;/depends&gt;
+
+&lt;/app&gt;
+</pre>
+<li>文件说明
+<p>现在notebook下的目录结构是这样的：</p>
+</li>
+</li>
+</ul>
+
+<table class="docutils">
+<tr>
+<th>路径</th>
+
+<th>说明</th>
+</tr>
+
+<tr>
+<td>app</td>
+
+<td>所有App放置目录</td>
+</tr>
+
+<tr>
+<td>app/base/...</td>
+
+<td>应用base所在目录</td>
+</tr>
+
+<tr>
+<td>app/notebook</td>
+
+<td>应用notebook所在目录</td>
+</tr>
+
+<tr>
+<td>config/config.php</td>
+
+<td>主配置文件</td>
+</tr>
+
+<tr>
+<td>config/mapper.php</td>
+
+<td>URL映射配置文件</td>
+</tr>
+
+<tr>
+<td>data</td>
+
+<td>数据文件夹</td>
+</tr>
+
+<tr>
+<td>index.php</td>
+
+<td>php入口文件</td>
+</tr>
+</table>
+</table>
+
+<p>app/notebook下的内容如下：
+<table class="docutils">
+<tr>
+<th>路径</th>
+
+<th>说明</th>
+</tr>
+
+<tr>
+<td>app/notebook/model</td>
+
+<td>模型目录</td>
+</tr>
+
+<tr>
+<td>app/notebook/view</td>
+
+<td>视图目录</td>
+</tr>
+
+<tr>
+<td>app/notebook/controller</td>
+
+<td>控制器目录</td>
+</tr>
+
+<tr>
+<td>app/notebook/dbschema</td>
+
+<td>数据库表结构定义</td>
+</tr>
+
+<tr>
+<td>app/notebook/lang</td>
+
+<td>语言包文件夹</td>
+</tr>
+
+<tr>
+<td>app/notebook/lib</td>
+
+<td>php类库文件</td>
+</tr>
+</table>
+</p>
+</table>
+
+<p>每个应用都是一个独立完整的MVC结构（<a href="../advance/part/mvc.html">../advance/part/mvc.html</a>）。并且可以有自己的数据表，语言包。安装项目实际上就是安装对应的app。 现在我们的应用安装好，下一步进行功能实现。
+<ul>
+<li>现在我们在命令提示符输入<b>install notebook</b>自动安装notebook:</li>
+</ul>
+</p>
+<pre>notebook &gt; app/base/cmd install notebook
+
+  1. 数据库主机     localhost
+  2. 数据库用户名  root
+  3. 数据库密码     (empty)
+  4. 数据库名
+  5. 数据库表前缀  sdb_
+  6. 默认时区        (北京时间) 北京、重庆、香港、新加坡
+________________________________________
+输入项目编号,或输入井号&quot;#&quot;确认:
+</pre>
+<ul>
+<li>输入4回车，选择一个要安装的数据库。</li>
+</ul>
+<pre>输入项目编号,或输入井号&quot;#&quot;确认: 4
+
+选择合适的数据库名:
+  1. information_schema
+  2. mysql
+  3. notebook
+输入合适的数据库名编号:
+</pre>
+<ul>
+<li>我们选择名为notebook的数据库，这里输入3</li>
+</ul>
+<pre>  1. 数据库主机     localhost
+  2. 数据库用户名  root
+  3. 数据库密码     (empty)
+  4. 数据库名        notebook
+  5. 数据库表前缀  sdb_
+  6. 默认时区        (北京时间) 北京、重庆、香港、新加坡
+________________________________________
+输入项目编号,或输入井号&quot;#&quot;确认: #
+</pre>
+<ul>
+<li>回到最开始的菜单，我们输入<tt class="docutils literal"><span class="pre">#</span></tt>继续安装。<pre>Using sample :/Users/wanglei/Sites/notebook/app/base/examples/config.php
+Writing config file... ok.
+Writing config compat... ok.
+Creating table sdb_base_app_content
+Creating table sdb_base_apps
+Creating table sdb_base_cache_expires
+Creating table sdb_base_files
+Creating table sdb_base_kvstore
+Creating table sdb_base_network
+Creating table sdb_base_queue
+Creating table sdb_base_rpcnotify
+Creating table sdb_base_rpcpoll
+Creating table sdb_base_task
+Installing service file_storage
+Installing service view_compile_helper
+Installing service view_helper
+Installing service html_input
+	...
+	...
+Scanning local Applications... ok.
+Application libaray is updated, ok.
+Application base installed... ok.
+notebook &quot;zh-cn&quot; language resource stored
+Application notebook installed... ok.
+</pre></li>
+</ul>
+
+<p>至此，新项目notebook已经创建并安装完成。</p>
+<h2><a name="id2">取消系统缓存</a></h2>
+<p>缓存已经成为评价一个框架优劣的重要评审标准之一, 它可以提供系统速度, 但在开发过程中. 缓存会令人感到头痛, 因此在我们开始我们的项目前, 先把缓存关掉</p>
+
+<p>修改ecos系统配置文件 config/config.php将:</p>
+<pre>define('WITHOUT_CACHE',false);
+</pre>
+<p>替换为:<pre>define('WITHOUT_CACHE',true);
+</pre></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">初始化项目</a>
+    <li><a href="#id2" class="reference internal">取消系统缓存</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">创建一个带后端的留言版</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="basic.html"
+                                  title="下一章">创建数据表，实现基本功能代码</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="basic.html" title="创建数据表，实现基本功能代码" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="创建一个带后端的留言版" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">快速入门</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">创建一个带后端的留言版</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

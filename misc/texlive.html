@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      TexLive2011 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="未归档" href="index.html" />
+
+        <link rel="next" title="nsis" href="NSIS.html" />
+        <link rel="prev" title="lfs" href="LFS.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="nsis.html" title="NSIS" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="lfs.html" title="LFS" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> TexLive2011</h1>
+            <h2><a name="id1">安装</a></h2>
+<ol>
+<li>下载iso文件 <a href="http://ftp.ctex.org/mirrors/CTAN/systems/texlive/Images/">点击进入</a>
+<li>安装 perl-tk 软件包<pre>sudo apt-get install perl-tk
+</pre>
+<li>挂载 iso<pre>sudo mount -o loop texlive2011.iso /mnt
+</pre>
+<li>开始安装:<pre>cd /mnt
+sudo ./install-tl -gui
+</pre></li>
+</li>
+</li>
+</li>
+</ol>
+<h2><a name="id2">安装sty文件方法</a></h2>
+<ol>
+<li>在一些latex中使用的怪异package一般不是自带的
+<p><a href="ftp://ftp.ctex.org/CTAN/macros/latex">下载地址</a>
+<li>比如我要下载则找到该sty文件<pre>/usepackage{listings}
+</pre>
+<li>传送到latex目录<pre>sudo mv /u_path /usr/local/texlive/2011/texmf-dist/tex/latex/
+</pre>
+<li>然后进入进入listings目录执行make操作
+<li>刷新命令<pre>sudo texhash or sudo mktexlsr
+</pre>
+<li>done</li>
+</li>
+</li>
+</li>
+</li>
+</p>
+</li>
+</ol>
+<h2><a name="id3">相关</a></h2>
+<p>查看中文字体<pre>sudo fc-list :lang=zh-cn
+</pre>修改中文字体<pre>sudo vim /usr/local/texlive/2011/texmf-dist/tex/latex/ctex/fontset/ctex-xecjk-winfonts.def
+</pre><pre class="mark">geometry 宏包能自动填充各项页面尺寸，如果你提供的页面设置数据不完整，它将自动补充剩余的数据；
+它采用页面自动居中自动平衡机制，所以只要提供最基本的页面尺寸数据，就可以获得所需的页面设置 。
+例如：设置四周边空各为2cm宽，无页眉的页面，只需要一条命令：\usepackage[margin=2cm]{geometry}。
+该宏包提供了大量的选项，可简便灵活地设定纸张大小、页面方向、页眉和页脚区域、边空宽度和边空注释等等。
+</pre></p>
+
+<p>下表所列为常用选项：<pre>选项	                   说明
+a4paper、b5paper、a5paper   设置标准页面外形尺寸
+screen                      幻灯页面，宽225×高180
+paperwidth=宽度             修改页面宽度，高度不变
+paperheight=高度            修改页面高度，宽度不变
+papersize={宽度,高度}	    设置页面尺寸
+landscape	                横向页面
+portrait	                纵向页面
+hscale=宽度比值	            正文宽度与页面宽度之比，默认值0.7
+vscale=宽度比值	            正文高度与页面高度之比，默认值0.7
+scale= {宽度比值 ,宽度比值}	正文主体与页面之比，
+width=宽度	                正文主体宽度
+height=高度	                正文主体高度，不含页眉页脚
+total={宽度,高度}	        正文主体区域的宽度与高度
+hmargin={左边空宽,右边空宽}	左右边空宽度，若相等hmargin=宽度
+vmargin={上边空宽,下边空宽}	上下边空宽度，若相等vmargin=宽度
+margin={A,B}	            边空设置，相当hmargin={A,B} 和vmargin={A,B}，等边空margin=A
+centering	                自动居中
+headheight=长度	            页眉高度
+headsep=长度	            页眉底线与正文顶线间距
+footskip=长度	            页脚底线与正文底线距离
+nohead	                    无页眉
+nofoot	                    无页脚
+noheadfoot	                无页眉页脚
+footnotesep=长度	        正文底线与脚注顶线间距
+</pre>该宏包支持 dvips、dvipdfm 和 pdflatex 等编译程序。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">安装</a>
+    <li><a href="#id2" class="reference internal">安装sty文件方法</a>
+    <li><a href="#id3" class="reference internal">相关</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="lfs.html"
+                                  title="上一章">LFS</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="nsis.html"
+                                  title="下一章">NSIS</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="nsis.html" title="NSIS" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="lfs.html" title="LFS" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

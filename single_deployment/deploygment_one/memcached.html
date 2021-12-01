@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      memcached安装 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="资料" href="../../_refs.html" />
+
+        <link rel="next" title="php-apc" href="php-apc安装.html" />
+        <link rel="prev" title="mongodb" href="mongodb安装.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="php-apc.html" title="php-apc安装" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="mongodb.html" title="mongodb安装" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../_refs.html">资料</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> memcached安装</h1>
+            
+<ul>
+<li>安装memcached依赖libevent
+<ol>
+<li>libevent 简介<pre class="mark">  libevent是为了取代事件循环发现在事件驱动的网络服务器。一个应用程序只需要调用event_dispatch(),然后添加或删除事件动态而无需更改事件循环。
+  libevent 与memcached 的关系？
+  libevent 下载地址：https://github.com/downloads/libevent/libevent/libevent-2.0.21-stable.tar.gz
+</pre>
+<li>libevent 安装<pre>  wget https://github.com/downloads/libevent/libevent/libevent-2.0.21-stable.tar.gz
+  tar zxvf libevent-2.0.21-stable.tar.gz
+  cd libevent-2.0.21-stable
+  ./configure --prefix=/usr
+  make&amp;make install
+</pre>
+<li>输入以下命令，查看是否有目录列出（检查是否安装成功)<pre class="mark">  ls -al /usr/lib | grep libevent
+</pre></ol>
+
+<li>安装memcached<pre>wget  http://memcached.googlecode.com/files/memcached-1.4.15.tar.gz
+tar zxvf memcached-1.4.15.tar.gz
+cd memcached-1.4.15
+./configure --with-libevent=/usr
+make &amp;&amp; make install
+</pre>
+<li>编译安装php下的memcache扩展
+<ol>
+<li>下载扩展包<pre>   wget http://pecl.php.net/get/memcache-2.2.7.tgz
+</pre>
+<li>编译并安装<pre>    tar vxzf memcache-2.2.7.tgz
+    cd memcache-2.2.7
+    /usr/local/webserver/php/bin/phpize
+    ./configure --enable-memcache --with-php-config=/usr/local/webserver/php/bin/php-config
+    make&amp;make install
+</pre>
+<li>安装成功的标志(扩展库存放路径)<pre>/usr/local/webserver/php/lib/php/extensions/no-debug-non-zts-20090626/
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="../image/memcache.png" />
+<li>配置php.ini
+<ul>
+<li>查找“extension_dir”，修改为如下代码：<pre>     extension_dir='/usr/local/webserver/php/lib/php/extensions/no-debug-non-zts-20090626/'
+</pre>
+<li>查找“extension”，任意地方添加如下代码：<pre>     extension=memcache.so
+</pre></ul>
+</ol>
+
+<li>配置启动脚本<pre>#! /bin/sh
+#
+# chkconfig: - 55 45
+# description:  The memcached daemon is a network memory cache service.
+# processname: memcached
+# config: /etc/sysconfig/memcached
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+PORT=11211
+USER=root
+MAXCONN=1024
+CACHESIZE=64
+OPTIONS=&quot;&quot;
+PID=&quot;/tmp/memcached.pid&quot;
+HOST=&quot;127.0.0.1&quot;
+PREFIX=/usr/local/bin/memcached
+
+if [ -f /etc/sysconfig/memcached ];then
+    . /etc/sysconfig/memcached
+fi
+
+# Check that networking is up.
+if [ &quot;$NETWORKING&quot; = &quot;no&quot; ]
+then
+    exit 0
+fi
+
+RETVAL=0
+
+start () {
+    echo &quot;Starting memcached ...&quot;
+    # insure that /var/run/memcached has proper permissions
+    chown $USER $PREFIX
+    $PREFIX -d -l $HOST -p $PORT -u $USER -m $CACHESIZE -c $MAXCONN -P $PID $OPTIONS
+    RETVAL=$?
+    [ $RETVAL -eq 0 ] &amp;&amp; touch /var/lock/subsys/memcached
+}
+stop () {
+    echo &quot;Stopping memcached ...&quot;
+    kill `cat /tmp/memcached.pid`
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ] ; then
+        rm -f /var/lock/subsys/memcached
+        rm -f $PID
+    fi
+}
+restart () {
+    stop
+    start
+}
+
+
+# See how we were called.
+case &quot;$1&quot; in
+    start)
+        start
+        ;;
+    stop)
+    stop
+    ;;
+    status)
+    status memcached
+    ;;
+    restart|reload)
+    restart
+    ;;
+    condrestart)
+    [ -f /var/lock/subsys/memcached ] &amp;&amp; restart || :
+    ;;
+    *)
+    echo $&quot;Usage: $0 {start|stop|status|restart|reload|condrestart}&quot;
+    exit 1
+esac
+
+exit $?
+</pre>
+<li>添加为开机启动<pre>chkconfig --add memcached
+</pre></li>
+</li>
+</ul>
+</li>
+</p>
+</li>
+</li>
+</li>
+</ol>
+</li>
+</li>
+</li>
+</li>
+</ol>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="mongodb.html"
+                                  title="上一章">mongodb安装</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="php-apc.html"
+                                  title="下一章">php-apc安装</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="php-apc.html" title="php-apc安装" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="mongodb.html" title="mongodb安装" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../_refs.html">资料</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

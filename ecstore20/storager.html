@@ -1,0 +1,438 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      ecstore资源文件分离方案及配置 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="ecstore2.0部署文档" href="index.html" />
+
+        <link rel="next" title="../ecstore_faq/index" href="ecstore FAQ.html" />
+        <link rel="prev" title="performance2" href="ecstore 性能指标2.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../ecstore_faq/index.html" title="ecstore FAQ" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="performance2.html" title="ecstore 性能指标2" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore2.0部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> ecstore资源文件分离方案及配置</h1>
+            <pre class="mark">目前ECStore中存放资源文件目录
+    1   每个app下的statics下的(图片，js，css)资源文件
+    2   模板的资源文件(图片，js，css)  themes/
+    3   public下的图片文件 (对应到 sdb_image_image 表中)
+</pre><h2><a name="id1">只做public中的图片分离</a></h2><pre>该方案只是将public下的图片文件进行分离，也就是说只将 sdb_image_image 表中的文件中的图片进行分离
+
+需要注意的是：
+    因为在sdb_image_image表中已经存放了对应的url地址，图片调用的是根据sdb_image_image表中的url地址进行调用
+    因此，在运营中的站点进行图片分离，已存储的图片在此方案中不会进行数据迁移
+</pre><h3><a name="id2">方案说明</a></h3><pre class="mark">环境：
+   web服务器 centos
+      IP地址  :192.168.65.145
+      站点目录:/data/www
+
+   storage服务器 centos
+      IP地址  :192.168.65.144
+
+   图片调用服务器
+      IP地址  :192.168.65.144
+
+图片调用服务器和storage(图片存储服务器)为同一个服务器
+
+说明
+    使用nginx + Tokyo Tyrant进行存储的方案
+    nginx的NginxHttpMemcachedModule有个很牛X的特性，可以使用url作为memcache的key进行资源访问。
+
+    使用内存做存储有两个缺点，一是有容量限制，二是不能永久存储。因此我们使用 Tokyo Tyrant 做存储方案。
+    只要在进行图片存储时，将url作为key，将图片存储到Tokyo Tyrant
+    Tokyo Tyrant是Tokyo Cabinet的网络接口，可以使用memcached一样的协议。同memcache相比，Tokyo Cabinet可以将资源存放在硬盘中
+</pre><h3><a name="id3">storage服务器中Tokyo Tyrant安装配置</a></h3>
+<ul>
+<li>安装ttserver<pre>wget http://fallabs.com/tokyocabinet/tokyocabinet-1.4.47.tar.gz
+wget http://fallabs.com/tokyotyrant/tokyotyrant-1.1.41.tar.gz
+
+1.安装Tokyo Cabinet
+    tar zxvf tokyocabinet-1.4.47.tar.gz
+    cd tokyocabinet-1.4.47
+    sudo ./configure 
+    sudo make
+    sudo make install
+
+2.安装Tokyo Tyrant
+    tar zxvf tokyotyrant-1.1.41.tar.gz
+    cd tokyotyrant-1.1.41
+    sudo ./configure
+    sudo make
+    sudo make install
+
+安装完成之后启动文件 默认在 /usr/local/sbin/ttservctl
+
+参考文档：http://www.ttlsa.com/ttserver/install-ttserver-on-linux/
+</pre><pre class="mark">注意：因为tt可以无密码进行操作，并且在tt中存储了挂件的php文件，因此需要在防火墙配置，保证tt服务器的安全性
+</pre>
+<li>启动ttservctl<pre>ttservctl start 
+</pre></li>
+</li>
+</ul>
+<h3><a name="id4">图片调用服务器nginx加入memc-nginx-module模块</a></h3>
+<ul>
+<li>memc-nginx-module 模块下载<pre>下载地址：https://github.com/agentzh/memc-nginx-module
+
+安装git：yum -y install git
+
+git clone memc-nginx-module模块：git clone https://github.com/agentzh/memc-nginx-module.git
+</pre>
+<li>nginx编译加载memc-nginx-module<pre>因为Nginx并不支持模块动态加载，所以要安装新的模块，必须重新编译Nginx
+
+wget http://nginx.org/download/nginx-1.4.7.tar.gz
+tar zxvf nginx-1.4.7.tar.gz
+cd nginx-1.4.7
+
+./configure --prefix=/usr/local/nginx --add-module=/path_to_memc-nginx-module(memc-nginx-modul模块下载的文件地址)
+
+make &amp;&amp; make install
+</pre>
+<li>nginx安装成功后,nginx.conf 配置中加入以下部分配置<pre>upstream tt_server1{  #配置一个tt服务器组
+    server localhost:1978; #该端口为ttserver启动端口
+}
+
+server {
+    listen       80;
+    server_name  localhost;
+
+    location / {
+        set $memcached_key $uri;
+        memcached_pass tt_server1;
+    }
+}
+</pre><pre>参考文档：http://blog.codinglabs.org/articles/nginx-memc-and-srcache.html
+</pre></li>
+</li>
+</li>
+</ul>
+<h3><a name="id5">web服务器ECStore配置修改</a></h3>
+<ul>
+<li>php安装memcache扩展<pre>phpinfo检查php是否安装了memcache扩展，如果没有安装这安装扩展,则进行安装
+
+/usr/local/webserver/php/bin/pecl install memcache
+
+vim /usr/local/webserver/php/php.ini
+
+extension=memcache.so
+</pre>
+<li>ECstore中conf.php修改<pre># file_storage
+define('FILE_STORAGER','ttsystem');//storage 使用ttserver存储
+define('STORAGE_MEMCACHED','192.168.65.144:1978');//1978端口为nginx tt_server1配置的端口
+define('STORAGE_HOST','http://192.168.65.144');//调用storage中图片的图片服务器地址
+</pre></li>
+</li>
+</ul>
+<h2><a name="id6">ECStore全站点图片，js，csss 等静态资源分离</a></h2><pre class="mark">ECStore支持版本：ECSore2.0.36及其以上版本
+在ECSore2.0.36中将所有的app中的statics和lang剥离到public/app/下
+</pre><h3><a name="id7">方案一、ttserver+nfs</a></h3><pre class="mark">环境：
+   web服务器 centos
+      IP地址  :192.168.65.145
+      站点目录:/data/www
+
+   storage服务器 centos
+      IP地址  :192.168.65.144
+
+   资源调用服务器
+      IP地址  :192.168.65.144
+
+图片调用服务器和storage(图片存储服务器)为同一个服务器
+
+方案说明
+    在ECSore2.0.34版本中，将每个app下的lang,statics,widgets文件夹移动到public/app/对应app下
+    因此在初始化的时候可以直接将public中的文件存储到ttserver中，进行调用
+    之后对public文件夹使用inotify进行监控，如果文件有改变则更新或删除ttserver中的数据
+    保证tterver中数据和本地文件夹的一致性
+
+    ECstore模板中的资源文件，调用判断分离不完善，暂时不能进行storage方式进行存储调用
+    因此模板文件使用nfs进行同步
+</pre><h3><a name="id8">配置</a></h3><pre class="mark">说明
+    1 storage服务器中安装 ttserver
+    2 web服务器中安装inotify对资源文件进行监控
+    3 资源调用服务器中安装nfs,web服务器中将网站的模板目录挂载到资源调用服务器
+</pre><h4><a name="id9">Tokyo Tyrant安装配置</a></h4><pre class="mark">参照public中的图片分离中的Tokyo Tyrant安装配置
+</pre><h4><a name="id10">web服务器安装inotify</a></h4><pre>inotify-tools项目地址：https://github.com/rvoicilas/inotify-tools
+
+wget http://github.com/downloads/rvoicilas/inotify-tools/inotify-tools-3.14.tar.gz
+tar zxvf inotify-tools-3.14.tar.gz
+cd inotify-tools-3.14
+./configure
+make
+make install
+
+其他Linux发行版安装方法可以参见：https://github.com/rvoicilas/inotify-tools/wiki#wiki-getting
+</pre><h4><a name="id11">NFS安装&配置</a></h4>
+<ul>
+<li>资源调用服务器和web服务器都安装NFS<pre>安装：nfs-utils
+    yum install nfs-utils
+
+安装：rpcbind, 注意（portmap，发现CentOS 6上不叫portmap，而是改为rpcbind）
+      yum install portmap  （适用centos 5）
+      yum install rpcbind  （适用centos 6）
+</pre>
+<li>启动NFS服务<pre>/etc/init.d/rpcbind start
+/etc/init.d/nfs start
+</pre>
+<li>NFS配置<pre>1 进入资源调用服务器配置的站点目录/data/www,创建NFS挂载目录
+  mkdir nfs
+
+2 在web服务器中，将web服务器中的themes文件复制到资源调用服务器
+  scp -r /data/www/themes root@192.168.65.144:/data/www/nfs/
+  scp -r /data/www/wap_themes root@192.168.65.144:/data/www/nfs/
+
+3 资源服务器：vim /etc/exports
+  /data/www/nfs/themes  192.168.65.145/24(rw,sync,all_squash,anonuid=502,anongid=502)
+  /data/www/nfs/wap_themes  192.168.65.145/24(rw,sync,all_squash,anonuid=502,anongid=502)
+
+  修改好执行命令：
+  exportfs -rv
+
+4 在web服务器中查看
+  showmount -e 192.168.65.144
+
+5 web中将模板目录挂载到资源调用服务器
+  mount 192.168.65.144:/data/www/nfs/themes /data/www/themes
+  mount 192.168.65.144:/data/www/nfs/wap_themes /data/www/wap_themes
+
+6 修改图片资源调用服务器的nginx.conf ，使得nginx可以调用themes文件
+    location /themes/{
+        root /data/www/nfs/;
+        index  index.html index.htm;
+    }
+    location /wap_themes/{
+        root /data/www/nfs/;
+        index  index.html index.htm;
+    }
+
+NFS配置：参考文档 http://man.ddvip.com/linux/debian/nfs/nfs-conf-4.html
+</pre></li>
+</li>
+</li>
+</ul>
+<h4><a name="id12">图片调用服务器nginx加入memc-nginx-module模块</a></h4><pre class="mark">参照public中的图片分离中的，图片调用服务器nginx加入memc-nginx-module模块
+</pre><h4><a name="id13">解决跨域加载字体问题:firefox和IE9不支持对icon font字体的跨域访问</a></h4>
+<ul>
+<li>资源调用服务器修改nginx配置文件 nginx.conf<pre>在nginx.conf文件中加入
+
+server {
+    ...
+    #在server中新增如果下配置
+    location ~* \.(eot|ttf|woff)$ {
+        add_header Access-Control-Allow-Origin *;
+        set $memcached_key $uri;
+        memcached_pass tt_server1;
+    }
+    ...
+}
+
+新增 AddType vim /usr/local/webserver/nginx/conf/mime.types
+在mime.types 中新增如果代码
+
+application/vnd.ms-fontobject         eot;
+font/ttf                              ttf;
+font/otf                              otf;
+application/x-font-woff               woff;
+</pre>
+<li>apache<pre>参考地址：http://w.67ge.com/p/fixing-firefox-font-face-cross-domain.html
+</pre></li>
+</li>
+</ul>
+<h4><a name="id14">解决图片上传flash的跨域问题</a></h4>
+<ul>
+<li>在域名根目录中添加crossdomain.xml<pre class="mark">&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;cross-domain-policy&gt;
+&lt;allow-access-from domain=&quot;*&quot; /&gt;
+&lt;/cross-domain-policy&gt;
+</pre></li>
+</ul>
+<h4><a name="id15">web服务器中安装ecstore</a></h4>
+<ul>
+<li>安装ecstore
+<li>执行初始化脚本<pre>1 修改 script/storage/ttserver.sh中storage存储地址和端口
+  #storage存储服务器地址
+  host=192.168.65.144
+  #ttserver端口
+  port=1978
+
+2 执行 ecstore站点目录：script/storage/init.sh
+</pre>
+<li>执行inotify监控脚本<pre>1 修改 在script/storage/inotify.sh中配置正确的inotifywait命令路径
+  inotifywait=&quot;/usr/local/bin/inotifywait&quot;
+
+2 执行 ecstore站点目录：script/storage/inotify.sh start
+</pre>
+<li>web服务器中修改config/config.php<pre class="mark"> define('FILE_STORAGER', 'ttprosystem');
+ define('STORAGE_MEMCACHED', '192.168.65.144:1978');
+ define('HOST_MIRRORS', 'http://192.168.65.144');
+</pre></li>
+</li>
+</li>
+</li>
+</ul>
+<h3><a name="id16">全nsf方案</a></h3><pre>public , themes , wap_themes 三个文件夹挂载到nfs服务器共享目录
+方式参照ttserver+nfs方案，将public中的文件不进行storage存储，进行nfs挂载
+</pre>
+<ul>
+<li>web服务器中修改config/config.php<pre class="mark"> define('FILE_STORAGER', 'filesystem');
+ define('HOST_MIRRORS', 'http://192.168.65.144');
+</pre>
+<li>nginx.conf配置<pre>location /{
+    root /data/www/nfs/;
+    index  index.html index.htm;
+}
+</pre>
+<li>解决跨域加载字体问题:firefox和IE9不支持对icon font字体的跨域访问
+<li>解决图片上传flash的跨域问题</li>
+</li>
+</li>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">只做public中的图片分离</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">方案说明</a>
+        <li><a href="#id3" class="reference internal">storage服务器中Tokyo Tyrant安装配置</a>
+        <li><a href="#id4" class="reference internal">图片调用服务器nginx加入memc-nginx-module模块</a>
+        <li><a href="#id5" class="reference internal">web服务器ECStore配置修改</a>
+    </ul>
+    <li><a href="#id6" class="reference internal">ECStore全站点图片，js，csss 等静态资源分离</a>
+        <ul>
+        <li><a href="#id7" class="reference internal">方案一、ttserver+nfs</a>
+        <li><a href="#id8" class="reference internal">配置</a>
+            <ul>
+            <li><a href="#id9" class="reference internal">Tokyo Tyrant安装配置</a>
+            <li><a href="#id10" class="reference internal">web服务器安装inotify</a>
+            <li><a href="#id11" class="reference internal">NFS安装&配置</a>
+            <li><a href="#id12" class="reference internal">图片调用服务器nginx加入memc-nginx-module模块</a>
+            <li><a href="#id13" class="reference internal">解决跨域加载字体问题:firefox和IE9不支持对icon font字体的跨域访问</a>
+            <li><a href="#id14" class="reference internal">解决图片上传flash的跨域问题</a>
+            <li><a href="#id15" class="reference internal">web服务器中安装ecstore</a>
+        </ul>
+        <li><a href="#id16" class="reference internal">全nsf方案</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="performance2.html"
+                                  title="上一章">ecstore 性能指标2</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../ecstore_faq/index.html"
+                                  title="下一章">ecstore FAQ</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../ecstore_faq/index.html" title="ecstore FAQ" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="performance2.html" title="ecstore 性能指标2" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore2.0部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

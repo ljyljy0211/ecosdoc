@@ -1,0 +1,487 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      b2c.goods.add 添加商品 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../doc.html" />
+    <link rel="up" title="ecstore  被外部系统请求的api接口" href="../index.html" />
+
+        <link rel="next" title="b2c.goods.delete" href="b2c.goods.delete 删除单个商品信息.html" />
+        <link rel="prev" title="../b2c.update_store.updateStore" href="b2c.update_store.updateStore 更新商品库存.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="b2c.goods.delete.html" title="b2c.goods.delete 删除单个商品信息" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../b2c.update_store.updateStore.html" title="b2c.update_store.updateStore 更新商品库存" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../../api.html">API</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ecstore  被外部系统请求的api接口</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> b2c.goods.add 添加商品</h1>
+            
+<p>author: danny,danny@shopex.cn</p>
+
+<p>2014-07-04</p>
+<h2><a name="id1">API应用级输入参数</a></h2>
+<table class="docutils">
+<tr>
+<th>参数</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>说明</th>
+</tr>
+
+<tr>
+<td>bn</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>商品编号</td>
+</tr>
+
+<tr>
+<td>name</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>商品名称</td>
+</tr>
+
+<tr>
+<td>type_id</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>商品类型(参数不传，默认为:1,表示通用商品类型)</td>
+</tr>
+
+<tr>
+<td>cat_id</td>
+
+<td>Number</td>
+
+<td>N</td>
+
+<td>商品分类(参数不传，默认为:0,表示分类不限)</td>
+</tr>
+
+<tr>
+<td>brief</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>简介</td>
+</tr>
+
+<tr>
+<td>description</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>描述</td>
+</tr>
+
+<tr>
+<td>brand_id</td>
+
+<td>Number</td>
+
+<td>N</td>
+
+<td>商品品牌</td>
+</tr>
+
+<tr>
+<td>cost</td>
+
+<td>Number</td>
+
+<td>N</td>
+
+<td>商品成本价</td>
+</tr>
+
+<tr>
+<td>price</td>
+
+<td>Number</td>
+
+<td>N</td>
+
+<td>商品价格</td>
+</tr>
+
+<tr>
+<td>mktprice</td>
+
+<td>Number</td>
+
+<td>N</td>
+
+<td>商品市场价</td>
+</tr>
+
+<tr>
+<td>weight</td>
+
+<td>Number</td>
+
+<td>N</td>
+
+<td>商品重量</td>
+</tr>
+
+<tr>
+<td>num</td>
+
+<td>Number</td>
+
+<td>N</td>
+
+<td>商品数量</td>
+</tr>
+
+<tr>
+<td>score</td>
+
+<td>Number</td>
+
+<td>N</td>
+
+<td>商品积分</td>
+</tr>
+
+<tr>
+<td>unit</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>计件单位</td>
+</tr>
+
+<tr>
+<td>approve_status</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>是否上下架(上架：onsale,其他均未下架)</td>
+</tr>
+
+<tr>
+<td>is_simple</td>
+
+<td>Boolean</td>
+
+<td>N</td>
+
+<td>是否为简单商品；可选值：true，false （如为true ，则返回sku_id）</td>
+</tr>
+
+<tr>
+<td>image_default_id</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>商品主图url路径，目前只支持gif,jpg,png,bmp格式，地址为远程http地址</td>
+</tr>
+
+<tr>
+<td>props</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>商品属性串 pid:vid;pid:vid;pid:vid;pid:vid</td>
+</tr>
+
+<tr>
+<td>input_pids</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>用户输入的自定义属性 pid;pid;pid;pid;pid;pid;pid</td>
+</tr>
+
+<tr>
+<td>input_str</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>用户输入的自定义属性值 value;value;value;value;value</td>
+</tr>
+
+<tr>
+<td>sku_bns</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>货品货号 json_encode(array('10','15','20'))</td>
+</tr>
+
+<tr>
+<td>sku_store</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>货品库存 json_encode(array('EA001','EA002','EA003'))</td>
+</tr>
+
+<tr>
+<td>sku_prices</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>货品价格 json_encode(array('21.00','21.00','23.00'))</td>
+</tr>
+
+<tr>
+<td>sku_costs</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>货品成本价 json_encode(array('10.00','12.00','14.00'))</td>
+</tr>
+
+<tr>
+<td>sku_mktprices</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>货品市场价 json_encode(array('30.00','40.00','50.00'))</td>
+</tr>
+
+<tr>
+<td>sku_weights</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>货品重量 json_encode(array('1.00','2.00','3.00'))</td>
+</tr>
+
+<tr>
+<td>sku_properties</td>
+
+<td>String</td>
+
+<td>if(sku_bns!=''){Y}else{N}</td>
+
+<td>商品规格串 pid:vid_pid:vid_pid:vid;pid:vid_pid:vid_pid:vid,如果开启多货品，此参数必填</td>
+</tr>
+
+<tr>
+<td>related_items</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>相关商品 json_encode(array('31','106','117'))</td>
+</tr>
+
+<tr>
+<td>keywords</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>关键字 json_encode(array('女鞋','时尚秋季女鞋','羊皮女鞋'))</td>
+</tr>
+</table>
+</table>
+<h2><a name="id2">API应用级返回结果</a></h2>
+<p>成功：</p>
+<pre class="mark">array (
+  'rsp' =&gt; 'succ',
+  'data' =&gt; 
+  array (
+    'iid' =&gt; '108',
+    'sku_id' =&gt; '560,561',
+    'sku_bn' =&gt; 'products100,products101',
+    'created' =&gt; '2011-11-22 11:46:13',
+  ),
+  'res' =&gt; '',
+)
+
+</pre>
+<p>失败：</p>
+<pre class="mark">array (
+  'rsp' =&gt; 'fail',
+  'res' =&gt; '商品名称不能为空，必要参数！',
+  'data' =&gt; 
+  array (
+    'iid' =&gt; '',
+  ),
+)
+</pre>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">API应用级输入参数</a>
+    <li><a href="#id2" class="reference internal">API应用级返回结果</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../b2c.update_store.updateStore.html"
+                                  title="上一章">b2c.update_store.updateStore 更新商品库存</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="b2c.goods.delete.html"
+                                  title="下一章">b2c.goods.delete 删除单个商品信息</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="b2c.goods.delete.html" title="b2c.goods.delete 删除单个商品信息" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../b2c.update_store.updateStore.html" title="b2c.update_store.updateStore 更新商品库存" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../../api.html">API</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ecstore  被外部系统请求的api接口</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

@@ -1,0 +1,537 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      kv永久存储flare &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="集群部署文档" href="index.html" />
+
+        <link rel="next" title="mongodb" href="kv永久存储mongodb.html" />
+        <link rel="prev" title="lvs" href="负载均衡.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="mongodb.html" title="kv永久存储mongodb" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="lvs.html" title="负载均衡" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">集群部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> kv永久存储flare</h1>
+            <h2><a name="id1">安装</a></h2>
+<p>安装TokyoCabinet<pre>wget  http://1978th.net/tokyocabinet/tokyocabinet-1.4.41.tar.gz
+tar -zxvf tokyocabinet-1.4.41.tar.gz
+cd tokyocabinet-1.4.41
+./configure --prefix=/usr/local/tokyocabinet
+make
+make install
+</pre></p>
+
+<p>安装boost<pre>wget http://nchc.dl.sourceforge.net/project/boost/boost/1.41.0/boost_1_41_0.tar.bz2
+tar -jxvf boost_1_41_0.tar.bz2
+cd boost_1_41_0
+./bootstrap.sh --prefix=/usr/local/boost
+./bjam install
+</pre></p>
+
+<p>安装flare<pre>wget  http://labs.gree.jp/data/source/flare-1.0.9.tgz
+tar -zxvf  flare-1.0.9.tgz
+cd flare-1.0.9
+./configure --with-boost=/usr/local/boost --with-tokyocabinet=/usr/local/tokyocabinet --prefix=/usr/local/flare
+make
+make install
+</pre></p>
+<h2><a name="id2">应用</a></h2>
+<p>Flare安装完成之后在集群中的配置</p>
+
+<table class="docutils">
+<tr>
+<th>主机</th>
+
+<th>角色</th>
+</tr>
+
+<tr>
+<td>ecos03</td>
+
+<td>flare主</td>
+</tr>
+
+<tr>
+<td>ecos02</td>
+
+<td>flare从</td>
+</tr>
+</table>
+</table>
+
+<p>flare路径<pre>/usr/local/flare
+</pre></p>
+
+<p>创建flare 配置文件和log文件目录<pre>mkdir -pv /usr/local/flare/etc
+mkdir -pv /usr/local/flare/data
+</pre></p>
+<h3><a name="id3">Starting a node(ecos03)</a></h3><h4><a name="id4">创建配置文件（引索服务器）</a></h4>
+<p>首先，创建一个配置文件的索引服务器 flarei.conf<pre>cat &gt; /usr/local/flare/etc/flarei.conf &lt;&lt;'EOF'
+# data directory
+data-dir = /usr/local/flare/data
+# syslog facility
+log-facility = local0
+# max connections to accept
+max-connection = 512
+# node down threshold
+monitor-threshold = 3
+# node monitoring interval (index server sends &quot;ping&quot; w/ this interval)
+monitor-interval = 1
+# server name of myself
+server-name = 10.0.0.3
+# server port of myself
+server-port = 12120
+# max thread pool size
+thread-pool-size = 8
+EOF
+</pre></p>
+<h4><a name="id5">创建配置文件（节点服务器）</a></h4>
+<p>下一步，我们需要创建一个节点服务器的配置文件 flared.conf<pre>cat &gt; /usr/local/flare/etc/flared.conf &lt;&lt;'EOF'
+# data directory
+data-dir = /usr/local/flare/data
+# name of index server (sync this to &quot;server-name&quot; of flarei.conf)
+index-server-name = flare.example.com
+# port number of index server (sync this to &quot;server-port&quot; of flarei.conf)
+index-server-port = 12120
+# syslog facility
+log-facility = local0
+# max-connections to accept
+max-connection = 1024
+# number of lock slots to access records
+mutex-slot = 64
+# number of proxy request concurrency
+proxy-concurrency = 2
+# server name of myself
+server-name = flare.example.com
+# server port of myself
+server-port = 12121
+# stack size of each thread (kb)
+stack-size = 128
+# storage options
+storage-ap = 4
+storage-bucket-size = 16777216
+# storage-compress =
+# storage-large = true
+# storage type (currently only &quot;tch&quot; is available)
+storage-type = tch
+# max number of thread pool
+thread-pool-size = 16
+</pre></p>
+
+<p>编辑默认配置文件 flare<pre>cat &gt; /usr/local/flare/etc/flare &lt;&lt;'EOF'
+RUN_INDEX=&quot;yes&quot;
+RUN_NODE=&quot;yes&quot;
+CONF_INDEX=&quot;/usr/local/flare/etc/flarei.conf&quot;
+CONF_NODE=&quot;/usr/local/falre/etc/flared.conf&quot;
+DATA_INDEX=&quot;/usr/local/flare/data&quot;
+DATA_NODE=&quot;/usr/local/flare/data&quot;
+EOF
+</pre></p>
+
+<p>配置日志在syslog.conf中添加一条日志消息<pre>cat &gt;&gt; /etc/syslog.conf &lt;&lt;'EOF'
+# Log for flare
+local0.*                /var/log/flare.log
+EOF
+</pre></p>
+<h4><a name="id6">运行</a></h4>
+<p>现在我们就做好flare的配置了，然后你可以下面这样运行它<pre>/usr/local/flare/bin/flarei -f /usr/local/flare/etc/flarei.conf --daemonize
+/usr/local/flare/bin/flared -f /usr/local/flare/etc/flared.conf --daemonize
+</pre></p>
+
+<p>设置开机启动<pre>cat &gt;&gt; /etc/rc.local &lt;&lt;'EOF'
+/usr/local/flare/bin/flarei -f /usr/local/flare/etc/flarei.conf --daemonize
+/usr/local/flare/bin/flared -f /usr/local/flare/etc/flared.conf --daemonize
+EOF
+</pre></p>
+
+<p>运行后日志会是下面的样子<pre>less /var/log/flare.log
+</pre><pre class="mark">flarei[8603]: [3069409824][NTC][flarei.cc:105-startup] flarei version 1.0.0 - system logger started
+flarei[8603]: [3069409824][NTC][flarei.cc:107-startup] application startup in progress...
+flarei[8603]: [3069409824][NTC][flarei.cc:108-startup]   config_path:       /usr/local/flare/etc/flarei.conf
+flarei[8603]: [3069409824][NTC][flarei.cc:109-startup]   daemonize:         true
+flarei[8603]: [3069409824][NTC][flarei.cc:110-startup]   data_dir:          /usr/local/flare/data
+flarei[8603]: [3069409824][NTC][flarei.cc:111-startup]   max_connection:    512
+flarei[8603]: [3069409824][NTC][flarei.cc:112-startup]   monitor_threshold: 3
+flarei[8603]: [3069409824][NTC][flarei.cc:113-startup]   monitor_interval:  1
+flarei[8603]: [3069409824][NTC][flarei.cc:114-startup]   server_name:       10.0.0.3
+flarei[8603]: [3069409824][NTC][flarei.cc:115-startup]   server_port:       12120
+flarei[8603]: [3069409824][NTC][flarei.cc:116-startup]   stack_size:        128
+flarei[8603]: [3069409824][NTC][flarei.cc:117-startup]   thread_pool_size:  8
+flarei[8604]: [3069409824][NTC][app.cc:90-_daemonize] daemon process created -&gt; now i have new pid [8604]
+flarei[8604]: [3069409824][NTC][cluster.cc:1210-_reconstruct_node_partition] reconstructing node partition map... (from 0 entries in node map)
+flarei[8604]: [3069409824][NTC][cluster.cc:1309-_reconstruct_node_partition] node partition map:
+flarei[8604]: [3069409824][NTC][cluster.cc:1328-_reconstruct_node_partition] node partition map (prepare):
+flarei[8604]: [3069409824][NTC][flarei.cc:164-run] entering running loop
+...
+flared[8607]: [3069975072][NTC][flared.cc:109-startup] flared version 1.0.0 - system logger started
+flared[8607]: [3069975072][NTC][flared.cc:111-startup] application startup in progress...
+flared[8607]: [3069975072][NTC][flared.cc:112-startup]   config_path:         /usr/local/flare/etc/flared.conf
+flared[8607]: [3069975072][NTC][flared.cc:113-startup]   daemonize:           true
+flared[8607]: [3069975072][NTC][flared.cc:114-startup]   data_dir:            /usr/local/flare/data
+flared[8607]: [3069975072][NTC][flared.cc:115-startup]   index_server_name:   10.0.0.3
+flared[8607]: [3069975072][NTC][flared.cc:116-startup]   index_server_port:   12120
+flared[8607]: [3069975072][NTC][flared.cc:117-startup]   max_connection:      1024
+flared[8607]: [3069975072][NTC][flared.cc:118-startup]   mutex_slot:          64
+flared[8607]: [3069975072][NTC][flared.cc:119-startup]   proxy_concurrency:   2
+flared[8607]: [3069975072][NTC][flared.cc:120-startup]   server_name:         10.0.0.3
+flared[8607]: [3069975072][NTC][flared.cc:121-startup]   server_port:         12121
+flared[8607]: [3069975072][NTC][flared.cc:122-startup]   stack_size:          128
+flared[8607]: [3069975072][NTC][flared.cc:123-startup]   storage_ap:          4
+flared[8607]: [3069975072][NTC][flared.cc:124-startup]   storage_bucket_size: 16777216
+flared[8607]: [3069975072][NTC][flared.cc:125-startup]   storage_compress:
+flared[8607]: [3069975072][NTC][flared.cc:126-startup]   storage_large:       false
+flared[8607]: [3069975072][NTC][flared.cc:127-startup]   storage_type:        tch
+flared[8607]: [3069975072][NTC][flared.cc:128-startup]   thread_pool_size:    16
+flared[8608]: [3069975072][NTC][app.cc:90-_daemonize] daemon process created -&gt; now i have new pid [8608]
+</pre></p>
+<h4><a name="id7">配置节点</a></h4>
+<p>最后，运行我们的节点服务器！但我们仍然需要配置节点设置。请检查节点的状态，这样：<pre>telnet 10.0.0.3 12120
+Trying 10.0.0.3...
+Connected to 10.0.0.3 (10.0.0.3).
+Escape character is '^]'.
+
+</pre></p>
+
+<p>输入<pre>stats nodes
+</pre></p>
+
+<p>然后，我们可以得到节点统计：<pre class="mark">STAT 10.0.0.3:12121:role proxy
+STAT 10.0.0.3:12121:state down
+STAT 10.0.0.3:12121:partition 0
+STAT 10.0.0.3:12121:balance -1
+STAT 10.0.0.3:12121:thread_type 16
+END
+</pre></p>
+
+<p>第一行中role proxy说明现在是代理模式, 我们需要把他改成master<pre>node role 10.0.0.3 12121 master 1 0
+</pre></p>
+
+<p>第二行说节点是关闭的, 那么我开启<pre>node state 10.0.0.3 12121 active
+</pre></p>
+
+<p>查看节点统计结果<pre>telnet 10.0.0.3 12121
+...
+stats nodes
+</pre>返回会是这样的<pre class="mark">STAT 10.0.0.3:12121:role master
+STAT 10.0.0.3:12121:state active
+STAT 10.0.0.3:12121:partition 0
+STAT 10.0.0.3:12121:balance 1
+STAT 10.0.0.3:12121:thread_type 16
+END
+</pre></p>
+
+<p>这是类似于我们有1个持续服务器。下面我们尝试set和get命令：<pre>telnet 10.0.0.3 12121
+...
+set key1 0 0 4
+test
+STORED
+
+get key1
+VALUE key1 0 4
+test
+END
+</pre></p>
+<h3><a name="id8">Adding slave nodes(ecos02)</a></h3>
+<p>如果负载太高 w/ 只有1个服务器，或添加redunduncy，添加从节点将解决这些问题。</p>
+<h4><a name="id9">创建配置文件</a></h4>
+<p>创建配置文件flared.conf<pre># data directory
+data-dir = /usr/local/flare/data
+# name of index server (sync this to &quot;server-name&quot; of flarei.conf)
+index-server-name = 10.0.0.3
+# port number of index server (sync this to &quot;server-port&quot; of flarei.conf)
+index-server-port = 12120
+# syslog facility
+log-facility = local0
+# max-connections to accept
+max-connection = 1024
+# number of lock slots to access records
+mutex-slot = 64
+# number of proxy request concurrency
+proxy-concurrency = 2
+# server name of myself
+server-name = 10.0.0.2
+# server port of myself
+server-port = 12121
+# stack size of each thread (kb)
+stack-size = 128
+# storage options
+storage-ap = 4
+storage-bucket-size = 16777216
+# storage-compress =
+# storage-large = true
+# storage type (currently only &quot;tch&quot; is available)
+storage-type = tch
+# max number of thread pool
+thread-pool-size = 16
+</pre></p>
+
+<p>编辑默认配置文件 flare<pre>cat &gt; /usr/local/flare/etc/flare &lt;&lt;'EOF'
+RUN_INDEX=&quot;no&quot;
+RUN_NODE=&quot;yes&quot;
+CONF_NODE=&quot;/usr/local/falre/etc/flared.conf&quot;
+DATA_INDEX=&quot;/usr/local/flare/data&quot;
+DATA_NODE=&quot;/usr/local/flare/data&quot;
+EOF
+</pre></p>
+
+<p>配置日志在syslog.conf中添加一条日志消息<pre>cat &gt;&gt; /etc/syslog.conf &lt;&lt;'EOF'
+# Log for flare
+local0.*                /var/log/flare.log
+EOF
+</pre></p>
+<h4><a name="id10">运行</a></h4>
+<p>现在我们就做好flare的配置了，然后你可以下面这样运行它<pre>/usr/local/flare/bin/flared -f /usr/local/flare/etc/flared.conf --daemonize
+</pre></p>
+
+<p>设置开机启动<pre>cat &gt;&gt; /etc/rc.local &lt;&lt;'EOF'
+/usr/local/flare/bin/flared -f /usr/local/flare/etc/flared.conf --daemonize
+EOF
+</pre></p>
+<h4><a name="id11">检查节点的状态</a></h4><pre>telnet 10.0.0.3 12120
+...
+Escape character is '^]'.
+stats nodes
+STAT 10.0.0.3:12121:role master
+STAT 10.0.0.3:12121:state active
+STAT 10.0.0.3:12121:partition 0
+STAT 10.0.0.3:12121:balance 1
+STAT 10.0.0.3:12121:thread_type 16
+STAT 10.0.0.2:12121:role proxy
+STAT 10.0.0.2:12121:state active
+STAT 10.0.0.2:12121:partition -1
+STAT 10.0.0.2:12121:balance 0
+STAT 10.0.0.2:12121:thread_type 17
+END
+</pre>
+<p>在上面结果所有求10.0.0.2：12121代理10.0.0.3：12121。检查这种行为可以连接10.0.0.2：12121，并发送一个GET命令：<pre>telnet 10.0.0.3 12120
+...
+Escape character is '^]'.
+get key1
+
+</pre>上面的例子会得到相同的结果：<pre>VALUE key1 0 4
+test
+END
+</pre>但该节点是从slave，所以我们需要设置这个节点</p>
+<h4><a name="id12">配置节点</a></h4>
+<p>使用'node role'命令：<pre>telnet 10.0.0.3 12120
+...
+Escape character is '^]'.
+node role 10.0.0.2 12121 slave 1 0
+OK
+</pre></p>
+
+<p>如果成功完成上述程序，你会得到以下结果：<pre>telnet 10.0.0.3 12120
+...
+Escape character is '^]'.
+stats nodes
+STAT 10.0.0.3:12121:role master
+STAT 10.0.0.3:12121:state active
+STAT 10.0.0.3:12121:partition 0
+STAT 10.0.0.3:12121:balance 1
+STAT 10.0.0.3:12121:thread_type 16
+STAT 10.0.0.2:12121:role slave
+STAT 10.0.0.2:12121:state active
+STAT 10.0.0.2:12121:partition 0
+STAT 10.0.0.2:12121:balance 0
+STAT 10.0.0.2:12121:thread_type 17
+END
+</pre></p>
+<h4><a name="id13">设置访问平衡</a></h4>
+<p>stats nodes运行的内容显示10.0.0.2:12121被转移到master，但也表明平衡设置为0。因此通过其他代理节点的所有请求不均衡到该节点, 发送另一个&quot;node role&quot;的命令<pre>node role 10.0.0.2 12121 slave 2
+</pre>注册请求是平衡10.0.0.2：12121 twrice 10.0.0.3：12121。</p>
+
+<p>启动|停止脚本
+<ul>
+<li>flarei<pre>#!/bin/sh
+       case &quot;$1&quot; in
+       start)
+       echo &quot;start flare index&quot;
+       #Run flarei.conf
+       /usr/local/flare/bin/flarei -f /usr/local/flare/etc/flarei.conf --daemonize
+       ;;
+       stop)
+       echo &quot;stop flare index&quot;
+       kill -9 `cat /usr/local/flare/data/flarei.pid`
+       ;;
+       *)
+       echo &quot;Usage： $0 {start|stop}&quot;
+       exit 1
+       esac
+</pre></li>
+</ul>
+</p>
+
+<ul>
+<li>flared<pre>#!/bin/sh
+       case &quot;$1&quot; in
+       start)
+       echo &quot;start flare node&quot;
+       #Run flared.conf
+       /usr/local/flare/bin/flared -f /usr/local/flare/etc/flared.conf --daemonize
+       ;;
+       stop)
+       echo &quot;stop flare node&quot;
+       kill -9 `cat /usr/local/flare/data/flared.pid`
+       ;;
+       *)
+       echo &quot;Usage： $0 {start|stop}&quot;
+       exit 1
+       esac
+</pre></li>
+</ul>
+<h2><a name="id14">参考资料</a></h2>
+<p>官网网地址: <a href="http://labs.gree.jp/Top/OpenSource/Flare-en.html">http://labs.gree.jp/Top/OpenSource/Flare-en.html</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">安装</a>
+    <li><a href="#id2" class="reference internal">应用</a>
+        <ul>
+        <li><a href="#id3" class="reference internal">Starting a node(ecos03)</a>
+            <ul>
+            <li><a href="#id4" class="reference internal">创建配置文件（引索服务器）</a>
+            <li><a href="#id5" class="reference internal">创建配置文件（节点服务器）</a>
+            <li><a href="#id6" class="reference internal">运行</a>
+            <li><a href="#id7" class="reference internal">配置节点</a>
+        </ul>
+        <li><a href="#id8" class="reference internal">Adding slave nodes(ecos02)</a>
+            <ul>
+            <li><a href="#id9" class="reference internal">创建配置文件</a>
+            <li><a href="#id10" class="reference internal">运行</a>
+            <li><a href="#id11" class="reference internal">检查节点的状态</a>
+            <li><a href="#id12" class="reference internal">配置节点</a>
+            <li><a href="#id13" class="reference internal">设置访问平衡</a>
+        </ul>
+    </ul>
+    <li><a href="#id14" class="reference internal">参考资料</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="lvs.html"
+                                  title="上一章">负载均衡</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="mongodb.html"
+                                  title="下一章">kv永久存储mongodb</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="mongodb.html" title="kv永久存储mongodb" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="lvs.html" title="负载均衡" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">集群部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

@@ -1,0 +1,818 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      b2c.order.update_items 修改订单明细信息 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="ecstore  被外部系统请求的api接口" href="index.html" />
+
+        <link rel="next" title="../append-b/index" href="ecstore 请求外部系统的api接口.html" />
+        <link rel="prev" title="goods/b2c.member.get_member_lv_all" href="b2c.member.get_member_lv_all 获取会员等级列表.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../append-b/index.html" title="ecstore 请求外部系统的api接口" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="goods/b2c.member.get_member_lv_all.html" title="b2c.member.get_member_lv_all 获取会员等级列表" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../api.html">API</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore  被外部系统请求的api接口</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> b2c.order.update_items 修改订单明细信息</h1>
+            
+<p>author: chenping,chenping@shopex.cn</p>
+
+<p>2014-07-04</p>
+<h2><a name="id1">API应用级输入参数</a></h2>
+<table class="docutils">
+<tr>
+<th>名称</th>
+
+<th>类型</th>
+
+<th>是否必需</th>
+
+<th>描述</th>
+
+<th>示例</th>
+</tr>
+
+<tr>
+<td>order_bn</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>交易编号</td>
+
+<td>20111111154444</td>
+</tr>
+
+<tr>
+<td>modified</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>修改订单时间戳</td>
+
+<td>1320996096</td>
+</tr>
+
+<tr>
+<td>has_invoice</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>是否开票。true(是) false(否)</td>
+
+<td>false</td>
+</tr>
+
+<tr>
+<td>invoice_title</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>发票抬头</td>
+
+<td>酷美信息技术有限公司</td>
+</tr>
+
+<tr>
+<td>invoice_fee</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>税费</td>
+
+<td>0.0</td>
+</tr>
+
+<tr>
+<td>total_goods_fee</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>订单成本价</td>
+
+<td>50.0</td>
+</tr>
+
+<tr>
+<td>total_trade_fee</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>订单总价</td>
+
+<td>40.0</td>
+</tr>
+
+<tr>
+<td>discount_fee</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>折扣</td>
+
+<td>0.0</td>
+</tr>
+
+<tr>
+<td>payed_fee</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>已支付的金额</td>
+
+<td>0.0</td>
+</tr>
+
+<tr>
+<td>currency</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>当前交易选择的货币类型。可选值：CNY（人民币），USD（美元），JPY（日元）。- 默认为CNY（人民币）</td>
+
+<td>CNY</td>
+</tr>
+
+<tr>
+<td>currency_rate</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>当前货别汇率</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>total_currency_fee</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>订单最终价格</td>
+
+<td>40.0</td>
+</tr>
+
+<tr>
+<td>buyer_obtain_point_fee</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>获取的积分</td>
+
+<td>0</td>
+</tr>
+
+<tr>
+<td>point_fee</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>使用的积分</td>
+
+<td>0</td>
+</tr>
+
+<tr>
+<td>total_weight</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>该笔交易中所有商品的总重量</td>
+
+<td>0.0</td>
+</tr>
+
+<tr>
+<td>receiver_time</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>收货时间</td>
+
+<td>任意日期任意时间段</td>
+</tr>
+
+<tr>
+<td>shipping_type</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>订单物流</td>
+
+<td>快递</td>
+</tr>
+
+<tr>
+<td>shipping_fee</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>物流费</td>
+
+<td>0.0</td>
+</tr>
+
+<tr>
+<td>is_protect</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>是否保架。可选值: true(是) false(否)</td>
+
+<td>false</td>
+</tr>
+
+<tr>
+<td>protect_fee</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>保架费</td>
+
+<td>0.0</td>
+</tr>
+
+<tr>
+<td>receiver_name</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>收货人姓名</td>
+
+<td>张三</td>
+</tr>
+
+<tr>
+<td>receiver_email</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>收货人email</td>
+
+<td>张三@163.com</td>
+</tr>
+
+<tr>
+<td>receiver_mobile</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>收货人手机</td>
+
+<td>13813813813</td>
+</tr>
+
+<tr>
+<td>receiver_address</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>收货地址</td>
+
+<td>mainland:广东/广州市/东山区:425</td>
+</tr>
+
+<tr>
+<td>receiver_zip</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>收货地址邮箱</td>
+
+<td>201507</td>
+</tr>
+
+<tr>
+<td>receiver_phone</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>收货人电话</td>
+
+<td>57000000</td>
+</tr>
+
+<tr>
+<td>commission_fee</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>支付费用</td>
+
+<td>0.0</td>
+</tr>
+
+<tr>
+<td>memo</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>订单留言</td>
+
+<td>最好三天内送达</td>
+</tr>
+
+<tr>
+<td>status</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>订单状态。可选值：active(活单) dead(死单) finish(完成)</td>
+
+<td>active</td>
+</tr>
+
+<tr>
+<td>pay_status</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>交易支付状态。可选值：0(未支付) 1(已支付) 2(已付款至到担保方) 3(部分付款) 4(部分退款) 5(全额退款)</td>
+
+<td>0</td>
+</tr>
+
+<tr>
+<td>ship_status</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>交易物流状态。可选值：0(未发货) 1(已发货) 2(部分发货) 3(部分退货) 4(已退货)</td>
+
+<td>0</td>
+</tr>
+
+<tr>
+<td>orders</td>
+
+<td><a href="#Orders">Orders</a></td>
+
+<td>N</td>
+
+<td>订单明细</td>
+
+<td>json_encode(Orders)</td>
+</tr>
+</table>
+</table>
+<h2><a name="id2">API应用级返回结果</a></h2>
+<p>成功<pre class="mark">  [{
+    'rsp':'succ',
+    'data':true,
+    'res':{'tid':'20111111154444'}
+  }]
+</pre></p>
+
+<p>失败<pre class="mark">  {
+    'rsp':'fail',
+    'data':'订单信息更新失败！',
+    'res':'E_USER_ERROR'
+  }
+</pre></p>
+<hr noshade size="5"><hr noshade size="5"><h4><a name="id3">Orders数据结构</a></h4>
+<table class="docutils">
+<tr>
+<th>名称</th>
+
+<th>类型</th>
+
+<th>是否必需</th>
+
+<th>描述</th>
+
+<th>示例</th>
+</tr>
+
+<tr>
+<td>order</td>
+
+<td><a href="#Order">Order</a></td>
+
+<td>Y</td>
+
+<td>订单明细</td>
+
+<td>order=&gt;array(0=&gt;order_items,1=&gt;order_times,......)</td>
+</tr>
+</table>
+</table>
+<h4><a name="id4">Order数据结构</a></h4>
+<table class="docutils">
+<tr>
+<th>名称</th>
+
+<th>类型</th>
+
+<th>是否必需</th>
+
+<th>描述</th>
+
+<th>示例</th>
+</tr>
+
+<tr>
+<td>order_items</td>
+
+<td><a href="#OrderItems">OrderItems</a></td>
+
+<td>Y</td>
+
+<td>订单明细 |</td>
+</tr>
+</table>
+</table>
+<h4><a name="id5">OrderItems数据结构</a></h4>
+<table class="docutils">
+<tr>
+<th>名称</th>
+
+<th>类型</th>
+
+<th>是否必需</th>
+
+<th>描述</th>
+
+<th>示例</th>
+</tr>
+
+<tr>
+<td>orders_bn</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>交易编号</td>
+
+<td>20111111154444</td>
+</tr>
+
+<tr>
+<td>item</td>
+
+<td><a href="#Item">Item</a></td>
+
+<td>Y</td>
+
+<td>交易明细</td>
+
+<td></td>
+</tr>
+</table>
+</table>
+<h4><a name="id6">item数据结构</a></h4>
+<table class="docutils">
+<tr>
+<th>名称</th>
+
+<th>类型</th>
+
+<th>是否必需</th>
+
+<th>描述</th>
+
+<th>示例</th>
+</tr>
+
+<tr>
+<td>item_type</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>明细类型。可选值：product(商品) normal(其他)</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>bn</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>商品货号</td>
+
+<td>P4C933FC5D9735</td>
+</tr>
+
+<tr>
+<td>name</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>商品名</td>
+
+<td>抽绳连体背带短裤</td>
+</tr>
+
+<tr>
+<td>sale_price</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>销售最终总价</td>
+
+<td>20.0</td>
+</tr>
+
+<tr>
+<td>num</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>数量</td>
+
+<td>3</td>
+</tr>
+
+<tr>
+<td>sendnum</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>发货数量</td>
+
+<td>1</td>
+</tr>
+
+<tr>
+<td>total_item_fee</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>销售原总价</td>
+
+<td>30.0</td>
+</tr>
+
+<tr>
+<td>score</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>积分</td>
+
+<td>3</td>
+</tr>
+
+<tr>
+<td>price</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>会员价</td>
+
+<td>10</td>
+</tr>
+
+<tr>
+<td>weight</td>
+
+<td>Number</td>
+
+<td>Y</td>
+
+<td>重量</td>
+
+<td>15</td>
+</tr>
+
+<tr>
+<td>discount_fee</td>
+
+<td>Number</td>
+
+<td>N</td>
+
+<td>优惠金额</td>
+
+<td>10</td>
+</tr>
+</table>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">API应用级输入参数</a>
+    <li><a href="#id2" class="reference internal">API应用级返回结果</a>
+        <ul>
+            <ul>
+            <li><a href="#id3" class="reference internal">Orders数据结构</a>
+            <li><a href="#id4" class="reference internal">Order数据结构</a>
+            <li><a href="#id5" class="reference internal">OrderItems数据结构</a>
+            <li><a href="#id6" class="reference internal">item数据结构</a>
+        </ul>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="goods/b2c.member.get_member_lv_all.html"
+                                  title="上一章">b2c.member.get_member_lv_all 获取会员等级列表</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../append-b/index.html"
+                                  title="下一章">ecstore 请求外部系统的api接口</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../append-b/index.html" title="ecstore 请求外部系统的api接口" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="goods/b2c.member.get_member_lv_all.html" title="b2c.member.get_member_lv_all 获取会员等级列表" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../api.html">API</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore  被外部系统请求的api接口</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

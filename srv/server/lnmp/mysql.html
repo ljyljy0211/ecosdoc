@@ -1,0 +1,585 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      mysql &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../doc.html" />
+    <link rel="up" title="lnmp服务器" href="index.html" />
+
+        <link rel="next" title="../https" href="https加密站点(nginx配置ssl证书).html" />
+        <link rel="prev" title="nginx" href="nginx.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../https.html" title="https加密站点(nginx配置ssl证书)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="nginx.html" title="nginx" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群部署文档</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">lnmp服务器</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> mysql</h1>
+            <h2><a name="id1">编译安装</a></h2><h3><a name="id2">文档中的环境</a></h3>
+<ul>
+<li>mysql的版本 5.6.12 源码版(这里采用cmake编译安装)
+<li>主mysql服务器IP 192.168.65.142
+<li>从mysql服务器IP 192.168.65.140
+<li>mysql服务器目录 /usr/local/webserver/mysql
+<li>mysql服务器数据目录 /usr/local/webserver/mysql/data</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+<h3><a name="id3">安装编译工具</a></h3>
+<p>首先安装依赖库和开发工具<pre>yum -y install cmake bison gcc gcc-c++ autoconf automake make zlib* libxml* ncurses-devel libtool-ltdl-devel* mysql-devel
+</pre></p>
+
+<p>#如果没有cmake，由于mysql5.5开始，不再使用configure安装，而是使用cmake。所以需要先安装</p>
+
+<p>cmake<pre>wget http://www.cmake.org/files/v2.8/cmake-2.8.6.tar.gz
+tar -zxvf cmake-2.8.6.tar.gz
+cd cmake-2.8.6/
+./configure
+make &amp;&amp; make install
+</pre></p>
+<h3><a name="id4">开始编译</a></h3><pre>wget http://downloads.mysql.com/archives/mysql-5.6/mysql-5.6.12-linux-glibc2.5-x86_64.tar.gz
+tar xvf mysql-5.6.12.tar.gz
+cd mysql-5.6.12/
+
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local/webserver/mysql \
+-DMYSQL_UNIX_ADDR=/tmp/mysql.sock \
+-DDEFAULT_CHARSET=utf8 \
+-DDEFAULT_COLLATION=utf8_general_ci \
+-DWITH_EXTRA_CHARSETS:STRING=utf8,gbk,gb2312 \
+-DWITH_MYISAM_STORAGE_ENGINE=1 \
+-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+-DWITH_MEMORY_STORAGE_ENGINE=1 \
+-DWITH_READLINE=1 \
+-DENABLED_LOCAL_INFILE=1 \
+-DMYSQL_USER=mysql
+
+make
+make install
+</pre><pre>ln -s /usr/local/webserver/mysql/lib/libmysqlclient.so.18 /usr/lib/libmysqlclient.so.18
+</pre><h3><a name="id5">基本设置</a></h3>
+<p>添加mysql用户组和用户<pre>/usr/sbin/groupadd mysql
+/usr/sbin/useradd -g mysql mysql
+</pre></p>
+
+<p>设置目录<pre>cd /usr/local/webserver/mysql/support-files/ #在mysql 安装目录下
+
+#如果没有my-large.cnf就拷贝别的如 my-default.cnf，后面需要重新配置my.cnf文件的
+cp my-large.cnf /etc/my.cnf
+
+#mysql服务文件copy到系统服务目录
+cp mysql.server /etc/rc.d/init.d/mysqld
+chmod +x /etc/init.d/mysqld
+
+#修改mysql安装目录相关权限
+chown -R mysql:mysql /usr/local/webserver/mysql
+chmod +w /usr/local/webserver/mysql
+
+cd /usr/local/webserver/mysql
+chown -R root .
+chown -R mysql data
+chgrp -R mysql .
+</pre></p>
+
+<p>设置软连接使mysql,  mysqldump,  mysqladmin这三个bin命令能在shell中直接运行<pre>sudo ln -s /usr/local/webserver/mysql/bin/mysql /usr/bin
+sudo ln -s /usr/local/webserver/mysql/bin/mysqldump /usr/bin
+sudo ln -s /usr/local/webserver/mysql/bin/mysqladmin /usr/bin
+</pre></p>
+
+<p>启动项相关<pre>chkconfig --add mysqld
+chkconfig mysqld on
+</pre></p>
+
+<p>启动服务<pre>service mysqld start
+</pre></p>
+
+<p>设置密码<pre>/usr/local/webserver/mysql/bin/mysqladmin -u root password &quot;密码&quot;
+</pre></p>
+<h2><a name="id6">设置主服务器 ecos02  (192.168.65.142)</a></h2>
+<p>编辑my.cnf<pre>vim /etc/my.cnf
+</pre>找到<pre>server-id       = 1
+</pre>在下面添加一下内容<pre>binlog-do-db=ecstore
+binlog-ignore-db=mysql
+binlog-ignore-db=test
+</pre></p>
+
+<p>ecos02完整的my.cnf内容如下<pre>[client]
+port            = 3306
+socket          = /tmp/mysql.sock
+
+[mysqld]
+port            = 3306
+socket          = /tmp/mysql.sock
+skip-external-locking
+key_buffer_size = 256M
+max_allowed_packet = 1M
+table_open_cache = 256
+sort_buffer_size = 1M
+read_buffer_size = 1M
+read_rnd_buffer_size = 4M
+myisam_sort_buffer_size = 64M
+thread_cache_size = 8
+query_cache_size= 16M
+thread_concurrency = 8
+log-bin=mysql-bin
+binlog_format=mixed
+
+server-id       = 1
+binlog-do-db=ecstore
+binlog-ignore-db=mysql
+binlog-ignore-db=test
+
+[mysqldump]
+quick
+max_allowed_packet = 16M
+
+[mysql]
+no-auto-rehash
+
+[myisamchk]
+key_buffer_size = 128M
+sort_buffer_size = 128M
+read_buffer = 2M
+write_buffer = 2M
+
+[mysqlhotcopy]
+interactive-timeout
+</pre>然后重启mysql<pre>service mysql restart
+</pre>进入mysql命令行<pre>[root@ecos02 ~]# /usr/local/webserver/mysql/bin/mysql
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 9
+Server version: 5.6.12-log Source distribution
+
+Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql&gt;
+</pre>创建数据库ecstore<pre>CREATE DATABASE ecstore;
+</pre>导入信息<pre>GRANT REPLICATION SLAVE ON *.* TO 'ecstore'@'192.168.65.140' IDENTIFIED BY '123456';
+
+# ecstore 是授权的用户名，192.168.65.140 是从服务器的地址，123456 是新授权用户ecstore的密码，这里的用户ecstore不需要自己建立的，会自动创建
+</pre>查看状态<pre>SHOW MASTER STATUS;
+</pre>如果显示如下表示配置成功了<pre>mysql&gt; SHOW MASTER STATUS;
++------------------+----------+--------------+------------------+-------------------+
+| File             | Position | Binlog_Do_DB | Binlog_Ignore_DB | Executed_Gtid_Set |
++------------------+----------+--------------+------------------+-------------------+
+| mysql-bin.000002 |     1033 | ecstore      | mysql,test       |                   |
++------------------+----------+--------------+------------------+-------------------+
+1 row in set (0.00 sec)
+</pre></p>
+<h2><a name="id7">设置从服务器 ecos03 (192.168.65.140)</a></h2>
+<p>编辑my.cnf<pre>vim /etc/my.cnf
+</pre>注释掉server-id=1打开server-id=2<pre>#server-id       = 1
+server-id       = 2
+</pre></p>
+
+<p>ecos03完整的my.cnf内容如下<pre>[client]
+port            = 3306
+socket          = /tmp/mysql.sock
+
+[mysqld]
+port            = 3306
+socket          = /tmp/mysql.sock
+skip-external-locking
+key_buffer_size = 256M
+max_allowed_packet = 1M
+table_open_cache = 256
+sort_buffer_size = 1M
+read_buffer_size = 1M
+read_rnd_buffer_size = 4M
+myisam_sort_buffer_size = 64M
+thread_cache_size = 8
+query_cache_size= 16M
+thread_concurrency = 8
+log-bin=mysql-bin
+binlog_format=mixed
+
+server-id       = 2
+
+[mysqldump]
+quick
+max_allowed_packet = 16M
+
+[mysql]
+no-auto-rehash
+
+[myisamchk]
+key_buffer_size = 128M
+sort_buffer_size = 128M
+read_buffer = 2M
+write_buffer = 2M
+
+[mysqlhotcopy]
+interactive-timeout
+</pre></p>
+
+<p>然后重启mysql<pre>service mysqld restart
+</pre>进入mysql命令行<pre>[root@ecos03 ~]# /usr/local/webserver/mysql/bin/mysql
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 9
+Server version: 5.6.12-log Source distribution
+
+Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql&gt;
+
+</pre>先关闭SLAVE<pre>STOP SLAVE;
+</pre>导入信息<pre>CHANGE MASTER TO MASTER_HOST='192.168.65.142', MASTER_USER='ecstore', MASTER_PASSWORD='123456', MASTER_LOG_FILE='mysql-bin.000002', MASTER_LOG_POS=1033;
+
+# 192.168.65.142 是主服务器的ip地址，
+# ecstore 是主服务器授权的用户名，
+# 123456 是用户ecstore的密码，
+# mysql-bin.000002是在主服务器mysql中通过 
+
+# show master status; 
+
+# 查询到的 字段file的值，这里是对应 mysql-bin.000002, 
+# 1033是对应 Position的值，这里是1033
+
+</pre>开启SLAVE<pre>START SLAVE;
+</pre>查看同步情况<pre>SHOW SLAVE STATUS\G;
+</pre>如果显示如下表示配置成功<pre>mysql&gt; SHOW SLAVE STATUS\G;
+*************************** 1. row ***************************
+               Slave_IO_State: Waiting for master to send event
+                  Master_Host: 192.168.65.142 //主服务器地址
+                  Master_User: ecstore # 授权帐户名，尽量避免使用root
+                  Master_Port: 3306  # 数据库端口，部分版本没有此行
+                Connect_Retry: 60
+              Master_Log_File: mysql-bin.000002
+          Read_Master_Log_Pos: 1033 # 同步读取二进制日志的位置，大于等于&gt;=Exec_Master_Log_Pos
+               Relay_Log_File: centos140-relay-bin.000002
+                Relay_Log_Pos: 982
+        Relay_Master_Log_File: mysql-bin.000002
+             Slave_IO_Running: Yes # 此状态必须YES
+            Slave_SQL_Running: Yes # 此状态必须YES
+              Replicate_Do_DB: 
+          Replicate_Ignore_DB: 
+           Replicate_Do_Table: 
+       Replicate_Ignore_Table: 
+      Replicate_Wild_Do_Table: 
+  Replicate_Wild_Ignore_Table: 
+                   Last_Errno: 0
+                   Last_Error: 
+                 Skip_Counter: 0
+          Exec_Master_Log_Pos: 1033
+              Relay_Log_Space: 1159
+              Until_Condition: None
+               Until_Log_File: 
+                Until_Log_Pos: 0
+           Master_SSL_Allowed: No
+           Master_SSL_CA_File: 
+           Master_SSL_CA_Path: 
+              Master_SSL_Cert: 
+            Master_SSL_Cipher: 
+               Master_SSL_Key: 
+        Seconds_Behind_Master: 0
+Master_SSL_Verify_Server_Cert: No
+                Last_IO_Errno: 0
+                Last_IO_Error: 
+               Last_SQL_Errno: 0
+               Last_SQL_Error: 
+  Replicate_Ignore_Server_Ids: 
+             Master_Server_Id: 1
+                  Master_UUID: d056dc01-fec5-11e2-bada-36a07f9e9822
+             Master_Info_File: /usr/local/webserver/mysql/data/master.info
+                    SQL_Delay: 0
+          SQL_Remaining_Delay: NULL
+      Slave_SQL_Running_State: Slave has read all relay log; waiting for the slave I/O thread to update it
+           Master_Retry_Count: 86400
+                  Master_Bind: 
+      Last_IO_Error_Timestamp: 
+     Last_SQL_Error_Timestamp: 
+               Master_SSL_Crl: 
+           Master_SSL_Crlpath: 
+           Retrieved_Gtid_Set: 
+            Executed_Gtid_Set: 
+                Auto_Position: 0
+1 row in set (0.00 sec)
+
+ERROR: 
+No query specified
+</pre></p>
+<h2><a name="id8">备份数据库</a></h2>
+<p>使用mysqldump备份数据, 设置自动定时备份</p>
+
+<p>备份数据路径<pre>/data/mysqlbackup
+</pre></p>
+
+<p>创建备份脚本<pre>cat mysql-backup.sh
+#!/bin/bash
+DBUser=root
+DBPasswd=&quot;root&quot;
+DBHost=192.168.65.142
+DBName=`echo &quot;select SCHEMA_NAME from information_schema.SCHEMATA where schema_name not in ('information_schema','test');&quot; | /usr/local/webserver/mysql/bin/mysql -u$DBUser -p$DBPasswd --skip-column-names --silent`
+BackupPath=/data/mysqlbackup
+LogFile=/data/mysqlbackup/log/mysql_backup.log
+NewFile=$(date +%Y%m%d).tgz
+OldFile=$(date +%Y%m%d --date='7 days ago').tgz
+
+pushd $BackupPath &gt;&gt; $LogFile
+echo $OldFile
+echo &quot;-------------------------------------------&quot; &gt;&gt; $LogFile
+echo $(date +&quot;%Y-%m-%d %H:%M:%S&quot;) &gt;&gt; $LogFile
+echo &quot;--------------------------&quot; &gt;&gt; $LogFile
+#Delete Old File
+if [ -f $OldFile ]
+then
+     rm -f $OldFile &gt;&gt; $LogFile 2&gt;&amp;1
+     echo &quot;[$OldFile]Delete Old File Success!&quot; &gt;&gt; $LogFile
+else
+     echo &quot;[$OldFile]No Old Backup File!&quot; &gt;&gt; $LogFile
+fi
+
+#backup mysql
+if [ -f $NewFile ]
+then
+   echo &quot;[$NewFile]The Backup File is exists,Can't Backup!&quot; &gt;&gt; $LogFile
+else
+   for item in $DBName
+   do
+      DumpFile=$item&quot;.sql&quot;
+      /usr/local/webserver/mysql/bin/mysqldump -u$DBUser -p$DBPasswd -R --triggers --single-transaction --flush-logs --master-data --database $item &gt; $DumpFile
+   done
+   /bin/tar czvf $NewFile *.sql &gt;&gt; $LogFile 2&gt;&amp;1
+   /bin/rm -f *.sql
+fi
+echo &quot;-------------------------------------------&quot; &gt;&gt; $LogFile
+popd &gt;&gt; $LogFile
+</pre></p>
+
+<p>自动化</p>
+
+<p>使用crontab定时执行备份脚本<pre>crontab -e
+</pre>添加一条任务<pre>0 4 * * * /bin/bash /data/mysqlbackup/mysql-backup.sh
+</pre></p>
+
+<p>查看任务<pre>crontab -l
+</pre></p>
+<h2><a name="id9">FAQ:mysql主从同步常见错误</a></h2>
+<ul>
+<li>Slave I/O: error connecting to master 'backup@192.168.1.x:3306' - retry-time: 60  retries: 86400, Error_code: 1045<pre class="mark"> ** 解决方法 **
+ 从服务器上删除掉所有的二进制日志文件，包括一个数据目录下的master.info文件和hostname-relay-bin开头的文件。
+ master.info:：记录了Mysql主服务器上的日志文件和记录位置、连接的密码。
+</pre></li>
+</ul>
+
+<ul>
+<li>Error reading packet from server: File '/home/mysql/mysqlLog/log.000001' not found (Errcode: 2) ( server_errno=29)<pre class="mark"> ** 解决方案 **
+ 由于主服务器运行了一段时间，产生了二进制文件，而slave是从log.000001开始读取的，删除主机二进制文件，包括log.index文件。
+</pre></li>
+</ul>
+
+<ul>
+<li>Slave SQL: Error 'Table 'xxxx' doesn't exist' on query. Default database: 't591'. Query: 'INSERT INTO `xxxx`(type,post_id,browsenum) SELECT type,post_id,browsenum FROM xxxx WHERE hitdate='20090209'', Error_code: 1146<pre class="mark"> ** 解决方法 **
+ 由于slave没有此table表，添加这个表，使用slave start 就可以继续同步。
+</pre></li>
+</ul>
+
+<ul>
+<li>Error 'Duplicate entry '1' for key 1' on query. Default database: 'movivi1'. Query: 'INSERT INTO `v1vid0_user_samename` VALUES(null,1,'123','11','4545','123')'
+<p>Error 'You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1' on query. Default database: 'club'. Query: 'INSERT INTO club.point_process ( GIVEID, GETID, POINT, CREATETIME, DEMO ) VALUES ( 0, 4971112, 5, '2010-12-19 16:29:28','1 row in set (0.00 sec)<pre class="mark"> Mysql &gt; SHOW SLAVE STATUS\G;
+
+ 显示：Slave_SQL_Running 为 NO 
+ 解决方法：
+ Mysql &gt; stop slave;
+ Mysql &gt; set global sql_slave_skip_counter =1 ;
+ Mysql &gt; start slave;
+</pre></p>
+</li>
+</ul>
+
+<ul>
+<li># show slave status\G;
+<p>Master_Log_File: mysql-bin.000029Read_Master_Log_Pos: 3154083Relay_Log_File: c7-relay-bin.000178Relay_Log_Pos: 633Relay_Master_Log_File: mysql-bin.000025Slave_IO_Running: YesSlave_SQL_Running: NoReplicate_Do_DB: clubReplicate_Ignore_DB:Replicate_Do_Table:Replicate_Ignore_Table:Replicate_Wild_Do_Table:Replicate_Wild_Ignore_Table:Last_Errno: 1594Last_Error: Relay log read failure: Could not parse relay log event entry. The possible reasons are: the master's binary log is corrupted (you can check this by running 'mysqlbinlog' on the binary log), the slave's relay log is corrupted (you can check this by running 'mysqlbinlog' on the relay log), a network problem, or a bug in the master's or slave's MySQL code. If you want to check the master's binary log or slave's relay log, you will be able to know their names by issuing 'SHOW SLAVE STATUS' on this slave.Skip_Counter: 0Exec_Master_Log_Pos: 1010663436这个问题原因是，主数据库突然停止或问题终止，更改了mysql-bin.xxx日志，slave服务器找不到这个文件，需要找到同步的点和日志文件，然后chage master即可。<pre class="mark"> 解决方法：
+ 
+ change master to 
+ master_host='211.103.156.198',
+ master_user='同步帐号', 
+ master_password='同步密码', 
+ master_port=3306, 
+ master_log_file='mysql-bin.000025', 
+ master_log_pos=1010663436;
+</pre></p>
+</li>
+</ul>
+
+<ul>
+<li>Error 'Unknown column 'qdir' in 'field list'' on query. Default database: 'club'. Query: 'insert into club.question_del (id, pid, ques_name, givepoint, title, subject, subject_pid, createtime, approve, did, status, intime, order_d, endtime,banzhu_uid,banzhu_uname,del_cause,qdir) select id, pid, ques_name, givepoint, title, subject, subject_pid, createtime, approve, did, status, intime, order_d, endtime,'1521859','admin0523','无意义回复',qdir from club.question where id=7330212' 1 row in set (0.00 sec)<pre class="mark">这个错误就说club.question_del 表里面没有qdir这个字段 造成的加上就可以了~！
+在主的mysql ： 里面查询 Desc club.question_del； 
+在 错误的从服务器上执行 ： alter table question_del add qdir varchar(30) not null;
+</pre></li>
+</ul>
+
+<ul>
+<li>Slave_IO_Running: NO<pre class="mark">这个错误就是IO 进程没连接上  ，想办法连接上把 把与主的POS 号和文件一定要对，然后重新加载下数据。具体步骤：
+slave stop;
+change master to master_host='IP地址',master_user='club',master_password='mima ',master_log_file='mysqld-bin.000048',MASTER_LOG_POS=396549485;
+注：master_log_file='mysqld-bin.000048',MASTER_LOG_POS=396549485;是从主的上面查出 来的 ：show master status\G;
+
+LOAD DATA FROM MASTER; 
+
+load data from master；
+
+slave start;
+</pre></li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">编译安装</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">文档中的环境</a>
+        <li><a href="#id3" class="reference internal">安装编译工具</a>
+        <li><a href="#id4" class="reference internal">开始编译</a>
+        <li><a href="#id5" class="reference internal">基本设置</a>
+    </ul>
+    <li><a href="#id6" class="reference internal">设置主服务器 ecos02  (192.168.65.142)</a>
+    <li><a href="#id7" class="reference internal">设置从服务器 ecos03 (192.168.65.140)</a>
+    <li><a href="#id8" class="reference internal">备份数据库</a>
+    <li><a href="#id9" class="reference internal">FAQ:mysql主从同步常见错误</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="nginx.html"
+                                  title="上一章">nginx</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../https.html"
+                                  title="下一章">https加密站点(nginx配置ssl证书)</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../https.html" title="https加密站点(nginx配置ssl证书)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="nginx.html" title="nginx" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群部署文档</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">lnmp服务器</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

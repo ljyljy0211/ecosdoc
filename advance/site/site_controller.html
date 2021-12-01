@@ -1,0 +1,362 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      site_controller控制器基类 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="优雅的前端- site" href="index.html" />
+
+        <link rel="next" title="site_router" href="site路由处理类 - site_router.html" />
+        <link rel="prev" title="base" href="概述.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="site_router.html" title="site路由处理类 - site_router" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="base.html" title="概述" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">优雅的前端- site</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> site_controller控制器基类</h1>
+            <h2><a name="id1">功能描述</a></h2>
+<p>前台控制器专用基类</p>
+<h2><a name="id2">应用场景</a></h2>
+<p>前台控制器</p>
+<h2><a name="id3">继承关系</a></h2><pre class="mark">sh: dot: command not found
+</pre><h2><a name="id4">使用方法</a></h2><h2><a name="id5">函数接口</a></h2><h3><a name="id6">常用函数</a></h3><h4><a name="id7">gen_url</a></h4>
+<p>拼接有效的URL地址</p>
+<pre class="mark">参数
+    array   $params
+
+返回
+    URL地址
+</pre><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">...<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">gen_url</span><span style="color: #007700">(array(</span><span style="color: #DD0000">'app'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$app_id</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'ctl'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$ctl</span><span style="color: #007700">,</span><span style="color: #DD0000">'act'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$act</span><span style="color: #007700">,</span><span style="color: #DD0000">'args'</span><span style="color: #007700">=&gt;array((</span><span style="color: #0000BB">$tmp&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">time</span><span style="color: #007700">())))),<br />&nbsp;&nbsp;&nbsp;&nbsp;...<br /></span>
+</span>
+</code></div><h4><a name="id8">page</a></h4>
+<p>对view下html页面进行编译，设置头部信息，并把生成的html。此生成的时候全页页面的main区域的html</p>
+
+<p>供site_router下的dispatch方法构成全页页面使用</p>
+<pre class="mark">参数
+    string  $view
+
+返回
+   string
+</pre><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">...<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">page</span><span style="color: #007700">(</span><span style="color: #DD0000">'site/member/main.html'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;...<br /></span>
+</span>
+</code></div><h4><a name="id9">redirect</a></h4>
+<p>直接跳转到指定地址</p>
+<pre class="mark">参数
+    array   $url
+    boolean $js_jump
+
+返回
+   null
+</pre><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">...<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">redirect</span><span style="color: #007700">(array(</span><span style="color: #DD0000">'app'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">,</span><span style="color: #DD0000">'ctl'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'site_cart'</span><span style="color: #007700">,</span><span style="color: #DD0000">'act'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'loginbuy'</span><span style="color: #007700">,</span><span style="color: #DD0000">'arg0'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'1'</span><span style="color: #007700">));<br />&nbsp;&nbsp;&nbsp;&nbsp;...<br /></span>
+</span>
+</code></div><h4><a name="id10">begin end end_only</a></h4>
+<p>begin end 或者 begin end_only函数配合使用，可对运行程序的错误信息进行处理后在进行显示</p>
+
+<p>begin   错误处理开始</p>
+
+<p>end     显示处理结果，显示成功或失败页面</p>
+
+<p>end_only  只显示错误信息</p>
+<pre class="mark">参数
+</pre><h4><a name="id11">splash</a></h4>
+<p>显示处理结果页面，可以用于状态提示跳转，如：是否已经登录的提示跳转</p>
+<pre class="mark">参数
+    string  $status 'success' or 'failed'
+    string  $jumpto 跳转的URL
+    strint  $msg    显示的提示信息
+
+返回
+   null
+
+注意： $jumpto参数中有两个特殊参数
+       1）当$jumpto='back'时，跳转的是返回的页面
+       2）当$jumpto='close'时，则不进行跳转，关闭本页面
+</pre><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">...<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$url&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">gen_url</span><span style="color: #007700">(array(</span><span style="color: #DD0000">'app'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">,</span><span style="color: #DD0000">'ctl'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">"site_member"</span><span style="color: #007700">,</span><span style="color: #DD0000">'act'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">"setting"</span><span style="color: #007700">));<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">splash</span><span style="color: #007700">(</span><span style="color: #DD0000">'failed'</span><span style="color: #007700">,</span><span style="color: #0000BB">$url&nbsp;</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'邮件已经存在'</span><span style="color: #007700">));<br />&nbsp;&nbsp;&nbsp;&nbsp;...<br /></span>
+</span>
+</code></div><h3><a name="id12">其他函数</a></h3><h4><a name="id13">extract_widgets_css</a></h4>
+<p>提取html页面中的css样式</p>
+<pre class="mark">public function extract_widgets_css(&amp;$body)
+
+参数
+    string  $body（html）
+
+返回
+    string
+</pre><h4><a name="id14">create_widgets_key_prefix</a></h4>
+<p>生成widgets特有的前缀信息(用于缓存)</p>
+<pre class="mark">public function create_widgets_key_prefix($values, $varys)
+
+参数
+    string  $values
+    string  $varys  widgets中widgets.php定义的$stting[varys]的信息
+
+返回
+   string
+</pre><h4><a name="id15">set_tmpl</a></h4>
+<p>设置主题模版类型,设置调用的模板页面，如果没有设置系统默认的调用模板的default.html</p>
+
+<p>当在theme中添加了一个自定义的模板页面，则要使用此页面的时候，需要在page方法的前面</p>
+
+<p>用此方法定义好。</p>
+<pre class="mark">final public function set_tmpl($tmpl)
+
+参数
+    string  $tmpl   模板页面的名字(index,default)
+
+返回
+    null
+</pre><h4><a name="id16">get_tmpl</a></h4>
+<p>读取主题模版类型,获取set_tmpl设置的值,此方法一般用不到，是系统自己调用的方法<pre class="mark">final public function get_tmpl()
+</pre></p>
+<h4><a name="id17">set_tmpl_file</a></h4>
+<p>设置主题模板文件,设置页面调用的模板，不同模板样式不同(模板中的html页面：page-help.html)</p>
+
+<p>如果定义的模板文件不是在theme的时候则需要用set_tmpl_file来设置页面调用的模板<pre class="mark">final public function set_tmpl_file($tmpl_file)
+
+参数
+    string  $tmpl_file  模板中的页面文件（page-help.html）
+
+返回
+    null
+</pre></p>
+<h4><a name="id18">get_tmpl_file</a></h4>
+<p>读取主题模板文件，获取set_tmpl_file定义的值，此一般是在page方法中调用了，所以一般用page来显示页面就可以了</p>
+<pre class="mark">final public function get_tmpl_file()
+</pre><h4><a name="id19">set_max_age</a></h4>
+<p>设置头部max-age信息,提共给page方法或其他显示页面使用</p>
+
+<p>Cache-control: max-age=5(表示当访问此网页后的5秒内再次访问不会去服务器)</p>
+<pre class="mark">参数  int  $time设置超时时间
+</pre><h4><a name="id20">set_no_cache</a></h4>
+<p>设置Cache-control:no_cache<pre class="mark">参数    var boolean $status
+</pre></p>
+<h4><a name="id21">set_no_store</a></h4>
+<p>设置Cache-control:no_store</p>
+
+<p>当header设置为Cache-control：no_cache,no_store是，系统则不会对此页面进行缓存<pre class="mark">参数    var boolean $status
+</pre></p>
+<h4><a name="id22">set_cache_access</a></h4>
+<p>设置Cache-control:public（rivate）<pre class="mark">参数    默认为pulbic
+</pre></p>
+<h2><a name="id23">site_controoler提供的service box</a></h2><h3><a name="id24">site_controller_content</a></h3>
+<p>修改（替换，添加，删除）html页面的内容，修改的是对应的页面的html内容</p>
+
+<ul>
+<li>使用方法
+<p>service注册的ID为site_controller_content<pre class="mark">&lt;service id=&quot;site_controller_content&quot;&gt;
+    &lt;class&gt;ecbook_service_modifyhtml&lt;/class&gt;
+&lt;/service&gt;
+</pre>ecbook_service_modifyhtml类的写法<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">ecbook_service_modifyhtml&nbsp;</span><span style="color: #007700">implements&nbsp;</span><span style="color: #0000BB">site_interface_controller_content</span><span style="color: #007700">{<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">modify</span><span style="color: #007700">(&amp;</span><span style="color: #0000BB">$html</span><span style="color: #007700">,&nbsp;&amp;</span><span style="color: #0000BB">$obj</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//$html为此页面的所有的html，在此可以做完修改后进行返回就好<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$arr&nbsp;</span><span style="color: #007700">=</span><span style="color: #DD0000">'xxxxxx'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$arr2</span><span style="color: #007700">.=</span><span style="color: #DD0000">'xxxxx'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$html&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">str_replace</span><span style="color: #007700">(</span><span style="color: #0000BB">$arr</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$arr2</span><span style="color: #007700">,</span><span style="color: #0000BB">$html</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />}<br /></span>
+</span>
+</code></div></p>
+</li>
+</ul>
+<h3><a name="id25">site_controller_content.%s.%s.%s</a></h3>
+<p>修改（替换，添加，删除）html页面的内容，修改的是指定的app的控制器的方法的页面的html内容</p>
+
+<p>因为这个service是在site_controller的构造方法里面的,因此，这个service一般是在修改系统共用的一些内容</p>
+
+<ul>
+<li>使用方法
+<p>其用法和site_controller_content这个service一样，service注册类的写法所一样的，需要注意的是service ID 的写法site_controller_content.$app_name.$ctl.$act<pre class="mark">第一个%s表示的此页面所在的app的app名字
+第二个%s表示的此页面所在的调用控制器的名字
+第三个%s表示的此页面所在的调用方法的名字
+</pre>service类的写法<pre class="mark">modify方法：和site_controller_content service类的写法一样
+boot方法：一般修改的是前台系统共用的一些配置信息,最后返回true
+</pre></p>
+</li>
+</ul>
+<h3><a name="id26">site_controller_display.%s.%s.%s</a></h3>
+<p>此service用于前台的页面劫持</p>
+
+<p>使用场景：如果在一个前台控制器中使用了site_controller中page方法调用view下的html页面，</p>
+
+<p>那么在需要劫持此方法中的的页面则可以使用此service</p>
+
+<ul>
+<li>使用方法
+<p>注册srevice<pre class="mark">第一个%s表示的此页面所在的app的app名字
+第二个%s表示的此页面所在的调用控制器的名字
+第三个%s表示的此页面所在的调用方法的名字
+</pre><pre>&lt;service id=&quot;site_controller_display.b2c.site_gallery.index&quot;&gt;
+    &lt;class&gt;shangchao_ctl_site_gallery&lt;/class&gt;
+&lt;/service&gt;
+</pre>service类的写法<pre class="mark">get_view方法：返回劫持后的页面
+get_app_id方法： 提供劫持后的页面所在的app的名字
+</pre><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">shangchao_ctl_site_gallery&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">site_controller</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">get_view</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//$GLOBALS['runtime']['serach_content']&nbsp;=&nbsp;$_GET['scontent'].'__'.$this-&gt;pagedata['args'][5];<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//提供劫持页面的数据<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">return&nbsp;</span><span style="color: #DD0000">'site/gallery/index.html'</span><span style="color: #007700">;</span><span style="color: #FF8000">//返回劫持的页面<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">get_app_id</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #DD0000">'shangchao'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />}<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div></p>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">功能描述</a>
+    <li><a href="#id2" class="reference internal">应用场景</a>
+    <li><a href="#id3" class="reference internal">继承关系</a>
+    <li><a href="#id4" class="reference internal">使用方法</a>
+    <li><a href="#id5" class="reference internal">函数接口</a>
+        <ul>
+        <li><a href="#id6" class="reference internal">常用函数</a>
+            <ul>
+            <li><a href="#id7" class="reference internal">gen_url</a>
+            <li><a href="#id8" class="reference internal">page</a>
+            <li><a href="#id9" class="reference internal">redirect</a>
+            <li><a href="#id10" class="reference internal">begin end end_only</a>
+            <li><a href="#id11" class="reference internal">splash</a>
+        </ul>
+        <li><a href="#id12" class="reference internal">其他函数</a>
+            <ul>
+            <li><a href="#id13" class="reference internal">extract_widgets_css</a>
+            <li><a href="#id14" class="reference internal">create_widgets_key_prefix</a>
+            <li><a href="#id15" class="reference internal">set_tmpl</a>
+            <li><a href="#id16" class="reference internal">get_tmpl</a>
+            <li><a href="#id17" class="reference internal">set_tmpl_file</a>
+            <li><a href="#id18" class="reference internal">get_tmpl_file</a>
+            <li><a href="#id19" class="reference internal">set_max_age</a>
+            <li><a href="#id20" class="reference internal">set_no_cache</a>
+            <li><a href="#id21" class="reference internal">set_no_store</a>
+            <li><a href="#id22" class="reference internal">set_cache_access</a>
+        </ul>
+    </ul>
+    <li><a href="#id23" class="reference internal">site_controoler提供的service box</a>
+        <ul>
+        <li><a href="#id24" class="reference internal">site_controller_content</a>
+        <li><a href="#id25" class="reference internal">site_controller_content.%s.%s.%s</a>
+        <li><a href="#id26" class="reference internal">site_controller_display.%s.%s.%s</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="base.html"
+                                  title="上一章">概述</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="site_router.html"
+                                  title="下一章">site路由处理类 - site_router</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="site_router.html" title="site路由处理类 - site_router" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="base.html" title="概述" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">优雅的前端- site</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      技术白皮书 - 架构篇 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="技术白皮书" href="index.html" />
+
+        <link rel="next" title="../product-initial/product-initial" href="OCS初始化数据手册.html" />
+        <link rel="prev" title="performace" href="技术白皮书 - 性能篇.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../product-initial/product-initial.html" title="OCS初始化数据手册" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="performace.html" title="技术白皮书 - 性能篇" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">OCS开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">技术白皮书</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 技术白皮书 - 架构篇</h1>
+            
+<p>Architecture Is Very Important To EC-Commerce</p>
+
+<p>企业为了生存，他们所依靠的软件必须能提供其所需的功能、所需的高质量、所承诺的可用性，未来的可扩展性</p>
+<h2><a name="id1">前言</a></h2>
+<p>作为中国电子商务全面解决方案的先行者，商派技术团队通过八年的实践，积累了大量的电子商务前后端的架构模式和中间件设计经验，正是通过这些积累，保证了商派在国内电商业界的领先地位。</p>
+
+<p>从公司ShopEx 4.8系列产品开始，商派一直在探索一种行之有效的方式，既能够降低研发成本和研发工作的复杂性，又能够快速地跟进业务的发展变化，在这种方式下，可以省去很多基础性的研发工作，复用八年来获得的经验，同时使研发周期大幅缩短，提高研发效率。自2009年立项开始，商派投入了30余名工程师，用将近一年的时间打造出了开源的电子商务业务架构平台，幵将其命名为ECOS，寓意电子商务操作系统。</p>
+
+<p>该系统借鉴OSGI体系，为实现复杂的电子商务应用提供了一个基础的应用化开发和运维框架，其中封装了大量的电子商务相关、网站优化相关的应用不组件，它同时为系统间互联提供底层服务。商派网络的新一代B2C系统ECSTORE、电商协同运营套件OCS等前后端系统都采用了ECOS为基础架构进行构筑。实践表明ECOS有效地降低了开发工作量，使开发出的软件即使在投入运行后，也能通过编写应用的方式快速地跟进业务的发展和变化。</p>
+<h2><a name="id2">ECOS的基础架构介绍</a></h2>
+<p>ECOS是Rails风栺的PHP快速开发框架，EC意味着电子商务，OS意味着操作系统，操作平台。他是一个完全由APP组成的系统，每个应用采用统一的约定组装在一起。如果说ECOS像Linux一样由许多包组成，那么Base就是ECOS的内核(Kernel)。Base封装了大部分的性能敏感资源访问，使得构建亍其上的其他应用丌需要考虑后端的资源实现。</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/a-001.jpg" /></p>
+
+<p>这使得具体应用丌需要考虑后端实现，而ECOS的整体性能会随着部署环境的提升而提升。不Linux Kernel丌同的是：Base提供了软件包管理机制。Base让软件包的安装和卸载非常便捷，只要一个命令，就可以像Yum/Apt一样为ECOS安装新的功能包。</p>
+
+<p>ECOS上的应用可以创建自己的数据表，创建自己的业务规则，操作视图。更强大的是应用间的协同扩展能力。</p>
+<h2><a name="id3">ECOS的架构技术特色--OSGI技术的实现</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="images/a-002.jpg" /></p>
+
+<p>OSGI是JAVA下的一个组件化设计，其代表产品是编辑器Eclipse，该工具生命力非常强大，可以通过组件来扩充使其适合软件开发工艺中的各个流程。ECOS尝试作为一个类似OSGI的简易实现，简化其开发成本，而由丌失去其灵活性。随着商派基亍ECOS的产品线发展，新的应用可以灵活的扩展原有应用的界面和流程，证明该尝试是非常成功的。OSGI的部署单位是Bundle, 对应在ECOS中就是APP。其共性是具有称为“服务”的扩展接口。通过Service机制，App之间可以扩展功能，界面，和操作流程。而丌必担心原有应用升级带来的问题。</p>
+
+<p>OSGI的部署单位是Bundle, 对应在ECOS中就是APP。其共性是具有称为“服务”的扩展接口。通过Service机制，App之间可以扩展功能，界面，和操作流程。而丌必担心原有应用升级带来的问题。</p>
+
+<p>ECOS是全消息驱动设计，采用事件机制，可以接通到您的企业数 据总线ESB,不您的企业更紧密集成, 让您之前的it投资得到增值采用ECOS可以提高二次开发效率，建表,建数据模型,建控制器。Rails风栺的脚手架帮你的团队节省时间。</p>
+
+<p>同时，ECOS是商派开发经验的体现，上海商派在十余年软件开发过程中的体悟，开发流程的管理经验，敏捷开发思想都浓缩在ECOS的开发工具中。自带Tdd和持续集成工具, 协助您的技术团队规范开发流程。</p>
+<h2><a name="id4">ECOS的技术架构详细图</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="images/a-003.jpg" /></p>
+
+<ul>
+<li>业务在高速的发展过程中，需要丌断地根据市场情况进行调整，对系统变更的响应及时性要求很高；
+<li>希望自己的信息系统能较好进行整合，系统间配合良好，同时能快速的接入各大集市型交易平台，如淘宝等；
+<li>希望降低自己的开发成本，同时吸取业内的成功经验；
+<li>希望信息化统一规划，实现统一业务架构和开发平台；
+<li>希望随着业务的发展，系统具备扩展的能力；</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">前言</a>
+    <li><a href="#id2" class="reference internal">ECOS的基础架构介绍</a>
+    <li><a href="#id3" class="reference internal">ECOS的架构技术特色--OSGI技术的实现</a>
+    <li><a href="#id4" class="reference internal">ECOS的技术架构详细图</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="performace.html"
+                                  title="上一章">技术白皮书 - 性能篇</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../product-initial/product-initial.html"
+                                  title="下一章">OCS初始化数据手册</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../product-initial/product-initial.html" title="OCS初始化数据手册" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="performace.html" title="技术白皮书 - 性能篇" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">OCS开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">技术白皮书</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

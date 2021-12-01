@@ -1,0 +1,353 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      base_controller控制器基类 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../../doc.html" />
+    <link rel="up" title="控制器(controller)" href="../c.html" />
+
+        <link rel="next" title="extend" href="控制器扩展.html" />
+        <link rel="prev" title="base_router" href="默认路由 - base_router.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="extend.html" title="控制器扩展" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="base_router.html" title="默认路由 - base_router" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">MVC框架</a> &raquo;
+        </li>
+                <li>
+          <a href="../c.html">控制器(controller)</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> base_controller控制器基类</h1>
+            <h2><a name="id1">调用流程</a></h2><h2><a name="id2">继承关系</a></h2><pre class="mark">sh: dot: command not found
+</pre><h3><a name="id3">base_render提供的函数</a></h3><h4><a name="id4">display</a></h4>
+<p>对html模板文件进行编译后输出<pre class="mark">function display($tmpl_file, $app_id=null, $fetch=false)
+
+参数
+    $tmpl_file  html模板文件路径
+    $app_id     html模板文所在所在app
+    $fetch      是否直接输出,false直接输出|true 返回编译后的内容，可以嵌套其他页面
+</pre></p>
+<h4><a name="id5">pre_display</a></h4>
+<p>对用display编译后的html进行再次编译，或则是说对编译后的内容进行修改</p>
+
+<p>此方法需要注册一个service实现 base_render_pre_display</p>
+<h4><a name="id6">single</a></h4>
+<p>私有方法实例化一个类</p>
+<pre class="mark">private function single($classname)
+
+参数
+    $classname   类的名字
+返回
+    object
+</pre><h4><a name="id7">fetch</a></h4>
+<p>fetch方法是调用display，是将display中的$fetch=true,使页面可嵌套输出<pre class="mark">function fetch($tmpl_file,$app_id=null)
+
+参数$tmpl_file，$app_id和display参数一样
+</pre></p>
+<h4><a name="id8">tmpl_cachekey</a></h4>
+<p>定义模板生成编译文件的key(也就编译文件的文件名)的后缀,为一个数组，可定义多个后缀信息</p>
+<pre class="mark">public function tmpl_cachekey($key,$value)
+
+参数
+    string          $key编译文件key这个数组中的一个键值
+    string|array    $value编译文件key这个数组对因键的值
+返回
+    array
+</pre><h4><a name="id9">ui</a></h4>
+<p>实例化base_component_ui类,这个类是系统中对一些UI组件的定义，此方法是在编译的时候调用</p>
+
+<p>对html模板中使用了系统的UI组件的代码进行编译</p>
+<pre class="mark">function &amp;ui()
+</pre><h4><a name="id10">compile_id</a></h4>
+<p>对模板生成编译文件的key的值(数组)进行md5,这个key值为:文件名+tmpl_cachekey方法定义的后缀<pre class="mark">function compile_id($path)
+参数
+    string  $path模板文件的路径，包含文件
+返回
+    string
+</pre></p>
+<h3><a name="id11">base_render提供的service</a></h3><h4><a name="id12">tpl_source.</a></h4><h5><a name="id13">应用场景</a></h5>
+<p>自定义模板文件，如邮件模板，短信模板</p>
+
+<p>一般是我们定义好一个邮件模板文件，先是将规则定义好，根据规则把模板文件存储到数据库</p>
+
+<p>在要使用这个模板文件的时候则到数据库中把模板文件获取到，在根据规则把数据填充到模板文件中</p>
+
+<p>再用base_render中的fetch方法进行编译返回</p>
+<h5><a name="id14">使用方法</a></h5>
+<ul>
+<li>注册service tpl_source.$name<pre>&lt;service id=&quot;tpl_source.messenger&quot;&gt;
+    &lt;class&gt;b2c_messenger_tmpl&lt;/class&gt;
+&lt;/service&gt;
+</pre>
+<li>service类的写法<pre class="mark">此service类的方法及作用
+
+last_modified       返回模板文件最后修改的时间
+get_file_contents   返回自定义模板文件
+</pre><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/**<br />&nbsp;*&nbsp;ShopEx&nbsp;licence<br />&nbsp;*<br />&nbsp;*&nbsp;@copyright&nbsp;&nbsp;Copyright&nbsp;(c)&nbsp;2005-2010&nbsp;ShopEx&nbsp;Technologies&nbsp;Inc.&nbsp;(http://www.shopex.cn)<br />&nbsp;*&nbsp;@license&nbsp;&nbsp;http://ecos.shopex.cn/&nbsp;ShopEx&nbsp;License<br />&nbsp;*/<br /><br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">b2c_messenger_tmpl</span><span style="color: #007700">{<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//获取模板文件的最后修改时间<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">public&nbsp;function&nbsp;</span><span style="color: #0000BB">last_modified</span><span style="color: #007700">(</span><span style="color: #0000BB">$tplname</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$systmpl&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">(</span><span style="color: #DD0000">'member_systmpl'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$aRet&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$systmpl</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getList</span><span style="color: #007700">(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">,array(</span><span style="color: #DD0000">'active'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'true'</span><span style="color: #007700">,</span><span style="color: #DD0000">'tmpl_name'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$tplname</span><span style="color: #007700">));</span><span style="color: #FF8000">//获取到自定义模板<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">if(</span><span style="color: #0000BB">$aRet</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$aRet</span><span style="color: #007700">[</span><span style="color: #0000BB">0</span><span style="color: #007700">][</span><span style="color: #DD0000">'edittime'</span><span style="color: #007700">];<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">time</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">get_file_contents</span><span style="color: #007700">(</span><span style="color: #0000BB">$tplname</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$systmpl&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">(</span><span style="color: #DD0000">'member_systmpl'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$aRet&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$systmpl</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getList</span><span style="color: #007700">(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">,array(</span><span style="color: #DD0000">'active'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'true'</span><span style="color: #007700">,</span><span style="color: #DD0000">'tmpl_name'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$tplname</span><span style="color: #007700">));<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">$aRet</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$aRet</span><span style="color: #007700">[</span><span style="color: #0000BB">0</span><span style="color: #007700">][</span><span style="color: #DD0000">'content'</span><span style="color: #007700">];</span><span style="color: #FF8000">//返回获取到的模板文件(代码)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">null</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />}<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>
+<li>调用display或则fetch是文件名参数的写法<pre class="mark">function fetch($tmpl_file,$app_id=null)
+一般来说$tmpl_file文件为文件的路径：'site/default.html'然而对于使用tpl_source.$name service的方式来说
+
+$tmpl_file写法是：($name:$tmpl_name)
+$name       &lt;service id=&quot;tpl_source.messenger&quot;&gt;例子来说 $name = messenger
+$tmpl_name  是能够获取到模板文件的一个标识
+</pre></li>
+</li>
+</li>
+</ul>
+<h4><a name="id15">base_render_pre_display</a></h4><h5><a name="id16">应用场景</a></h5>
+<p>如果模板文件经过系统编译过以后，需要对编译后的文内容再一次进行修改，或则替换，则需要注册此service</p>
+<h5><a name="id17">使用方法</a></h5>
+<ul>
+<li>注册service<pre>&lt;service id=&quot;base_render_pre_display&quot;&gt;
+    &lt;class&gt;base_service_render&lt;/class&gt;
+&lt;/service&gt;
+</pre>
+<li>service类的写法<pre class="mark">pre_display(&amp;$content)
+
+参数
+    $content    传引用，得到数据是display经过系统编译后的内容
+</pre><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/**<br />&nbsp;*&nbsp;ShopEx&nbsp;licence<br />&nbsp;*<br />&nbsp;*&nbsp;@copyright&nbsp;&nbsp;Copyright&nbsp;(c)&nbsp;2005-2010&nbsp;ShopEx&nbsp;Technologies&nbsp;Inc.&nbsp;(http://www.shopex.cn)<br />&nbsp;*&nbsp;@license&nbsp;&nbsp;http://ecos.shopex.cn/&nbsp;ShopEx&nbsp;License<br />&nbsp;*/<br /><br /><br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">base_service_render</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">pre_display</span><span style="color: #007700">(&amp;</span><span style="color: #0000BB">$content</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$content&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">base_storager</span><span style="color: #007700">::</span><span style="color: #0000BB">image_storage</span><span style="color: #007700">(</span><span style="color: #0000BB">$content</span><span style="color: #007700">);</span><span style="color: #FF8000">//对编译后的内容$content进行替换<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">}</span><span style="color: #FF8000">//End&nbsp;Function<br /><br /></span><span style="color: #007700">}</span><span style="color: #FF8000">//End&nbsp;Class<br /></span>
+</span>
+</code></div></li>
+</li>
+</ul>
+<h3><a name="id18">base_controller提供的函数</a></h3><h4><a name="id19">begin</a></h4>
+<p>开启事务，设置错误或成功时返回的URL地址，设置用户自定义的错误处理函数_errorHandler</p>
+
+<p>和 end 配合使用</p>
+<pre class="mark">参数
+    string|array    当参数为字符串时，是自己拼的URL,当参数为数组时，则为gen_url对应的写法
+</pre>
+<p>例1<pre>$this-&gt;begin('index.php?app=b2c&amp;ctl=admin_brand&amp;act=index');
+</pre>例2<pre>$this-&gt;begin(array('app'=&gt;'b2c','ctl'=&gt;'admin_brand','act'=&gt;'index'));
+</pre></p>
+<h4><a name="id20">end</a></h4>
+<p>配合begin使用，事务处理，提交或回滚。进行提示成功或失败提示</p>
+
+<p>提示跳转调用的是desktop_controller下的splash方法<pre class="mark">function end($result=true,$message=null,$url_params=null,$params=array()){
+参数
+    bool    $result=true则提交,$result=false则回滚
+    string  $message返回的提示信息
+    string  提示跳转的URL。如果参数为空并且begin带了参数，那么就用begin带的参数
+
+            当参数为字符串时，是自己拼的URL,当参数为数组时，则为gen_url对应的写法
+    array   splash的最后一个参数
+
+</pre></p>
+<pre>function save(){
+    $this-&gt;begin('index.php?app=b2c&amp;ctl=admin_brand&amp;act=index');
+    $objBrand = &amp;$this-&gt;app-&gt;model('brand');
+    $brandname = $objBrand-&gt;dump(array('brand_name'=&gt;$_POST['brand_name'],'brand_id'));
+    if(empty($_POST['brand_id']) &amp;&amp; is_array($brandname)){
+         $this-&gt;end(false,app::get('b2c')-&gt;_('品牌名重复')); //错误提示
+    }
+    $_POST['ordernum'] = intval( $_POST['ordernum'] );
+    $data = $this-&gt;_preparegtype($_POST);
+    $this-&gt;end($objBrand-&gt;save($data),app::get('b2c')-&gt;_('品牌保存成功'));
+}
+</pre><h4><a name="id21">endonly</a></h4>
+<p>配合begin使用事物处理，错误则用错误处理函数进行显示，正确则不处理<pre class="mark">function endonly($result=true){
+参数
+    bool    $result=true则提交,$result=false则回滚
+</pre></p>
+<h4><a name="id22">splash</a></h4>
+<p>信息提示函数,在base只是一个接口类似的东西，实现功能只是跳转，在系统中用的最多还是site_controller或则desktop_controller</p>
+
+<p>中的对base_controller中的splash的重构的方法<pre class="mark">function splash($status='success',$url=null,$msg=null,$method='redirect',$params=array())
+</pre></p>
+<h4><a name="id23">page</a></h4>
+<p>在系统中很少使用，用的最多的还是site_controller中的page或则是desktop_controller中的page</p>
+
+<p>调用的base_render中的display或则是自己注册一个service theme 自己写一个display方法，自定义编译规则<pre class="mark">function page($detail){
+参数
+    string  $detail需要编译的文件路径
+</pre></p>
+<h3><a name="id24">base_controller提供的serviec</a></h3><h4><a name="id25">theme</a></h4>
+<p>此service由base_controller下的page方法提供，service类的方法为dispaly</p>
+
+<p>实现功能和bsae_render下的display的功能差不多，可以在这个方法中自定义</p>
+
+<p>编译规则进行编译，之后在返回给编译后的内容</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">调用流程</a>
+    <li><a href="#id2" class="reference internal">继承关系</a>
+        <ul>
+        <li><a href="#id3" class="reference internal">base_render提供的函数</a>
+            <ul>
+            <li><a href="#id4" class="reference internal">display</a>
+            <li><a href="#id5" class="reference internal">pre_display</a>
+            <li><a href="#id6" class="reference internal">single</a>
+            <li><a href="#id7" class="reference internal">fetch</a>
+            <li><a href="#id8" class="reference internal">tmpl_cachekey</a>
+            <li><a href="#id9" class="reference internal">ui</a>
+            <li><a href="#id10" class="reference internal">compile_id</a>
+        </ul>
+        <li><a href="#id11" class="reference internal">base_render提供的service</a>
+            <ul>
+            <li><a href="#id12" class="reference internal">tpl_source.</a>
+                <ul>
+                <li><a href="#id13" class="reference internal">应用场景</a>
+                <li><a href="#id14" class="reference internal">使用方法</a>
+            </ul>
+            <li><a href="#id15" class="reference internal">base_render_pre_display</a>
+                <ul>
+                <li><a href="#id16" class="reference internal">应用场景</a>
+                <li><a href="#id17" class="reference internal">使用方法</a>
+            </ul>
+        </ul>
+        <li><a href="#id18" class="reference internal">base_controller提供的函数</a>
+            <ul>
+            <li><a href="#id19" class="reference internal">begin</a>
+            <li><a href="#id20" class="reference internal">end</a>
+            <li><a href="#id21" class="reference internal">endonly</a>
+            <li><a href="#id22" class="reference internal">splash</a>
+            <li><a href="#id23" class="reference internal">page</a>
+        </ul>
+        <li><a href="#id24" class="reference internal">base_controller提供的serviec</a>
+            <ul>
+            <li><a href="#id25" class="reference internal">theme</a>
+        </ul>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="base_router.html"
+                                  title="上一章">默认路由 - base_router</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="extend.html"
+                                  title="下一章">控制器扩展</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="extend.html" title="控制器扩展" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="base_router.html" title="默认路由 - base_router" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">MVC框架</a> &raquo;
+        </li>
+                <li>
+          <a href="../c.html">控制器(controller)</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      维护app的生命周期 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../doc.html" />
+    <link rel="up" title="app机制" href="../app.html" />
+
+        <link rel="next" title="app_class" href="app - app处理类.html" />
+        <link rel="prev" title="app-content" href="资源探测器.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="app_class.html" title="app - app处理类" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="app-content.html" title="资源探测器" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../app.html">app机制</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 维护app的生命周期</h1>
+            <h2><a name="id1">app如何维护自己的生命周期</a></h2>
+<p>在app的整个生命周期, 存在5种变迁. 分别是安装, 更新, 启用, 暂停, 卸载. 每个app都可以自行维护每种变迁时的相应处理.</p>
+
+<p>方法简单, 只需要在app/{$app_id}目录下定义task.php文件. 并根据需要写相应的回调函数.<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">desktop_task&nbsp;</span><span style="color: #007700">{<br />...<br />}<br /></span>
+</span>
+</code></div></p>
+<pre class="quote">补充知识: 日志记录
+
+为了调试和运维的方便, 需要在关键的节点记录log. 记录方式:调用kernel::log()函数
+
+在整个维护周期, 如果是通过命令行工具进行维护会直接显示输出, 如果是通过web方式进行维护会记录在相应的日志文件内
+</pre><h3><a name="id2">install - 安装</a></h3>
+<p>通常的场景, 在app安装时需要基本的外部参数, 例如: base app, 需要在安装时传入db_host, db_user, db_host等参数, 根据参数进行配置文件的生成和数据库的连接</p>
+<h4><a name="id3">参数设置</a></h4>
+<p>如果安装过程需要参数, 需要写回调函数install_options(), 返回值为二维数组. 一维key值表示参数名称</p>
+<pre>class desktop_task{
+    
+    function install_options(){
+        return array(
+                'admin_uname'=&gt;array('type'=&gt;'text','vtype'=&gt;'required','required'=&gt;true,'title'=&gt;'用户名','default'=&gt;'admin'),
+                'admin_password'=&gt;array('type'=&gt;'password','vtype'=&gt;'required','required'=&gt;true,'title'=&gt;'密码'),
+                'admin_password_re'=&gt;array('type'=&gt;'password','vtype'=&gt;'required','vtype'=&gt;'samePas','required'=&gt;true,'title'=&gt;'重复密码'),  
+            );
+    }
+</pre>
+<p>表-1 参数属性
+<table class="docutils">
+<tr>
+<th>属性</th>
+
+<th>作用</th>
+</tr>
+
+<tr>
+<td>type</td>
+
+<td>输入方式:text/select/password</td>
+</tr>
+
+<tr>
+<td>default</td>
+
+<td>默认值, 在没有输入参数时使用默认值</td>
+</tr>
+
+<tr>
+<td>options</td>
+
+<td>选项, 当type属性设置为select时, 会从options中取得需选项, 表现为一维数组</td>
+</tr>
+
+<tr>
+<td>options_callback</td>
+
+<td>选项的函数回调, 当type设置为select, 当选项不能通过枚举的形式列举出来时. 需要回调函数来返回相应的options数组. 使用options_callback时不要为options属性赋值. 格式为array(app =&gt; {$app_id}, 'method' =&gt; {$method_name} )</td>
+</tr>
+
+<tr>
+<td>title</td>
+
+<td>标题名</td>
+</tr>
+</table>
+<h4><a name="id4">参数检测</a></h4>检测安装参数是否正确, 通过回调函数checkenv()来实现.</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">base_task</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">checkenv</span><span style="color: #007700">(</span><span style="color: #0000BB">$options</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(!</span><span style="color: #0000BB">$options</span><span style="color: #007700">[</span><span style="color: #DD0000">'db_host'</span><span style="color: #007700">]){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;echo&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">"Error:&nbsp;需要填写数据库主机"</span><span style="color: #007700">).</span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(!</span><span style="color: #0000BB">$options</span><span style="color: #007700">[</span><span style="color: #DD0000">'db_user'</span><span style="color: #007700">]){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;echo&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">"Error:&nbsp;需要填写数据库用户名"</span><span style="color: #007700">).</span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(!</span><span style="color: #0000BB">$options</span><span style="color: #007700">[</span><span style="color: #DD0000">'db_name'</span><span style="color: #007700">]){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;echo&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">"Error:&nbsp;请选择数据库"</span><span style="color: #007700">).</span><span style="color: #DD0000">"\n"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />...<br /></span>
+</span>
+</code></div><pre class="mark">参数:
+    options 安装参数, 内容为install_options()函数所定义的子集.
+返回:
+    bool 检测通过为true, 反之则false
+</pre><h4><a name="id5">安装过程</a></h4>
+<p>安装一个app分成三个步骤
+<ul>
+<li>pre_install
+<li>install 系统级安装
+<ul>
+<li>安装系统当前状态下所支持的所有app的资源, 参考:<a href="app-content.html">资源探测器</a></ul>
+
+<li>post_install</li>
+</ul>
+</li>
+</li>
+</ul>
+</p>
+
+<p>其中install属于系统级安装, 其余两个可以定义自己的回调函数<h5><a name="id6">pre_install</a></h5>在系统级安装前完成, 通过回调函数pre_install()来实现.</p>
+
+<p>通常不需要</p>
+<pre class="mark">参数:
+    array $options 安装参数, 内容为install_options()函数所定义的子集.
+返回:
+    null
+</pre><h5><a name="id7">post_install</a></h5>
+<p>在系统级安装后完成, 通过回调函数post_install()来实现.</p>
+
+<p>初始化安装的过程基本在此回调函数内实现, 列举一二作为参考</p>
+
+<ul>
+<li><a href="../../dbeav/dbeav.t2t#id4">dbev-meta注册</a>
+<li>app数据库初始化数据, 需要使用<a href="#">类库base_initial</a>
+<li>设置<a href="setting.html">setting</a>初始化数据
+<li>为pam app注册账号类型</li>
+</li>
+</li>
+</li>
+</ul>
+<h3><a name="id8">uninstall - 卸载</a></h3>
+<p>如果编写了install()回调函数, 请务必要使用uninstall的回调函数. 屁股是要擦干净的</p>
+<h4><a name="id9">pre_uninstall</a></h4>
+<p>回调函数pre_uninstall()</p>
+<pre class="mark">参数:
+    无
+返回:
+    null
+</pre><h4><a name="id10">post_uninstall</a></h4>
+<p>回调函数post_uninstall()<pre class="mark">参数:
+    无
+返回:
+    null
+</pre><h3><a name="id11">update - 更新</a></h3><h4><a name="id12">pre_update</a></h4>回调函数pre_update()<pre class="mark">参数:
+    无
+返回:
+    null
+</pre></p>
+<h4><a name="id13">post_update</a></h4>
+<p>回调函数post_update()<pre class="mark">参数:
+    string $version 当前app版本
+返回:
+    null
+</pre></p>
+<h3><a name="id14">active - 启用</a></h3><h4><a name="id15">pre_enable</a></h4>
+<p>回调函数pre_enable()<pre class="mark">参数:
+    无
+返回:
+    null
+</pre></p>
+<h4><a name="id16">post_enable</a></h4>
+<p>回调函数post_enable()<pre class="mark">参数:
+    无
+返回:
+    null
+</pre></p>
+<h3><a name="id17">pause - 暂停</a></h3><h4><a name="id18">pre_disable</a></h4>
+<p>回调函数pre_disable()<pre class="mark">参数:
+    无
+返回:
+    null
+</pre></p>
+<h4><a name="id19">post_disable</a></h4>
+<p>回调函数post_disable()<pre class="mark">参数:
+    无
+返回:
+    null
+</pre></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">app如何维护自己的生命周期</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">install - 安装</a>
+            <ul>
+            <li><a href="#id3" class="reference internal">参数设置</a>
+            <li><a href="#id4" class="reference internal">参数检测</a>
+            <li><a href="#id5" class="reference internal">安装过程</a>
+                <ul>
+                <li><a href="#id6" class="reference internal">pre_install</a>
+                <li><a href="#id7" class="reference internal">post_install</a>
+            </ul>
+        </ul>
+        <li><a href="#id8" class="reference internal">uninstall - 卸载</a>
+            <ul>
+            <li><a href="#id9" class="reference internal">pre_uninstall</a>
+            <li><a href="#id10" class="reference internal">post_uninstall</a>
+        </ul>
+        <li><a href="#id11" class="reference internal">update - 更新</a>
+            <ul>
+            <li><a href="#id12" class="reference internal">pre_update</a>
+            <li><a href="#id13" class="reference internal">post_update</a>
+        </ul>
+        <li><a href="#id14" class="reference internal">active - 启用</a>
+            <ul>
+            <li><a href="#id15" class="reference internal">pre_enable</a>
+            <li><a href="#id16" class="reference internal">post_enable</a>
+        </ul>
+        <li><a href="#id17" class="reference internal">pause - 暂停</a>
+            <ul>
+            <li><a href="#id18" class="reference internal">pre_disable</a>
+            <li><a href="#id19" class="reference internal">post_disable</a>
+        </ul>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="app-content.html"
+                                  title="上一章">资源探测器</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="app_class.html"
+                                  title="下一章">app - app处理类</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="app_class.html" title="app - app处理类" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="app-content.html" title="资源探测器" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../app.html">app机制</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

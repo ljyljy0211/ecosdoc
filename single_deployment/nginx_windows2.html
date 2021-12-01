@@ -1,0 +1,311 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      nginx + windows单机部署(开发版本) &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="ECstore部署文档" href="index.html" />
+
+        <link rel="next" title="System_optimization" href="系统性能调优.html" />
+        <link rel="prev" title="windows-apache" href="windows-Apache单机部署(开发版本).html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="System_optimization.html" title="系统性能调优" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="windows-apache.html" title="windows-Apache单机部署(开发版本)" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ECstore部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> nginx + windows单机部署(开发版本)</h1>
+            <pre>windows下没有php-fpm可以使用，但是可以通过xxfpm，可以模拟php-fpm使用，只有32位版本的，但是经过测试，可以在64位windows7旗舰版使用。
+</pre><h2><a name="id1">安装包下载</a></h2>
+<p>php下载地址：<a href="http://pan.baidu.com/s/1xlAvs">php5.3.28非线程安全版</a></p>
+
+<p>nginx下载地址：<a href="http://pan.baidu.com/s/1eQDs4Rw">nginx1.2.0</a></p>
+
+<p>xxfpm下载地址（已经包涵pthreadGC2.dll）：<a href="http://pan.baidu.com/s/1gdKcbwJ">xxfpm</a></p>
+
+<p>mysql请自行下载:<a href="http://www.mysql.com/downloads/mirror.php?id=409760">mysql-32</a>（windows 32位）</p>
+
+<p><a href="http://www.mysql.com/downloads/mirror.php?id=409777">mysql-64</a>（windows 64位）</p>
+
+<p>【下载时要登录，如果可以,就自己注册用户。已经注册好的用户：1051292443@qq.com anjiaxin】</p>
+
+<p>ZendGuardLoader下载地址：<a href="http://www.zend.com/en/products/guard/downloads">ZendGuardLoader</a></p>
+
+<p>测试环境php.ini下载地址：<a href="http://pan.baidu.com/s/1ntjXZq5">php.ini</a></p>
+
+<p>测试环境nginx.conf下载地址：<a href="http://pan.baidu.com/s/1gdutA2B">nginx.conf</a></p>
+<h2><a name="id2">环境安装</a></h2><h3><a name="id3">nginx安装</a></h3>
+<p>下载nginx，解压即可（测试的时候放在d:\nginx1.2.0目录）</p>
+
+<p>启动时直接运行nginx.exe即可（需要管理员权限）关闭时直接结束进程即可关闭命令：<pre>taskkill /F /IM nginx.exe &gt; nul
+</pre></p>
+<h3><a name="id4">php安装</a></h3>
+<p>下载php非线程安全版非安装版解压即可（测试的时候放在d:\php目录）</p>
+<h3><a name="id5">mysql安装</a></h3>
+<p>请参考其它windows下单机环境部署，无特殊要求，只要本机可以联通即可。</p>
+<h3><a name="id6">xxfpm安装</a></h3>
+<p>将目录解压缩（主要目标文件是xxfpm.exe和pthreadGC2.dll，测试环境为d:\xxfpm\bin\目录）</p>
+
+<p>若两个文件放在同一目录下，仍提示缺少pthredGC2.dll文件而无法运行，请按照以下步骤注册pthreadGC2.dll文件。将pthreadGC2.dll文件拷贝到windows安装目录\system32\目录下（测试环境为c:\windows\system32）注册pthreadGC2.dll文件（cmd下执行regsvr32 pthreadGC2.dll）<pre>regsvr32 pthreadGC2.dll
+</pre></p>
+
+<p>启动命令：xxfpm.exe d:/php/php-cgi.exe <a href="进程数] [-i ip地址] [-p 端口号">-n</a>测试环境执行如下命令<pre>xxfpm.exe d:/php/php-cgi.exe -n 5 -p 9000
+</pre>如果需要指定特定的php.ini文件执行以下命令<pre>xxfpm.exe &quot;d:/php/php-cgi.exe -c d:/php/php.ini&quot; -n 5 -p9000
+</pre></p>
+
+<p>关闭命令：<pre>taskkill /F /IM xxfpm.exe &gt; nul
+</pre><b>注意：</b>php-cgi.exe在关闭xxfpm.exe的时候也会一起关闭</p>
+<h2><a name="id7">环境配置</a></h2><h3><a name="id8">nginx配置</a></h3>
+<p>nginx需要配置如下内容：</p>
+
+<p>fastcgi</p>
+
+<p>pathinfo</p>
+
+<p>php页面支持</p>
+<pre>#user  nobody;
+worker_processes  1;
+worker_rlimit_nofile 65538;
+error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+#pid        logs/nginx.pid;
+events {
+    worker_connections  1024;
+}
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+    #log_format  main  '$remote_addr - $remote_user [$time_local] &quot;$request&quot; '
+#   '$status $body_bytes_sent &quot;$http_referer&quot; '
+#   '&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;';
+    access_log  logs/access.log;
+    sendfile        on;
+    #tcp_nopush     on;
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+    #gzip  on;
+    server {
+        listen       8080;
+        server_name  localhost;
+        root        d:/www;
+        charset utf-8;
+        access_log  logs/host.access.log;
+        location / {
+           root        d:/www;
+           index  index.html index.htm index.php;
+           autoindex on;
+        }
+    #error_page  404              /404.html;
+    # redirect server error pages to the static page /50x.html
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root        d:/www;
+    }
+    location ~ \.php {
+        include        fastcgi_params;
+        set $path_info &quot;&quot;;
+        set $real_script_name $fastcgi_script_name;
+        if ($fastcgi_script_name ~ &quot;^(.+?\.php)(/.+)$&quot;) {
+            set $real_script_name $1;
+            set $path_info $2;
+        }
+        fastcgi_param SCRIPT_NAME $real_script_name;
+        fastcgi_param PATH_INFO $path_info;
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;  
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+    }
+    # deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
+    #location ~ /\.ht {
+    #    deny  all;
+    #}
+}
+}
+
+</pre><h3><a name="id9">php配置</a></h3>
+<p>php.ini需要配置内容：</p>
+
+<p>基本支持（时区，pathinfo，GD，mysql等）<pre>date.timezone = prc
+enable_dl = On
+cgi.force_redirect = 0
+cgi.fix_pathinfo=1
+fastcgi.impersonate = 1
+cgi.rfc2616_headers = 1
+allow_url_fopen = On
+</pre></p>
+<pre>    extension_dir=&quot;e:/php/ext&quot;
+        
+    extension=php_bz2.dll  
+    extension=php_curl.dll  
+    extension=php_gd2.dll 
+    extension=php_gettext.dll 
+    extension=php_mbstring.dll 
+    extension=php_mysql.dll 
+    extension=php_mysqli.dll 
+    extension=php_openssl.dll 
+    extension=php_pdo_mysql.dll 
+    extension=php_sockets.dll 
+    extension=php_xmlrpc.dll 
+</pre>
+<p>ZendLoader配置：<pre>[Zend.loader]
+zend_loader.enable=1
+zend_loader.disable_licensing=0
+zend_loader.obfuscation_level_support=3
+zend_loader.license_path=d:\www\doorman\config
+zend_extension=&quot;D:\PHP\ext\ZendLoader.dll&quot;
+</pre></p>
+
+<p>详细内容请对照测试版php.ini（本文开头部分下载）</p>
+
+<p>配置完成后请将php.ini复制到windows目录下，否则无法解密。</p>
+<h2><a name="id10">常见问题以及解决方案</a></h2><h3><a name="id11">FastCGI错误</a></h3>
+<p>提示如下错误：<pre>Fatal error: Limited-user licenses are not supported when running as CGI in D:\example.com\app\base\kernel.php on line 23
+</pre>没有安装php-fpm导致，windows下用xxfpm代替（请查阅xxfpm安装）</p>
+<h3><a name="id12">php.ini读取错误</a></h3>
+<p>这种错误很难发现，并且发生在安装多个php环境的电脑中。请将所有的php.ini重命名即可（指定固定的php.ini也有一定可能读取别的php.ini）。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">安装包下载</a>
+    <li><a href="#id2" class="reference internal">环境安装</a>
+        <ul>
+        <li><a href="#id3" class="reference internal">nginx安装</a>
+        <li><a href="#id4" class="reference internal">php安装</a>
+        <li><a href="#id5" class="reference internal">mysql安装</a>
+        <li><a href="#id6" class="reference internal">xxfpm安装</a>
+    </ul>
+    <li><a href="#id7" class="reference internal">环境配置</a>
+        <ul>
+        <li><a href="#id8" class="reference internal">nginx配置</a>
+        <li><a href="#id9" class="reference internal">php配置</a>
+    </ul>
+    <li><a href="#id10" class="reference internal">常见问题以及解决方案</a>
+        <ul>
+        <li><a href="#id11" class="reference internal">FastCGI错误</a>
+        <li><a href="#id12" class="reference internal">php.ini读取错误</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="windows-apache.html"
+                                  title="上一章">windows-Apache单机部署(开发版本)</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="System_optimization.html"
+                                  title="下一章">系统性能调优</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="System_optimization.html" title="系统性能调优" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="windows-apache.html" title="windows-Apache单机部署(开发版本)" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ECstore部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

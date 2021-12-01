@@ -1,0 +1,284 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      MySQL队列(默认队列) &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../doc.html" />
+    <link rel="up" title="队列" href="index.html" />
+
+        <link rel="next" title="rabbitmq" href="RabbitMQ.html" />
+        <link rel="prev" title="index" href="队列.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="rabbitmq.html" title="RabbitMQ" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="队列" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">队列</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> MySQL队列(默认队列)</h1>
+            <h2><a name="id1">队列表</a></h2>
+<ul>
+<li>在队列表中主要用到的几个字段（队列表是在base/dbschema/queue.php中定义）,具体的可以去查看</li>
+</ul>
+
+<table class="docutils">
+<tr>
+<th>queue_id</th>
+
+<th>queue_title</th>
+
+<th>status</th>
+
+<th>start_time</th>
+
+<th>worker</th>
+
+<th>cursor_id</th>
+
+<th>params</th>
+
+<th>runkey</th>
+</tr>
+</table>
+</table>
+
+<ul>
+<li>主要字段说明<pre>queue_id        队列ID 在运行队列的时候是唯一标识
+queue_title     队列标题，直观区分队列
+status          队列状态（running/运行中，hibernate/休眠中，paused/已暂停，failure/执行失败）
+start_time      队列产生时间
+worker          在执行队列的时候会根据worker这个字段表示该队列在哪个方法执行
+cursor_id       游标--对于一个队列中有多个任务需要用到此字段
+params          参数(参数，通常就是filter)
+runkey          队列运行的Key，通常不需要自定义
+</pre></li>
+</ul>
+<h2><a name="id2">队列调用流程</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="images/queue.jpg" /></p>
+
+<ul>
+<li>在ECOS后台系统的后台会每30秒会调用如下地址</li>
+</ul>
+<pre>http://localhost/ecstore-bugfix/index.php/shopadmin/index.php?ctl=default&amp;act=status
+</pre>
+<p>在desktop_ctl_default的status方法中会调</p>
+<pre>function status(){
+    ...
+    app::get('base')-&gt;model('queue')-&gt;flush();
+    ...
+}
+</pre>
+<ul>
+<li>跳到base的queue model中<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">base_mdl_queue&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">base_db_model</span><span style="color: #007700">{<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$limit&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">100</span><span style="color: #007700">;&nbsp;</span><span style="color: #FF8000">//最大任务并发<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">var&nbsp;</span><span style="color: #0000BB">$task_timeout&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">300</span><span style="color: #007700">;&nbsp;</span><span style="color: #FF8000">//单次任务超时<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">function&nbsp;</span><span style="color: #0000BB">flush</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$base_url&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">base_url</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;foreach(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">db</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">select</span><span style="color: #007700">(</span><span style="color: #DD0000">'select&nbsp;queue_id&nbsp;from&nbsp;sdb_base_queue&nbsp;limit&nbsp;'</span><span style="color: #007700">.</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">limit</span><span style="color: #007700">)&nbsp;as&nbsp;</span><span style="color: #0000BB">$r</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">runtask</span><span style="color: #007700">(</span><span style="color: #0000BB">$r</span><span style="color: #007700">[</span><span style="color: #DD0000">'queue_id'</span><span style="color: #007700">]);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">runtask</span><span style="color: #007700">(</span><span style="color: #0000BB">$task_id</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$http&nbsp;</span><span style="color: #007700">=&nbsp;new&nbsp;</span><span style="color: #0000BB">base_httpclient</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$_POST</span><span style="color: #007700">[</span><span style="color: #DD0000">'task_id'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">$task_id</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$url&nbsp;</span><span style="color: #007700">=&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">openapi_url</span><span style="color: #007700">(</span><span style="color: #DD0000">'openapi.queue'</span><span style="color: #007700">,</span><span style="color: #DD0000">'worker'</span><span style="color: #007700">,array(</span><span style="color: #DD0000">'task_id'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$task_id</span><span style="color: #007700">));<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">log</span><span style="color: #007700">(</span><span style="color: #DD0000">'Spawn&nbsp;[Task-'</span><span style="color: #007700">.</span><span style="color: #0000BB">$task_id</span><span style="color: #007700">.</span><span style="color: #DD0000">']&nbsp;'</span><span style="color: #007700">.</span><span style="color: #0000BB">$url</span><span style="color: #007700">);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//99%概率不会有问题<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$http</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">hostaddr&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$_SERVER</span><span style="color: #007700">[</span><span style="color: #DD0000">"SERVER_ADDR"</span><span style="color: #007700">]?</span><span style="color: #0000BB">$_SERVER</span><span style="color: #007700">[</span><span style="color: #DD0000">"SERVER_ADDR"</span><span style="color: #007700">]:</span><span style="color: #DD0000">'127.0.0.1'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$http</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">hostport&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$_SERVER</span><span style="color: #007700">[</span><span style="color: #DD0000">"SERVER_PORT"</span><span style="color: #007700">]?</span><span style="color: #0000BB">$_SERVER</span><span style="color: #007700">[</span><span style="color: #DD0000">"SERVER_PORT"</span><span style="color: #007700">]:</span><span style="color: #DD0000">'80'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$http</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">timeout&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">2</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">log</span><span style="color: #007700">(</span><span style="color: #0000BB">$http</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">post</span><span style="color: #007700">(</span><span style="color: #0000BB">$url</span><span style="color: #007700">,</span><span style="color: #0000BB">$_POST</span><span style="color: #007700">));<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />}<br /></span>
+</span>
+</code></div></li>
+</ul>
+
+<p>从代码中可以看到在这获取到存放在队列表中的队列任务，进行运行</p>
+<pre>根据  kernel::openapi_url('openapi.queue','worker',array('task_id'=&gt;$task_id));
+知道调用了base_service_queue类的worker方法
+
+</pre>
+<ul>
+<li>调用base_service_queue的worker方法<pre>function worker(){
+    ...
+    list($worker,$method) = explode('.',$task_info['worker']);
+    $errmsg = null;
+    $obj_work = kernel::single($worker);
+    $remaining = call_user_func_array( array(  $obj_work ,$method),array(&amp;$task_info['cursor_id'],$task_info['params'], &amp;$errmsg));
+    ...
+}
+</pre></li>
+</ul>
+
+<p>从以上代码可以看出:执行队列的方法是队列worker字段的值。</p>
+
+<p>eg<pre>'worker'=&gt;'b2c_queue.send_msg',
+</pre>表示在b2c_queue类中的send_msg方法中执行此队列</p>
+
+<p>从worker方法中可以看出，在向执行队列的方法中会传入cursor_id,params两个参数</p>
+
+<p>如果在一个队列中只有一个任务，如上则在执行完一个任务后需要返回一个false，则会删除此队列.</p>
+
+<p>如果有一个队列中有多个任务，则会根据游标（cursor_id）进行完成任务，只要队列还没执行完成，</p>
+
+<p>返回true则会跟新游标(cursor_id)直到返回false，再删除队列</p>
+<h2><a name="id3">队列应用</a></h2>
+<p>如下是ECOS后台中群发消息的一个队列</p>
+<h2><a name="id4">插入队列</a></h2>
+<p>在ECOS中每个队列都是放在sdb_base_queue这个队列表中，所以在插入队列的时候需要把队列信息插入到</p>
+
+<p>队列表中即可<pre>//可循环插入队列
+$data = array(
+    'queue_title'=&gt;app::get('b2c')-&gt;_('到货通知站内信'),
+    'start_time'=&gt;time(),
+    'params'=&gt;array(
+                'member_id'=&gt;$data['member_id'],
+                'data' =&gt;$aTmp,
+                'name' =&gt; $login_name,
+                'gnotify_id' =&gt; $gnid,
+        ),
+    'worker'=&gt;'b2c_queue.send_msg',
+);
+if(!$queue-&gt;insert($data)){
+    $this-&gt;end(false,app::get('b2c')-&gt;_('操作失败！'));
+}
+</pre></p>
+<h2><a name="id5">执行队列</a></h2>
+<p>新建b2c_queue类，写send_msg方法来执行此队列</p>
+<pre>function send_msg(&amp;$cursor_id,$params){
+    $obj_memmsg = kernel::single('b2c_message_msg');
+    $aData = $params['data'];
+    $aData['member_id'] = 1;
+    $aData['uname'] = app::get('b2c')-&gt;_('管理员');
+    $aData['to_id'] = $params['member_id'];
+    $aData['msg_to'] = $params['name'];
+    $aData['subject'] = $aData['title'];
+    $aData['comment'] = $aData['content'];
+    $aData['has_sent'] = 'true';
+    $obj_memmsg-&gt;send($aData);
+}
+</pre>
+<p>注意执行完一个队列，需要返回一个false</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">队列表</a>
+    <li><a href="#id2" class="reference internal">队列调用流程</a>
+    <li><a href="#id3" class="reference internal">队列应用</a>
+    <li><a href="#id4" class="reference internal">插入队列</a>
+    <li><a href="#id5" class="reference internal">执行队列</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">队列</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="rabbitmq.html"
+                                  title="下一章">RabbitMQ</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="rabbitmq.html" title="RabbitMQ" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="队列" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">队列</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

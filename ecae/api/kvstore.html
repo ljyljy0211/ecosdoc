@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      永久存储 kvstore(需开启MongoDB服务) &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="开发手册" href="index.html" />
+
+        <link rel="next" title="rsa" href="加密模块 rsa(需开启Crypto服务).html" />
+        <link rel="prev" title="cache" href="内存存储 cache(需开启MemCache服务).html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="rsa.html" title="加密模块 rsa(需开启Crypto服务)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="cache.html" title="内存存储 cache(需开启MemCache服务)" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECAE</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">开发手册</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 永久存储 kvstore(需开启MongoDB服务)</h1>
+            <h2><a name="id1">ecae_kvstore_write()</a></h2>
+<p><b>描述</b><pre class="mark">设置指定的$key为$value, 返回值为bool类型
+</pre></p>
+
+<p><b>语法</b><pre>ecae_kvstore_write($key, $value)
+</pre></p>
+
+<table class="docutils">
+<tr>
+<th>参数</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>$key</td>
+
+<td>string</td>
+</tr>
+
+<tr>
+<td>$value</td>
+
+<td>string</td>
+</tr>
+</table>
+</table>
+
+<p>例子<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;$key&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'newid'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$val&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">time</span><span style="color: #007700">();<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">ecae_kvstore_write</span><span style="color: #007700">(</span><span style="color: #0000BB">$key</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$val</span><span style="color: #007700">));<br /></span>
+</span>
+</code></div></p>
+
+<p>运行结果<pre>bool(true)
+</pre></p>
+<h2><a name="id2">ecae_kvstore_read()</a></h2>
+<p><b>描述</b><pre class="mark">获指定$key的值以$value传递, 返回值为bool类型
+</pre></p>
+
+<p><b>语法</b><pre>ecae_kvstore_read($key, $value)
+</pre></p>
+
+<table class="docutils">
+<tr>
+<th>参数</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>$key</td>
+
+<td>$value</td>
+</tr>
+
+<tr>
+<td>$value</td>
+
+<td>&amp;$value</td>
+</tr>
+</table>
+</table>
+
+<p>例子<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;$key&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'newid'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$val&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">time</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">ecae_kvstore_write</span><span style="color: #007700">(</span><span style="color: #0000BB">$key</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$val</span><span style="color: #007700">);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">ecae_kvstore_read</span><span style="color: #007700">(</span><span style="color: #0000BB">$key</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$v</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$v</span><span style="color: #007700">);<br /></span>
+</span>
+</code></div></p>
+
+<p>运行结果<pre>int(1319007956)
+</pre></p>
+<h2><a name="id3">ecae_kvstore_delete()</a></h2>
+<p><b>描述</b><pre class="mark">删除指定$key, 返回值为bool类型
+</pre></p>
+
+<p><b>语法</b><pre>ecae_kvstore_delete($key)
+</pre></p>
+
+<table class="docutils">
+<tr>
+<th>参数</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>$key</td>
+
+<td>$value</td>
+</tr>
+</table>
+</table>
+
+<p>例子<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;$key&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'newid'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$val&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">time</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">ecae_kvstore_write</span><span style="color: #007700">(</span><span style="color: #0000BB">$key</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$val</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">ecae_kvstore_read</span><span style="color: #007700">(</span><span style="color: #0000BB">$key</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$v</span><span style="color: #007700">);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">ecae_kvstore_delete</span><span style="color: #007700">(</span><span style="color: #0000BB">$key</span><span style="color: #007700">));<br /></span>
+</span>
+</code></div></p>
+
+<p>运行结果<pre>bool(true)
+</pre></p>
+<h2><a name="id4">ecae_kvstore_list()</a></h2>
+<p><b>描述</b><pre class="mark">返回所有kvstore的数据, Array
+</pre></p>
+
+<p><b>语法</b><pre>ecae_kvstore_list()
+</pre></p>
+
+<p>例子<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">ecae_kvstore_list</span><span style="color: #007700">());<br /></span>
+</span>
+</code></div></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">ecae_kvstore_write()</a>
+    <li><a href="#id2" class="reference internal">ecae_kvstore_read()</a>
+    <li><a href="#id3" class="reference internal">ecae_kvstore_delete()</a>
+    <li><a href="#id4" class="reference internal">ecae_kvstore_list()</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="cache.html"
+                                  title="上一章">内存存储 cache(需开启MemCache服务)</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="rsa.html"
+                                  title="下一章">加密模块 rsa(需开启Crypto服务)</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="rsa.html" title="加密模块 rsa(需开启Crypto服务)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="cache.html" title="内存存储 cache(需开启MemCache服务)" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECAE</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">开发手册</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

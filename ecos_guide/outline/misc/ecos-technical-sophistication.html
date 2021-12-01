@@ -1,0 +1,321 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      Ecos技术先进性-方案技术特点 for ECP &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../doc.html" />
+    <link rel="up" title="其他" href="index.html" />
+
+        <link rel="next" title="../../prepare" href="开发前准备.html" />
+        <link rel="prev" title="index" href="其他.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../../prepare.html" title="开发前准备" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="其他" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">ECOS开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../outline.html">概述</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">其他</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> Ecos技术先进性-方案技术特点 for ECP</h1>
+            <h2><a name="id1">自行研发的ECOS框架</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="images/1.jpg" /></p>
+<h2><a name="id2">访问速度快</a></h2>
+<ul>
+<li>支持CDN优化，使网站无论是联通用户还是电信用户，获得一致的访问体验
+<li>对JS，CSS等资源采用引用方式，支持本地缓存加载，提升访问速度</li>
+</li>
+</ul>
+<h2><a name="id3">系统负载低</a></h2>
+<ul>
+<li>对于站内搜索及购物向导采用搜索引擎技术进行优化
+<li>独有的多级缓存体系保证服务器负载能力
+<li>为大型企业量身定做的集群支持，系统负载能力强</li>
+</li>
+</li>
+</ul>
+<h2><a name="id4">营销活动支持</a></h2>
+<ul>
+<li>无状态的Application服务层，使企业随意扩展服务器资源，应对营销活动的突发流量
+<li>平滑实现资源新增，无需中断业务进行升级
+<li>可支持云计算模式实现按需付费，降低运营成本</li>
+</li>
+</li>
+</ul>
+<h2><a name="id5">PUSH ORDER技术</a></h2>
+<ul>
+<li>后端处理系统可以在公司内网布署，防范黑客风险
+<li>近百台服务器组成的采用云计算技术及PUSH ORDER技术的矩阵云服务提供路由及转换运算，处理能力达2000万订单/日
+<li>使高峰订单时后端处理系统的处理能力提升达数十倍
+<li>云端计算按统一数据标准输出，系统无需关心外部系统如淘宝、拍拍、物流及支付等接口的频繁变更</li>
+</li>
+</li>
+</li>
+</ul>
+<h2><a name="id6">搜索引擎友好</a></h2>
+<ul>
+<li>URL路由功能支持网站URL按需定制
+<li>可自由定制网站标题、关键字及描述
+<li>经专业团队优化的网页代码方便搜索引擎读取</li>
+</li>
+</li>
+</ul>
+<h2><a name="id7">系统存储安全保护</a></h2>
+<ul>
+<li>遵循公安部GA 611-2006 《互联网信息服务系统 安全保护技术措施》标准设计
+<li>高强度的多重变换Salt密码算法，即使数据库泄露，密码破解难度极大
+<li>对敏感信息进行加密保护
+<li>完备的安全日志以供审计
+<li>支持SSL加密传输</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+<h2><a name="id8">灾难恢复能力</a></h2>
+<ul>
+<li>系统RPO等于0，即当主数据库服务器发生硬盘损坏等毁灭性灾难时，没有数据丢失
+<li>系统RTO小于等于10分钟，即主数据库服务器发生硬盘损坏等毁灭性灾难时，只需要5分钟时间进行切换，如需RTO为0，可采用cluster解决方案
+<li>除数据库服务器外，其它服务器的损坏不会引发系统不可用</li>
+</li>
+</li>
+</ul>
+<h2><a name="id9">MySQL企业版数据库</a></h2>
+<ul>
+<li>基于Oracle Enterprise Linux优化
+<li>innoDB存储引擎提供事务安全
+<li>支持InnoDB联机备份
+<li>支持时间点恢复</li>
+</li>
+</li>
+</li>
+</ul>
+<h2><a name="id10">系统承载能力</a></h2>
+<p>测试环境：4台Web server ,1台cache server,2台DB server</p>
+
+<table class="docutils">
+<tr>
+<th>Name</th>
+
+<th>highest 10sec mean</th>
+
+<th>lowest 10sec mean</th>
+
+<th>Highest Rate</th>
+
+<th>Mean</th>
+
+<th>Count</th>
+</tr>
+
+<tr>
+<td>connect</td>
+
+<td>0.732 msec</td>
+
+<td>0.622 msec</td>
+
+<td>239.8 / sec</td>
+
+<td>0.684 msec</td>
+
+<td>114977</td>
+</tr>
+
+<tr>
+<td>page</td>
+
+<td>4.25 sec</td>
+
+<td>0.27 sec</td>
+
+<td>199.8 / sec</td>
+
+<td>0.90 sec</td>
+
+<td>82985</td>
+</tr>
+
+<tr>
+<td>request</td>
+
+<td>2.86 sec</td>
+
+<td>0.22 sec</td>
+
+<td>280.5 / sec</td>
+
+<td>0.65 sec</td>
+
+<td>114977</td>
+</tr>
+
+<tr>
+<td>session</td>
+
+<td>4.61 sec</td>
+
+<td>0.27 sec</td>
+
+<td>201.4 / sec</td>
+
+<td>0.90 sec</td>
+
+<td>82985</td>
+</tr>
+</table>
+</table>
+<pre class="quote">在600秒压力测试过程中,成功处理114977PV访问,总计生成订单5625.
+
+集群每秒成功处理280.5页面请求,可承载1000万PV/日的压力.
+
+经测试,集群能够承载促销活动时大并发量,高订单转化率业务场景所产生的压力.
+同时，随着服务器的新增，负载能力能平滑升级
+
+从request数据表中,我们可以看到页面请求平均最高响应时间为2.86秒,用户能够正常访问各页面
+
+(摘自压力测试报告)
+</pre>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">自行研发的ECOS框架</a>
+    <li><a href="#id2" class="reference internal">访问速度快</a>
+    <li><a href="#id3" class="reference internal">系统负载低</a>
+    <li><a href="#id4" class="reference internal">营销活动支持</a>
+    <li><a href="#id5" class="reference internal">PUSH ORDER技术</a>
+    <li><a href="#id6" class="reference internal">搜索引擎友好</a>
+    <li><a href="#id7" class="reference internal">系统存储安全保护</a>
+    <li><a href="#id8" class="reference internal">灾难恢复能力</a>
+    <li><a href="#id9" class="reference internal">MySQL企业版数据库</a>
+    <li><a href="#id10" class="reference internal">系统承载能力</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">其他</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../../prepare.html"
+                                  title="下一章">开发前准备</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../../prepare.html" title="开发前准备" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="其他" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">ECOS开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../outline.html">概述</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">其他</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

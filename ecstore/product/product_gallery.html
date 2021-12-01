@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      商品列表页 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="商品" href="index.html" />
+
+        <link rel="next" title="../tools/index" href="ECStore工具集.html" />
+        <link rel="prev" title="product_detail" href="商品详情页流程图.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../tools/index.html" title="ECStore工具集" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="product_detail.html" title="商品详情页流程图" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">商品</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 商品列表页</h1>
+            
+<ul>
+<li>控制器：b2c_ctl_site_gallery
+<li>方法：index
+<li>使用到的主要模型层类：
+<ol>
+<li>b2c_mdl_goods_virtual_cat
+<li>b2c_mdl_search
+<li>b2c_mdl_goods_cat
+<li>b2c_mdl_goods
+<li>b2c_mdl_goods_type
+<li>b2c_mdl_goods_type_spec
+<li>b2c_mdl_specification</ol>
+
+<li>使用到的主要service：
+<ol>
+<li>b2c_site_goods_list_viewer_apps 商品分类列表展示信息
+<li>propselect.prop_search
+<li>tags_special.add 列表页标签显示，show tag on goods image</ol>
+
+<li>展示所有商品的各种模式，有列表基本模式(含图)，大图（橱窗模式）和文字模式（不含图片）
+<li>提供排序方式、价格、销量和人气等分类筛选功能。
+<li>提供分类、品牌等筛选框（根据搜索条件得出）
+<li>流程图
+<p><br /><img border="0" alt="" align="middle" src="./images/product_gallery.gif" /></p>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ol>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ol>
+</li>
+</li>
+</li>
+</ul>
+<h3><a name="id1">筛选条件区域</a></h3>
+<ul>
+<li>筛选条件分为两部分一部分为品牌，类型筛选；另一部分就是展示类型和排序筛选（属性）</ul>
+
+<ol>
+<ol>
+<li>商品属性筛选区域
+<ul>
+<li>商品分类、类型筛选
+<li>商品品牌筛选
+<li>商品虚拟分类筛选</ul>
+
+<li>商品排序区域
+<ul>
+<li>提供排序方式、价格、销量和人气等分类筛选功能
+<li>筛选功能可以自定义，可以提供扩展（劫持页面）</li>
+</li>
+</ul>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</ol>
+</ol>
+</ul>
+<h3><a name="id2">显示风格</a></h3>
+<ul>
+<li>图文混排
+<li>橱窗形式
+<li>文字列表</li>
+</li>
+</li>
+</ul>
+<h3><a name="id3">商品搜索</a></h3>
+<ul>
+<li>根据搜索条件得到相应的商品数据，显示商品列表，列表格式显示
+<li>搜索可以包含很多内容，都是通过联想模糊搜索的方式去的，也可以通过分词搜素等，如scws和sphinx</li>
+</li>
+</ul>
+<h3><a name="id4">业务代码分析</a></h3>
+<ul>
+<li>前台控制器类b2c_ctl_site_gallery::index()方法参数<pre>/**
+ *
+ * @param int $cat_id 商品分类ID
+ * @param string $urlFilter 品牌，规格等过滤参数
+ * @param int $orderBy 排序array(
+       1=&gt;array('label'=&gt;app::get('b2c')-&gt;_('默认')),
+       2=&gt;array('label'=&gt;app::get('b2c')-&gt;_('按发布时间 新-&gt;旧'),'sql'=&gt;'last_modify desc'),
+       3=&gt;array('label'=&gt;app::get('b2c')-&gt;_('按发布时间 旧-&gt;新'),'sql'=&gt;'last_modify'),
+       4=&gt; array('label'=&gt;app::get('b2c')-&gt;_('按价格 从高到低'),'sql'=&gt;'price desc'),
+       5=&gt;array('label'=&gt;app::get('b2c')-&gt;_('按价格 从低到高'),'sql'=&gt;'price'),
+       6=&gt;array('label'=&gt;app::get('b2c')-&gt;_('访问周次数'),'sql'=&gt;'view_w_count desc'),
+       7=&gt; array('label'=&gt;app::get('b2c')-&gt;_('总访问次数'),'sql'=&gt;'view_count desc'),
+       8=&gt;array('label'=&gt;app::get('b2c')-&gt;_('周购买次数'),'sql'=&gt;'buy_count desc'),
+       9=&gt; array('label'=&gt;app::get('b2c')-&gt;_('总购买次数'),'sql'=&gt;'buy_w_count desc'),
+       10=&gt; array('label'=&gt;app::get('b2c')-&gt;_('评论次数'),'sql'=&gt;'comments_count desc'),
+    );
+ * @param unknown_type $tab 参数分隔符
+ * @param int $page 页数
+ * @param int $cat_type 虚拟分类时使用，虚拟分类id，与分类$cat_id互斥的
+ * @param string $view 商品列表页展示方式，index,text,grid三种显示方式
+ */
+public function index($cat_id='',$urlFilter=null,$orderBy=0,$tab=null,$page=1,$cat_type=null,$view=null) {}
+
+注：http://localhost/ecos/index.php/gallery-12-b,2_1,59-1--1--grid.html?scontent=b,2_1,59_)
+</pre>
+<li>前台控制器类b2c_ctl_site_gallery::index()方法来处理<pre class="mark">1.$urlFilter=htmlspecialchars(urldecode($urlFilter));
+        $_GET['scontent'] = htmlspecialchars($_GET['scontent']);
+        if(!empty($urlFilter) &amp;&amp; $urlFilter != $_GET['scontent']){
+            $urlFilter .= '_'.$_GET['scontent'];
+        }else{
+            $urlFilter = $_GET['scontent'];
+        }
+        if( $cat_type ){
+            $vcatid = $cat_type;
+            $oVcat = $this-&gt;app-&gt;model('goods_virtual_cat');
+            $oSearch = &amp;$this-&gt;app-&gt;model('search');
+            $vcat = $oVcat-&gt;getList('cat_id,cat_path,virtual_cat_id,filter,virtual_cat_name as cat_name',array('virtual_cat_id'=&gt;intval($vcatid)));
+            $vcat = current( $vcat );
+            $vcatFilters=$oVcat-&gt;_mkFilter($vcat['filter']);
+            $vcatFilters=$oVcat-&gt;getFilter($vcatFilters);
+            $old_cat_id = $cat_id;
+            $old_urlFilter = $urlFilter;
+            $cat_id = $cat_id?$cat_id.implode(&quot;,&quot;,$vcatFilters['cat_id']):implode(&quot;,&quot;,$vcatFilters['cat_id']);
+            $urlFilter = $urlFilter?$urlFilter:$oSearch-&gt;encode($vcatFilters);
+        }
+
+ 过滤生成参数，将参数加入filter
+ 2.品牌参数的筛选
+ $propargs = $searchtools-&gt;decode($urlFilter,$path,$cat);
+        if(is_array($propargs)){
+            foreach($propargs as $rk=&gt;$rv){
+                $pos = strpos($rk,'p_');
+                if($pos === 0){
+                    $propz[$rk] = $rv[0];
+                    $rk =substr($rk,2);
+                    $proparg[$rk] = $rv;
+                    $prot[] = $rk;
+                }
+            }
+        }
+        if(isset($propargs['name'])){
+            $GLOBALS['runtime']['search_key'] = $propargs['name'][0];
+        }
+       $this-&gt;pagedata['prot'] = $prot;
+       $filter = $propargs;
+       if(is_array($filter)){
+            $filter=array_merge(array('cat_id'=&gt;$cat_id,'marketable'=&gt;'true'),$filter);
+            if( ($filter['cat_id'][0] === '' || $filter['cat_id'][0] === null ) &amp;&amp; !isset( $filter['cat_id'][1] ) )
+                unset($filter['cat_id']);
+            if( ($filter['brand_id'][0] ==='' || $filter['brand_id'][0] === null) &amp;&amp; !isset( $filter['brand_id'][1] ))
+                unset($filter['brand_id']);
+        }else{
+            $filter = array('cat_id'=&gt;$cat_id,'marketable'=&gt;'true');
+        }
+ 3.获取类型关联的规格
+ $type_id = $type_filter['type_id'];
+        $gType = &amp;$this-&gt;app-&gt;model('goods_type');
+        $SpecList = $gType-&gt;getSpec($type_id,1);//获取关联的规格
+        $oGoodsTypeSpec = $this-&gt;app-&gt;model('goods_type_spec');
+        $type_spec = $oGoodsTypeSpec-&gt;get_type_spec($type_id);
+        $oSpecification = &amp;$this-&gt;app-&gt;model('specification');
+        $filter['cat_id'] = $cat_id;
+        $filter['goods_type'] = 'normal';
+        $filter['marketable'] = 'true';
+        //-----查找当前类别子类别的关联类型ID
+        if ($urlFilter){
+            if($vcat['type_id']){
+                //$filter['type_id']=$vcat['type_id'];
+                $filter['type_id']=null;
+            }
+        }
+ 4.商品搜索-品牌，分类（虚拟分类），标签等搜索的筛选
+ if ($SpecList){
+            if ($curSpec)
+                $curSpecKey=array_keys($curSpec);
+            foreach($SpecList as $spk =&gt; $spv){
+                $selected=0;
+                if ($curSpecKey&amp;&amp;in_array($spk,$curSpecKey)){
+                    $spv['spec_value'][$curSpec[$spk]]['selected']=true;
+                    $selected=1;
+                }
+                if ($spv['spec_style']==&quot;select&quot;){ //下拉
+                    $SpecSelList[$spk] = $spv;
+                    if ($selected)
+                        $SpecSelList[$spk]['selected'] = true;
+                }
+                elseif ($spv['spec_style']==&quot;flat&quot;){
+                    $SpecFlatList[$spk] = $spv;
+                    if ($selected)
+                        $SpecFlatList[$spk]['selected'] = true;
+                }
+            }
+        }
+        $this-&gt;pagedata['SpecFlatList'] = $SpecFlatList;
+        $this-&gt;pagedata['specimagewidth'] = $this-&gt;app-&gt;getConf('spec.image.width');
+        $this-&gt;pagedata['specimageheight'] = $this-&gt;app-&gt;getConf('spec.image.height');
+        $this-&gt;pagedata['orderBy'] = $objGoods-&gt;orderBy();//排序方式
+        if(empty($orderBy)) $orderBy = 1;
+        if(!isset($this-&gt;pagedata['orderBy'][$orderBy])){
+            $this-&gt;_response-&gt;set_http_response_code(404);
+        }else{
+            $orderby = $this-&gt;pagedata['orderBy'][$orderBy]['sql'];
+        }
+        $selector['ordernum'] = $cat['ordernum'];
+        if(app::get('base')-&gt;getConf('server.search_server.search_goods')){
+           $searchApp = search_core::instance('search_goods');
+           $sfilter['filter'] = $filter;
+           $sfilter['from'] = $pageLimit*($page-1);     //分页
+           $sfilter['to'] = $pageLimit;
+           $sfilter['order'] = $orderby;
+           $sfilter['scount'] = count($cat['props']);
+        }
+        $res = false;   //初始化
+        if(is_object($searchApp)){
+           $sphinxstart = true;
+           $queryRes = $searchApp-&gt;query($sfilter);
+           if($queryRes){
+               $res = $searchApp-&gt;commit();
+               $nprop = $res['prop'];           //属性搜索
+               $cbrand = $res['brand'];
+               $rfilter['goods_id'] = $res['result'];
+               if(is_array($res['result'])){
+                   $count = $res['total'];
+                   $search_data = $objGoods-&gt;getList('*', $rfilter);
+                   foreach($search_data AS $tmp_data){
+                       $tmp_search_data[$tmp_data['goods_id']] = $tmp_data;
+                   }
+                   foreach($res['result'] as $v){
+                       if(!isset($tmp_search_data[$v])) continue;
+                       $aProduct[] = $tmp_search_data[$v];  //产品
+                   }
+                   unset($search_data);
+                   unset($tmp_search_data);
+               }else{
+                   $count = 0;
+                   $aProduct = array();
+               }
+           }
+        }
+        if($res === false){
+            if (isset($filter['tag'][0])&amp;&amp;!$filter['tag'][0]） unset($filter['tag']);
+            $aProduct = $objGoods-&gt;getList('*',$filter,$pageLimit*($page-1),$pageLimit,$orderby);
+            $count = $objGoods-&gt;count($filter);
+        }
+ 5.展示页面
+ $this-&gt;page('site/gallery/index.html');
+</pre></li>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+        <ul>
+        <li><a href="#id1" class="reference internal">筛选条件区域</a>
+        <li><a href="#id2" class="reference internal">显示风格</a>
+        <li><a href="#id3" class="reference internal">商品搜索</a>
+        <li><a href="#id4" class="reference internal">业务代码分析</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="product_detail.html"
+                                  title="上一章">商品详情页流程图</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../tools/index.html"
+                                  title="下一章">ECStore工具集</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../tools/index.html" title="ECStore工具集" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="product_detail.html" title="商品详情页流程图" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">商品</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

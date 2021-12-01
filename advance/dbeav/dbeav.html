@@ -1,0 +1,573 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      dbeav 使用手册 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="增强型模型(Model) - dbeav" href="index.html" />
+
+        <link rel="next" title="../ectools/index" href="电商工具集 - ectools.html" />
+        <link rel="prev" title="save_dump" href="save && dump文档.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../ectools/index.html" title="电商工具集 - ectools" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="save_dump.html" title="save && dump文档" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">增强型模型(Model) - dbeav</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> dbeav 使用手册</h1>
+            <h2><a name="id1">dbeav简介</a></h2>
+<ul>
+<li>对数据库进行meta扩展
+<li>对数据进行多表操作</li>
+</li>
+</ul>
+<h3><a name="id2">dbeav中的dbschema(表)介绍</a></h3>
+<p><br /><img border="0" alt="" align="middle" src="image/1.jpg" /><pre class="mark">meta_register 用于存储扩展字段的一些信息
+
+meta_value_datetime
+meta_value_decimal
+meta_value_int
+meta_value_longtext
+meta_value_text
+meta_value_varchar
+用于存放数据，不同的数据类型存放在不同的表中
+
+recycle
+</pre></p>
+<h3><a name="id3">meta扩展</a></h3>
+<p>什么是meta扩展？<pre class="quote">在不改动原表的情况下，增加扩展表字段。在二次开发中不推荐直接修改dbschema文件，那么在不修改原来dbschema(表)的情况下，
+推荐使用meta扩展来增加要修改表的字段
+</pre></p>
+
+<p>怎么使用meta扩展？</p>
+
+<ul>
+<li>在对需要扩展字段的表的model中添加下面的构造方法,此model需要继承dbeav_model<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />function&nbsp;</span><span style="color: #0000BB">__construct</span><span style="color: #007700">(</span><span style="color: #0000BB">$app</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">parent</span><span style="color: #007700">::</span><span style="color: #0000BB">__construct</span><span style="color: #007700">(</span><span style="color: #0000BB">$app</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//使用meta系统进行存储<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">use_meta</span><span style="color: #007700">();<br />}<br />...<br /></span>
+</span>
+</code></div>
+<li>进行扩展字段注册<pre class="mark">注册字段一般会在进行安装app的时候进行注册，所以一般注册字段方法会放在task.php文件中
+还有一种是放在model中，先判断表中是否有需要注册的字段，如果没有则进行注册.
+</pre></ul>
+
+<ol>
+<li>model中注册一般是在调用这字段的时候需要判断是否注册了，如果没注册则需要调用model中的注册字段方法进行注册
+<p>在需要注册的表对应的model中加入如下方法<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br /></span><span style="color: #FF8000">//方法名自定义<br />//在注册的时候对此方法进行调用，则对表添加了一个新的字段<br /></span><span style="color: #007700">public&nbsp;function&nbsp;</span><span style="color: #0000BB">mytest</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//和dbschema里的*列定义*一样，&nbsp;但是没有pkey,extra,title定义<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$column&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'qq'</span><span style="color: #007700">=&gt;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'number'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'required'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">__</span><span style="color: #007700">(</span><span style="color: #DD0000">'&nbsp;短值测试列'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'width'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">110</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'editable'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">meta_register</span><span style="color: #007700">(</span><span style="color: #0000BB">$column</span><span style="color: #007700">);</span><span style="color: #FF8000">//注意：这只可以注册一个字段,如果要一次注册多个字段则可以循环<br /></span><span style="color: #007700">}<br />...<br /></span>
+</span>
+</code></div>
+<li>task.php 中注册（推荐使用此方法）<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />&nbsp;</span><span style="color: #FF8000">//会在安装app的时候调用,进行注册<br />&nbsp;</span><span style="color: #007700">function&nbsp;</span><span style="color: #0000BB">post_install</span><span style="color: #007700">(</span><span style="color: #0000BB">$options</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$obj&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">(</span><span style="color: #DD0000">'member'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$col&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'qq'</span><span style="color: #007700">=&gt;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'number'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'required'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">__</span><span style="color: #007700">(</span><span style="color: #DD0000">'&nbsp;短值测试列'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'width'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">110</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'editable'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$obj</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">meta_register</span><span style="color: #007700">(</span><span style="color: #0000BB">$col</span><span style="color: #007700">);<br />&nbsp;}<br />...<br /></span>
+</span>
+</code></div></li>
+</p>
+</li>
+</ol>
+</li>
+</ul>
+
+<p>注册字段成功后我们会发现在sdb_dbeav_meta_register表中会有一条这样的记录<br /><img border="0" alt="" align="middle" src="image/4.jpg" /></p>
+<h4><a name="id4">查看meta扩展效果</a></h4><pre class="mark">meta扩展前
+</pre>
+<ol>
+<li>先来看原表的表结构
+<p><br /><img border="0" alt="" align="middle" src="image/2.jpg" />
+<li>查询表中数据：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />&nbsp;</span><span style="color: #0000BB">$arr&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">(</span><span style="color: #DD0000">'member'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">getList</span><span style="color: #007700">(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">);<br />&nbsp;echo&nbsp;</span><span style="color: #DD0000">'&lt;pre&gt;'</span><span style="color: #007700">;<br />&nbsp;</span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$arr</span><span style="color: #007700">);<br />...<br /></span>
+</span>
+</code></div>
+<li>得到的数据：<br /><img border="0" alt="" align="middle" src="image/3.jpg" /></li>
+</li>
+</p>
+</li>
+</ol>
+<pre class="mark">meta扩展后
+</pre>
+<ol>
+<li>在扩展后中插入一条数据<pre>function save() {
+    $filter = array(
+        'member_user' =&gt; 'XXXX',
+        'member_password' =&gt; md5('shopex'),
+        'member_email'=&gt;'XXXX@qq.com',
+        'member_time'=&gt;time(),
+        'qq'=&gt;1111111,
+    );
+    $this-&gt;app-&gt;model('member')-&gt;save($filter);//保存数据
+    //保存后查询
+    $arr = $this-&gt;app-&gt;model('member')-&gt;getList('*');
+    echo '&lt;pre&gt;';
+    print_r($arr);
+}
+</pre>
+<li>查询到的数据是
+<p><br /><img border="0" alt="" align="middle" src="image/5.jpg" /></p>
+</li>
+</li>
+</ol>
+<pre class="mark">此记录在数据表中的表现方式是：
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="image/7.jpg" /></p>
+<h3><a name="id5">使用dbeav进行多表操作</a></h3>
+<p>在ECOS中对数据表进行多表操作，推荐使用dbeav中的内置的方法(save,dump,delete)进行多表操作</p>
+
+<p>如果要使用dbeav中的多表操作方法进行多表操作则需要进行如下配置</p>
+</ol>
+
+<ul>
+<ul>
+<li>对表进行关联
+<li>配置subSdf
+<li>使用对应的方法进行多表操作</li>
+</li>
+</li>
+</ul>
+</ul>
+<h4><a name="id6">对表进行关联</a></h4>
+<p>对表进行关联在ECOS中有两种方法,一种是直接在dbschema中进行定义，另外一种是用has_many，has_one进行关联</p>
+
+<ul>
+<li>dbschema中对表进行关联<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br /><br /></span><span style="color: #FF8000">#这是goods表中的一个字段<br />#这个表示的是goods表中的type_id关联到goods_type表中的type_id<br /></span><span style="color: #007700">...<br /></span><span style="color: #DD0000">'type_id'&nbsp;</span><span style="color: #007700">=&gt;<br />&nbsp;&nbsp;&nbsp;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'table:goods_type'</span><span style="color: #007700">,&nbsp;</span><span style="color: #FF8000">//关联goods_type表<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'sdfpath'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'type/type_id'</span><span style="color: #007700">,&nbsp;</span><span style="color: #FF8000">//关联goods_type表中的type_id字段<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'类型'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'width'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">75</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'editable'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'filtertype'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'yes'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default_in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;),<br />...<br /></span>
+</span>
+</code></div>
+<li>has_many,has_one进行关联<pre class="mark">has_many,has_one 用法类似，都是标明表的关系
+has_many 标明表的对外一对多
+has_one  标明表对外为一对一
+</pre>
+<p>语法<pre>var $has_many = array(
+    'sdfkey'=&gt;'表名(@app名):操作:字段关联',
+    ....
+);
+</pre>
+<table class="docutils">
+<tr>
+<td>名称</td>
+
+<td>说明</td>
+
+<td>默认值</td>
+
+<td>必须</td>
+</tr>
+
+<tr>
+<td>sdfkey</td>
+
+<td>对应关系在sdf树中的挂载点名</td>
+
+<td>无</td>
+
+<td>√</td>
+</tr>
+
+<tr>
+<td>表名</td>
+
+<td>对应的表名</td>
+
+<td>无</td>
+
+<td>√</td>
+</tr>
+
+<tr>
+<td>操作</td>
+
+<td>save的操作方式( append:只对导入数据做save保存不对数据库原有数据做操作；replace:先删除数据库原有所有相关数据 再对导入数据做save；contrast:和数据数原有数据做比对 导入数据原有数据存在库中做update 不存在insert 数据库存在未导入数据delete)</td>
+
+<td>append</td>
+
+<td>　</td>
+</tr>
+
+<tr>
+<td>字段关联</td>
+
+<td>本表字段^关联表字段 2表之间</td>
+
+<td>本表主键 与 对应表dbschema中&quot;type=&gt;table:本表名&quot;字段 不能关联用此方法标识对应关系</td>
+
+<td>　</td>
+</tr>
+</table>
+例：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">b2c_mdl_goods&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">dbeav_model</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$has_many&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'product'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'products:contrast'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'rate'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'goods_rate:replace:goods_id^goods_1'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'keywords'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'goods_keywords:replace'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'images'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'image_attach@image:contrast:goods_id^target_id'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'tag'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'tag_rel@desktop:replace:goods_id^rel_id'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;);<br />&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$has_one&nbsp;</span><span style="color: #007700">=&nbsp;array(<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;);<br /></span>
+</span>
+</code></div></p>
+</li>
+</li>
+</ul>
+<h4><a name="id7">配置subSdf</a></h4>
+<p>为什么要配置subSdf?<pre class="quote">一个主表可以关联多个子表，但是有些操作则只需要对一个主表和其中关联的一个子表进行操作。那么则需要定义subSdf来进行过滤
+</pre>
+<ul>
+<li>配置subSdf语法<pre>var $subSdf = array(
+    'key'=&gt;array('field' subsdf),
+    ':Foreign key'=&gt;array(
+        'field',subsdf
+    ),
+)
+</pre>
+<table class="docutils">
+<tr>
+<td>名称</td>
+
+<td>说明</td>
+</tr>
+
+<tr>
+<td>key</td>
+
+<td>has_many/has_one定义键值 支持xpath语法</td>
+</tr>
+
+<tr>
+<td>field</td>
+
+<td>子表所需输出字段</td>
+</tr>
+
+<tr>
+<td>Foreign key</td>
+
+<td>dbschema定义的外键表名 :前有string可以自定义外联表数据在sdf树中的键名</td>
+</tr>
+
+<tr>
+<td>subsdf</td>
+
+<td>子表subsdf</td>
+</tr>
+</table>
+
+<li>在哪定义subSdf<pre class="mark">标准sdf结构的subsdf定义在model中
+例:model/goods.php
+    var $subSdf = array(
+            'default' =&gt; subsdf ......
+        );
+
+default 为默认，可以自定义别的写法 basic,simple等等等
+如果 $subSdf 未定义则为$has_many,$has_one的集合
+</pre>例：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">b2c_mdl_goods&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">dbeav_model</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$has_many&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'product'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'products:contrast'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'rate'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'goods_rate:replace:goods_id^goods_1'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'keywords'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'goods_keywords:replace'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'images'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'image_attach@image:contrast:goods_id^target_id'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'tag'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'tag_rel@desktop:replace:goods_id^rel_id'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$subSdf&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'keywords'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//第二个参数是has_many定义的proudct所对应的products中关联表的subSdf<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'product'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">,array(</span><span style="color: #DD0000">'price/member_lv_price'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">))),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">':goods_type'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">':goods_cat'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">/*'tag'=&gt;array('*',array(':tag'=&gt;array('*'))),*/<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'images'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">,array(</span><span style="color: #DD0000">':image'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">)))<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'delete'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'keywords'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'product'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">,array(</span><span style="color: #DD0000">'price/member_lv_price'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">))),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'images'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);<br /></span>
+</span>
+</code></div><pre class="mark">使用方法:$goods = $oGoods-&gt;dump($goods_id,'*','default');
+</pre></li>
+</li>
+</ul>
+</p>
+<h3><a name="id8">dbeav中函数接口</a></h3><h4><a name="id9">_filter</a></h4>
+<p>在_filter是对base_db_model中filter的扩展</p>
+<pre>扩展的数组
+
+$FilterArray= array(
+        'than'=&gt;' &gt; '.$var,
+        'lthan'=&gt;' &lt; '.$var,
+        'nequal'=&gt;' = \''.$var.'\'',
+        'noequal'=&gt;' &lt;&gt; \''.$var.'\'',
+        'tequal'=&gt;' = \''.$var.'\'',
+        'sthan'=&gt;' &lt;= '.$var,
+        'bthan'=&gt;' &gt;= '.$var,
+        'has'=&gt;' like \'%'.$var.'%\'',
+        'head'=&gt;' like \''.$var.'%\'',
+        'foot'=&gt;' like \'%'.$var.'\'',
+        'nohas'=&gt;' not like \'%'.$var.'%\'',
+        'between'=&gt;' {field}&gt;='.$var[0].' and '.' {field}&lt;'.$var[1],
+        'in' =&gt;&quot; in ('&quot;.implode(&quot;','&quot;,(array)$var).&quot;') &quot;,
+        'notin' =&gt;&quot; not in ('&quot;.implode(&quot;','&quot;,(array)$var).&quot;') &quot;,
+    );
+</pre>
+<p>代码：<pre>$filter = array(
+    'id|than'=&gt;1,//这个表示 id&gt;1
+    'filter_sql'=&gt;' `name`= wuwei or sex=male', //filter_sql 可以自己写sql语句
+);
+
+</pre></p>
+<h4><a name="id10">count</a></h4>
+<p>统计满足条件的记录条数<pre>function count(){
+	$filter = array(
+		'member_user'=&gt;'XXXX'
+	);
+
+	$this-&gt;app-&gt;model('member')-&gt;count($filter);
+}
+</pre></p>
+<h4><a name="id11">getList</a></h4>
+<p>用法和传递的参数和<a href="http://www.ec-os.net/advance/base/mvc/m/base_db_model.html#id10">base_db_model中的getList</a> 一样</p>
+
+<p>如果用到 了meta扩展则需要调用dbeav中的getList.</p>
+<h4><a name="id12">insert</a></h4>
+<p>加了一层判断，如果在做插入的时候,有用到过 meta 扩展则要做是否注册此扩展字段</p>
+
+<p>insert用法参照：  <a href="http://www.ec-os.net/advance/base/mvc/m/base_db_model.html#id16">insert</a></p>
+<h4><a name="id13">dump</a></h4>
+<p>使用dbeav中的dump进行多表查询，则需要（先进行多表关联）配置$has_many,$_has_one,subSdf</p>
+
+<p>function dump($filter,$field = '*',$subSdf = null)</p>
+
+<p>$subSdf 中是在 var $subSdf 中定义的节点，如果没定义，则是$has_many,$has_one的集合</p>
+
+<p>例：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">notebook_mdl_members&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">dbeav_model</span><span style="color: #007700">{<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$has_many&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'member_lv'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'member_lv:append:member_lv_id^member_lv_id'</span><span style="color: #007700">,&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//这表示在member表中有关联了三个表<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'pam_account'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'pam_account@pam:append:member_id^account_id'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">item</span><span style="color: #007700">:</span><span style="color: #0000BB">append</span><span style="color: #007700">:</span><span style="color: #0000BB">member_id</span><span style="color: #007700">^</span><span style="color: #0000BB">member_id</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$subSdf&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">/*第一个参数则是members中所要查询的字段<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*第二个参数表示是members表中的子表item的$subSdf,如果在item中没有关联的子表则以&nbsp;null&nbsp;代替<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*array(&nbsp;0,2,'item_id&nbsp;DESC'&nbsp;)此参数表示在item子节点中：从0到2取三条记录，按照&nbsp;item_id&nbsp;DESC&nbsp;排序<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">,</span><span style="color: #0000BB">null</span><span style="color: #007700">,array(&nbsp;</span><span style="color: #0000BB">0</span><span style="color: #007700">,</span><span style="color: #0000BB">2</span><span style="color: #007700">,</span><span style="color: #DD0000">'item_id&nbsp;DESC'&nbsp;</span><span style="color: #007700">)),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'delete'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">__construct</span><span style="color: #007700">(</span><span style="color: #0000BB">$app</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">parent</span><span style="color: #007700">::</span><span style="color: #0000BB">__construct</span><span style="color: #007700">(</span><span style="color: #0000BB">$app</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//使用meta系统进行存储<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">use_meta</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">item_dump</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$filter&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'member_id'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">10</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$aDate&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$filter</span><span style="color: #007700">,</span><span style="color: #DD0000">"*"</span><span style="color: #007700">,</span><span style="color: #DD0000">'default'</span><span style="color: #007700">);</span><span style="color: #FF8000">//dump1&nbsp;输出的是$subSdf&nbsp;中的item中定义的节点<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">echo&nbsp;</span><span style="color: #DD0000">"&lt;pre&gt;"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$aDate</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />}<br /></span>
+</span>
+</code></div>得到<pre class="mark">Array
+(
+    [member_id] =&gt; 10
+    [member_user] =&gt; XXXX
+    [member_password] =&gt; 1e236443e5a30b09910e0d48c994b8e6
+    [member_time] =&gt; 1305280926
+    [member_email] =&gt; XXXX@qq.com
+    [qq] =&gt; 1111111
+    [item] =&gt; Array
+        (
+            [3] =&gt; Array   //注意这里 $subSdf 里面定义的排序
+                (
+                    [item_id] =&gt; 3
+                    [member_id] =&gt; 10
+                    [item_subject] =&gt; fsdafsd
+                )
+            [1] =&gt; Array
+                (
+                    [test1_id] =&gt; 1
+                    [member_id] =&gt; 10
+                    [item_subject] =&gt;测试测试
+                )
+        )
+)
+</pre></p>
+
+<p>注意：用dump进行多表连查则第三个参数是必须，否则查不出数据</p>
+<h4><a name="id14">delete</a></h4>
+<p>使用delete进行多表删除，需要先进行多表关联（配置好has_many，has_one, subSdf）</p>
+
+<p>function delete($filter,$subSdf = 'delete')</p>
+
+<p>接着上面member的model,添加下面的方法<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />function&nbsp;</span><span style="color: #0000BB">member_delect</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$filter&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'member_id'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">10</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;);<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">delete</span><span style="color: #007700">(</span><span style="color: #0000BB">$filter</span><span style="color: #007700">,</span><span style="color: #DD0000">'delete'</span><span style="color: #007700">);</span><span style="color: #FF8000">//会删除在$subSdf&nbsp;中定义的节点<br /></span><span style="color: #007700">}<br />...<br /></span>
+</span>
+</code></div>得到的数据为空，因为在member表中把member_id = 10 的这条记录给删除了！但是在数据库中可以看到表item把member_id=10</p>
+
+<p>的记录全部删除了，但是表pam_account,中的account_id=10,的数据还没有删除，</p>
+
+<p>因为在执行delete 的时候，节点删除是根据$subSdf中来删除的<pre class="mark">注意：$this-&gt;delete($filter);如果没有定义删除节点，默认会把所有关联的子表的相关信息删除
+</pre></p>
+<h4><a name="id15">update</a></h4>
+<p>用法和传递的参数和<a href="http://www.ec-os.net/advance/base/mvc/m/base_db_model.html#id17">base_db_model中的update</a> 一样</p>
+
+<p>如果用到 了meta扩展则需要调用dbeav中的update.</p>
+<h4><a name="id16">save</a></h4>
+<p>如果需要用save做多表保存或则更新数据需要先进行上面的多表关联操作(配置好has_many，has_one, subSdf)function save(&amp;$data,$mustUpdate = null)</p>
+<h3><a name="id17">参数</a></h3>
+<table class="docutils">
+<tr>
+<td>名称</td>
+
+<td>说明</td>
+
+<td>结构</td>
+
+<td>引用</td>
+
+<td>必要</td>
+</tr>
+
+<tr>
+<td>$data</td>
+
+<td>需保存数据的</td>
+
+<td>sdf</td>
+
+<td>√</td>
+
+<td>√</td>
+</tr>
+
+<tr>
+<td>$mustUpdate</td>
+
+<td>必须保存的结构说明</td>
+
+<td>sdf</td>
+
+<td>　</td>
+
+<td>　</td>
+</tr>
+</table>
+</table>
+<h3><a name="id18">说明</a></h3>
+<p>将单条sdf数据通过has_many,has_one配置递归save入数据库，联合主键表不支持递归save，返回bool，主键返回$data</p>
+
+<p>例：刚才删除的时候把表item，member_id = 10,和 表 member,member_id=10中的数据都删除了，现在在保存；<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">member_save</span><span style="color: #007700">()&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$filter&nbsp;</span><span style="color: #007700">=&nbsp;Array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'member_id'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">10</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'member_user'&nbsp;</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'wuwei'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'member_password'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'1234656'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'member_time'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">1305280926</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'member_email'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'wuweishopex.cn'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'qq'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">123456789</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;Array<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'1'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;Array&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//注意这里$subSdf里面定义的排序<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item_id'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">1</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item_subject'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'jjjjjdsgfdgfd'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'3'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;Array<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item_id'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">3</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'item_subject'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'fsadfsdfsdfa'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">(</span><span style="color: #DD0000">'member'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">save</span><span style="color: #007700">(</span><span style="color: #0000BB">$filter</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /></span>
+</span>
+</code></div></p>
+<h4><a name="id19">batch_dump</a></h4>
+<p>如果需要用batch_dump做多表保存或则更新数据需要先进行上面的多表关联操作(配置好has_many，has_one, subSdf)</p>
+
+<p>function batch_dump($filter,$field = '*',$subSdf = null,$start=0,$limit=20,$orderType = null )</p>
+
+<p>根据$filter条件，getList出多个主键Id</p>
+
+<p>在根据 主键Id dump出多条 subSdf</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">dbeav简介</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">dbeav中的dbschema(表)介绍</a>
+        <li><a href="#id3" class="reference internal">meta扩展</a>
+            <ul>
+            <li><a href="#id4" class="reference internal">查看meta扩展效果</a>
+        </ul>
+        <li><a href="#id5" class="reference internal">使用dbeav进行多表操作</a>
+            <ul>
+            <li><a href="#id6" class="reference internal">对表进行关联</a>
+            <li><a href="#id7" class="reference internal">配置subSdf</a>
+        </ul>
+        <li><a href="#id8" class="reference internal">dbeav中函数接口</a>
+            <ul>
+            <li><a href="#id9" class="reference internal">_filter</a>
+            <li><a href="#id10" class="reference internal">count</a>
+            <li><a href="#id11" class="reference internal">getList</a>
+            <li><a href="#id12" class="reference internal">insert</a>
+            <li><a href="#id13" class="reference internal">dump</a>
+            <li><a href="#id14" class="reference internal">delete</a>
+            <li><a href="#id15" class="reference internal">update</a>
+            <li><a href="#id16" class="reference internal">save</a>
+        </ul>
+        <li><a href="#id17" class="reference internal">参数</a>
+        <li><a href="#id18" class="reference internal">说明</a>
+            <ul>
+            <li><a href="#id19" class="reference internal">batch_dump</a>
+        </ul>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="save_dump.html"
+                                  title="上一章">save && dump文档</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../ectools/index.html"
+                                  title="下一章">电商工具集 - ectools</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../ectools/index.html" title="电商工具集 - ectools" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="save_dump.html" title="save && dump文档" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">增强型模型(Model) - dbeav</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

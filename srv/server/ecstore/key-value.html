@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      Key-Value引擎相关配置 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../doc.html" />
+    <link rel="up" title="部署站点ecstore" href="index.html" />
+
+        <link rel="next" title="file-storage" href="File Storage.html" />
+        <link rel="prev" title="cache" href="Cache 相关配置.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="file-storage.html" title="File Storage" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="cache.html" title="Cache 相关配置" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群部署文档</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">部署站点ecstore</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> Key-Value引擎相关配置</h1>
+            <h2><a name="id1">Key-Value 存储引擎</a></h2><pre>#选项有：
+# base_kvstore_filesystem   文件存储（默认）
+# base_kvstore_mysql  mysql
+# base_kvstore_memcache  memcache
+# base_kvstore_dba  dba
+# base_kvstore_tokyotyrant  tokyotyrant
+# base_kvstore_flare  flare
+# base_kvstore_mongodb  mongodb
+# base_kvstore_tair  tair
+define('KVSTORE_STORAGE', '');
+
+#当使用kv存储引擎支持并使用memcache协议时，如：memcahe,tt,flare,需配置以下选项
+#参见cache相关配置中的CACHE_MEMCACHE_CONFIG选项
+define('KVSTORE_MEMCACHE_CONFIG', '');
+
+#如使用mongodb，需配置以下选项
+#mongodb 服务器配置
+#连接服务器地址:
+#格式如下：&quot;mongodb://${username}:${password}@localhost&quot; , &quot;mongodb:///tmp/mongo-27017.sock&quot;
+#define('MONGODB_SERVER_CONFIG', 'mongodb://localhost:27017');
+#连接参数:
+#array(&quot;connect&quot; =&gt; TRUE),array(&quot;username&quot;=&gt;'xxxx', &quot;password&quot;=&gt;'xxx');
+#define('MONGODB_OPTION_CONFIG','return '. var_export(array('connect'=&gt;true),1).';');
+
+# KV_PREFIX KV引擎前缀
+# 默认是default
+# define('KV_PREFIX', 'default');
+
+# 是否在写入kv时，先在mysql里存一份
+# true为不开启，false为开启(默认)
+# 开启时会小量影响性能，但支持kv重建
+# 如果做了kv服务器高可用，建议关闭该选项
+define('WITHOUT_KVSTORE_PERSISTENT', false);
+</pre>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">Key-Value 存储引擎</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="cache.html"
+                                  title="上一章">Cache 相关配置</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="file-storage.html"
+                                  title="下一章">File Storage</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="file-storage.html" title="File Storage" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="cache.html" title="Cache 相关配置" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群部署文档</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">部署站点ecstore</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

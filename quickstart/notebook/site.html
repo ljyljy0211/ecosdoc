@@ -1,0 +1,537 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      Site - 让前端更优雅 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="创建一个带后端的留言版" href="index.html" />
+
+        <link rel="next" title="pam" href="pam - 添加登录功能.html" />
+        <link rel="prev" title="desktop" href="Desktop - 添加后台管理功能.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="pam.html" title="pam - 添加登录功能" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="desktop.html" title="Desktop - 添加后台管理功能" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">快速入门</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">创建一个带后端的留言版</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> Site - 让前端更优雅</h1>
+            <h2><a name="id1">为notebook app提供 site app支持</a></h2>
+<ul>
+<li>名词解释
+<p><b>site</b>: 比<b>base</b>提供的更强大的前端, 目前用做<b>ecstore</b>的前端展示提供<b>模板机制, 站点管理, 菜单管理, sitemap, seo优化, sitemap, url路由, 提示信息, 友情链接</b>等. 是自由建站的利器！</p>
+</li>
+</ul>
+
+<ul>
+<li>在<b>app</b>目录下引入<b>site</b>软件包<pre> [http://app.ec-os.net/svn/site/trunk]
+</pre></li>
+</ul>
+
+<ul>
+<li>修改: <b>app/notebook/app.xml</b>,使<b>notebook</b>依附于<b>site</b>。<pre>        ...
+	&lt;depends&gt;
+		...
+		&lt;app&gt;site&lt;/app&gt;
+	&lt;/depends&gt;
+	...
+</pre></li>
+</ul>
+
+<ul>
+<li>重新安装 <b>notebook</b><pre>bryant@forsky /Users/bryant/codes/notebook/app/base %&gt; sudo ./cmd install -r notebook
+Creating table sdb_image_image
+Creating table sdb_image_image_attach
+Installing service desktop_finder.image_mdl_image
+image &quot;en-us&quot; language resource stored
+image &quot;zh-cn&quot; language resource stored
+Installing Cache_Expires DB:IMAGE_IMAGE
+UPDATE CACHE EXPIRES KV DATA
+Installing Cache_Expires DB:IMAGE_IMAGE_ATTACH
+UPDATE CACHE EXPIRES KV DATA
+Installing permission image
+Installing panelgroup images
+Installing adminpanel admin_manage:index
+Installing adminpanel admin_manage:imageset
+Initial image
+Application image installed... ok.
+Creating table sdb_site_explorers
+Creating table sdb_site_link
+Creating table sdb_site_menus
+Creating table sdb_site_modules
+Creating table sdb_site_route_statics
+Creating table sdb_site_seo
+Creating table sdb_site_themes
+Creating table sdb_site_themes_tmpl
+Creating table sdb_site_widgets
+Creating table sdb_site_widgets_instance
+Creating table sdb_site_widgets_proinstance
+Installing service desktop_finder.site_mdl_explorers
+Installing service desktop_finder.site_mdl_link
+Installing service desktop_finder.site_mdl_modules
+Installing service desktop_finder.site_mdl_seo
+Installing service desktop_finder.site_mdl_menus
+Installing service desktop_finder.site_mdl_themes
+Installing service desktop_finder.site_mdl_route_statics
+Installing service desktop_finder.site_mdl_route_statics
+Installing service desktop_finder.site_mdl_widgets_proinstance
+Installing service desktop_finder_callback.site_mdl_modules
+Installing service desktop_finder_callback.site_mdl_modules
+Installing service app_content_detector
+Installing service view_compile_helper
+Installing service view_helper
+Installing service site_view_helper
+Installing service site_controller_content
+Installing service cachemgr_global_vary
+Installing service site_service_seo
+Installing service autotask
+Installing service desktop_menu
+Installing service site_maps
+Installing service dev.project_type
+Installing service site_theme_content_detector
+Installing service tpl_source.site_proinstance
+Installing service site_display_errorpage.conf
+site &quot;en-us&quot; language resource stored
+site &quot;zh-cn&quot; language resource stored
+Installing Cache_Expires DB:SITE_EXPLORERS
+UPDATE CACHE EXPIRES KV DATA
+Installing Cache_Expires DB:SITE_LINK
+UPDATE CACHE EXPIRES KV DATA
+Installing Cache_Expires DB:SITE_MENUS
+UPDATE CACHE EXPIRES KV DATA
+Installing Cache_Expires DB:SITE_MODULES
+UPDATE CACHE EXPIRES KV DATA
+Installing Cache_Expires DB:SITE_ROUTE_STATICS
+UPDATE CACHE EXPIRES KV DATA
+Installing Cache_Expires DB:SITE_SEO
+UPDATE CACHE EXPIRES KV DATA
+Installing Cache_Expires DB:SITE_THEMES
+UPDATE CACHE EXPIRES KV DATA
+Installing Cache_Expires DB:SITE_THEMES_TMPL
+UPDATE CACHE EXPIRES KV DATA
+Installing Cache_Expires DB:SITE_WIDGETS
+UPDATE CACHE EXPIRES KV DATA
+Installing Cache_Expires DB:SITE_WIDGETS_INSTANCE
+UPDATE CACHE EXPIRES KV DATA
+Installing Cache_Expires DB:SITE_WIDGETS_PROINSTANCE
+UPDATE CACHE EXPIRES KV DATA
+Installing menu site_ctl_admin_module
+Installing menu site_ctl_admin_module
+Installing menu site_ctl_admin_module
+Installing menu site_ctl_admin_module
+Installing menu site_ctl_admin_module
+Installing menu site_ctl_admin_module
+Installing menu site_ctl_admin_module
+Installing menu site_ctl_admin_module
+Installing menu site_ctl_admin_module
+Installing menu site_ctl_admin_module
+Installing menu site_ctl_admin_module
+Installing menu site_ctl_admin_module
+Installing workground site.wrokground.theme
+Installing workground site.wrokground.theme
+Installing permission site
+Initial themes
+Application site installed... ok.
+Creating table sdb_notebook_item
+Installing service notebook_addon
+Installing service desktop_finder.notebook_mdl_item
+Installing Cache_Expires DB:NOTEBOOK_ITEM
+UPDATE CACHE EXPIRES KV DATA
+Installing menu notebook_ctl_admin_notebook
+Installing workground notebook_admin_notebook
+Installing permission notebook_manage
+Application notebook installed... ok.
+</pre></li>
+</ul>
+
+<ul>
+<li>进入后台，效果如下：</li>
+</ul>
+
+<p><br /><img border="0" alt="" align="middle" src="screen-8.png" /></p>
+
+<ul>
+<li>现在我们已经可以看到模板很多的功能了。</li>
+</ul>
+
+<p><i>下边开始准备为我们自己的模板提供在线安装</i></p>
+<h2><a name="id2">创建自己的个性化模板</a></h2>
+<ul>
+<li>目前我们的<b>site app</b>的在线模板中只支持<b>ecstore</b>的模板, 因此我们要根据项目设计自己的模板</li>
+</ul>
+
+<p><i>模板设计文档参见：</i>[<a href="http://www.ec-os.net/quickstart/advance/site/template.html">http://www.ec-os.net/quickstart/advance/site/template.html</a>]</p>
+
+<ul>
+<li>为了方便演示，我们下载一个现有的模板, 进行修改：</li>
+</ul>
+
+<ul>
+<li>进入站点-&gt;模板列表-&gt;在线安装模板</li>
+</ul>
+
+<p><br /><img border="0" alt="" align="middle" src="screen-9.png" /></p>
+
+<ul>
+<li>我们选择在线安装电子<b>数码模板</b>
+<p><br /><img border="0" alt="" align="middle" src="screen-13.png" /></p>
+</li>
+</ul>
+
+<ul>
+<li>模板被安装到 [项目名称]/themes/digital 目录下
+<li>创建我们自己的模板目录 [项目名称](<i>以后略去</i>)/themes/notebook
+<li>从<b>themes/digital</b>目录下拷贝必要的文件到我们自己的模板目录下 themes/notebook<pre class="quote">block
+borders
+default.html
+images
+index.html
+preview.jpg
+theme.xml
+</pre>
+<p><i>注：以上文件缺一不可，一定得复制完全！</i>
+<li>创建：<b>themes/notebook/info.xml</b><pre>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;theme&gt;
+  &lt;name&gt;notebook&lt;/name&gt;
+  &lt;id&gt;notebook&lt;/id&gt;
+  &lt;version&gt;0.1&lt;/version&gt;
+  &lt;info&gt;&lt;/info&gt;
+  &lt;author&gt;ShopEx-bryant&lt;/author&gt;
+  &lt;site&gt;http://www.shopex.cn&lt;/site&gt;
+  &lt;update_url&gt;&lt;/update_url&gt;
+  &lt;borders&gt;
+    &lt;set key=&quot;邮件订阅&quot; tpl=&quot;borders/border1.html&quot; /&gt;
+    &lt;set key=&quot;边栏样式&quot; tpl=&quot;borders/border2.html&quot; /&gt;
+    &lt;set key=&quot;品牌热卖排行&quot; tpl=&quot;borders/border4.html&quot; /&gt;
+    &lt;set key=&quot;热销排行&quot; tpl=&quot;borders/border5.html&quot; /&gt;
+    &lt;set key=&quot;首页商品列表&quot; tpl=&quot;borders/border6.html&quot; /&gt;
+    &lt;set key=&quot;页尾文章列表&quot; tpl=&quot;borders/border9.html&quot; /&gt;
+    &lt;set key=&quot;购买本商品的顾客还买过&quot; tpl=&quot;borders/border10.html&quot; /&gt;
+  &lt;/borders&gt;
+  &lt;views&gt;&lt;/views&gt;
+  &lt;config&gt;&lt;/config&gt;
+&lt;/theme&gt;
+</pre><i>因为我们复制的theme.xml这个文件里有很多无用的widget,所以我们还要做下面操作</i>
+<li>打开<b>theme.xml</b>然后将该文件的内容全部替换成刚才新建的<b>info.xml</b>里的内容（两个文件的内容一模一样便可）。<b>我们的模板已初步完成</b>
+<li>删除我们的参照模板目录 <b>themes/digital</b>
+<li>为了让系统重新加载模板, 我们需要重新安装<b>site</b><pre>bryant@forsky /Users/bryant/codes/notebook/app/base %&gt; sudo ./cmd uninstall -r site
+...
+...
+bryant@forsky /Users/bryant/codes/notebook/app/base %&gt; sudo ./cmd install notebook
+...
+...
+</pre>
+<li>进入后台, 看看我们自己的模板<br /><img border="0" alt="" align="middle" src="screen-10.png" /></li>
+</li>
+</li>
+</li>
+</li>
+</p>
+</li>
+</li>
+</li>
+</ul>
+
+<ul>
+<li>点击上图中的可视化编辑,效果下图所示：
+<p><br /><img border="0" alt="" align="middle" src="screen-11.png" /></p>
+</li>
+</ul>
+<h2><a name="id3">创建前台导航widget</a></h2>
+<ul>
+<li>如果已经看过我们的模板设计文档, 应该已经对<b>widget</b>有个基本概念</li>
+</ul>
+
+<ul>
+<li>实际上系统添加 <b>widget</b> 有两种方式：
+<ol>
+<li>通过<b>app</b>进行添加  app/[$app_name]/widgets 目录下
+<li>通过<b>模板</b>进行添加  themes/[$theme_name]/widgets 目录下</li>
+</li>
+</ol>
+</li>
+</ul>
+</ol>
+
+<ul>
+<li>我们选择通过<b>app</b>进行添加，具体实现过程如下：</li>
+</ul>
+
+<ol>
+<ol>
+<li>创建<b>app/notebook</b>下的<b>widgets</b>目录 <b>app/notebook/widgets</b>
+<li>把 <b>app/b2c/widgets/menu_lv1</b> 目录拷贝到 <b>app/notebook/widgets</b>，通过拷贝的方式建立前台导航<b>widgets</b>。
+<li>修改挂件描述文件: <b>app/notebook/widgets/menu_lv1/widgets.php</b>，把文件中的 <b>app::get('b2c')-&gt;_('xxxx')</b> 的写法换成  <b>'xxxx'</b>。
+<li>前后对比效果图如下：
+<p>修改前：<pre class="quote">   $setting['name']=app::get('b2c')-&gt;_('商店导航菜单');
+</pre>修改后效果：<pre class="quote">   $setting['name']='商店导航菜单';
+</pre><i>这种奇怪的写法是为了多语言的考虑, 暂无需理解。</i></ol>
+
+<ul>
+<li>大功告成, 重新安装 <b>site app</b><pre>bryant@forsky /Users/bryant/codes/notebook/app/base %&gt; sudo ./cmd uninstall -r site
+...
+...
+bryant@forsky /Users/bryant/codes/notebook/app/base %&gt; sudo ./cmd install notebook
+...
+...
+</pre></li>
+</ul>
+</li>
+</li>
+</li>
+</li>
+</ol>
+</ol>
+
+<ul>
+<li>进入 <b>index.html</b> 可视化编辑页, 添加刚刚写完的<b>widgets</b>，具体操作流程如下：</ul>
+
+<ol>
+<ol>
+<li>点击页面左上角<b>添加模板</b>按钮，如下图所示：
+<p><br /><img border="0" alt="" align="middle" src="screen-12.png" />
+<li>在弹出的<b>增加页面板块</b>提示框中，单击左侧列表的<b>导航相关</b>，如下图所示：<br /><img border="0" alt="" align="middle" src="screen-15.png" />
+<li>在右侧弹出<b>商店导航菜单</b>中，单击<b>商店导航菜单</b>右上角的<b>小加号</b>，如下图所示：<br /><img border="0" alt="" align="middle" src="screen-16.png" />
+<li>将数据移动到页面的<b>导航菜单栏</b>的左上角，会自动弹出蓝色的小编辑条，单击蓝色编辑条右侧的<b>编辑</b>按钮，如下图所示：<br /><img border="0" alt="" align="middle" src="screen-17.png" />
+<li>在出现的<b>修改板块</b>提示框中，填写<b>板块标题</b>，选择<b>板块边框</b>为<b>无边框</b>，单击<b>保存修改</b>按钮，如下图所示：<br /><img border="0" alt="" align="middle" src="screen-18.png" />
+<li>最后单击可视化编辑页面右上角的<b>保存</b>按钮，待保存完毕，关闭可视化编辑页面。如下图所示：<br /><img border="0" alt="" align="middle" src="screen-19.png" /></ol>
+
+<ul>
+<li>这时我们可以点击模板下方的<b>启用此模板</b>，启用我们自建的模板。然后我们可以访问[<a href="http://lcoalhost/项目名称/index.php">http://lcoalhost/项目名称/index.php</a>]查看效果，如下图所示：<br /><img border="0" alt="" align="middle" src="screen-20.png" /></li>
+</ul>
+</li>
+</li>
+</li>
+</li>
+</p>
+</li>
+</ol>
+</ol>
+</ul>
+<h2><a name="id4">让我们的前端支持site</a></h2>
+<p><b>下面，我们开始对之前的notebook前端进行改造：</b></p>
+
+<ul>
+<li>为<b>notebook</b>增加:<b>app/notebook/site.xml</b><pre>&lt;site&gt;
+    &lt;explorer id='notebook' path='view/site'&gt;notebook&lt;/explorer&gt;
+
+    &lt;module controller='site_default' &gt;
+        &lt;name&gt;default&lt;/name&gt;
+        &lt;title&gt;notebook&lt;/title&gt;
+        &lt;disable&gt;false&lt;/disable&gt;
+        &lt;allow_menu act='index'&gt;留言板&lt;/allow_menu&gt;
+        &lt;default_menu&gt;
+            &lt;title&gt;留言板&lt;/title&gt;
+            &lt;act&gt;index&lt;/act&gt;
+            &lt;hidden&gt;false&lt;/hidden&gt;
+        &lt;/default_menu&gt;
+    &lt;/module&gt;
+&lt;/site&gt;
+</pre></li>
+</ul>
+
+<ul>
+<li>修改<b>mapper</b>文件 <b>config/mapper.php</b></li>
+</ul>
+
+<p>将</p>
+
+<p>'/' 设置为 array('app' =&gt; 'site')<pre class="quote">我们让site app来接管 通过url对控制器的调度方式
+</pre>
+<ul>
+<li>更改老的控制器位置将 <b>app/notebook/controller/default.php</b> 搬到 <b>app/notebook/controller/site/</b> 目录下</li>
+</ul>
+</p>
+
+<ul>
+<li>修改 <b>default.php</b>
+<li>更改控制器的名称为<b>notebook_ctl_site_default</b>, 并将继承类从 <b>base_controller</b> 改为 <b>site_controller</b><pre class="quote">  注：[http://localhost/项目名称/index.php/default.html] 对应到控制器为 **notebook_ctl_site_default**
+</pre><pre class="quote">  这样的目的是为了seo友好
+</pre>
+<p>将<b>function index</b> 里的<pre>  $this-&gt;display('default.html');
+</pre>替换为<pre>  $this-&gt;page('default.html');
+</pre></p>
+</li>
+</li>
+</ul>
+
+<p>将<b>function addnew</b> 的<pre>  $this-&gt;begin(array(&quot;ctl&quot; =&gt; &quot;default&quot;, &quot;act&quot; =&gt; &quot;index&quot;, &quot;app&quot;=&gt; &quot;notebook&quot;));
+</pre>替换为<pre>  $this-&gt;begin(array(&quot;ctl&quot; =&gt; &quot;site_default&quot;, &quot;act&quot; =&gt; &quot;index&quot;, &quot;app&quot;=&gt; &quot;notebook&quot;));
+</pre>
+<ul>
+<li>修改页面文件<b>app/notebook/view/default.html</b>，修改form表单&quot;提交&quot;的控制器，修改代码如下：</li>
+</ul>
+</p>
+
+<p><b>将</b><pre class="quote">...
+&lt;form id=&quot;writer&quot; method=&quot;post&quot; action=&quot;&lt;{link ctl='default' act='addnew' app='notebook'}&gt;&quot;&gt;
+...
+</pre><b>修改为：</b><pre class="quote">...
+&lt;form id=&quot;writer&quot; method=&quot;post&quot; action=&quot;&lt;{link ctl='site_default' act='addnew' app='notebook'}&gt;&quot;&gt;
+...
+</pre>
+<ul>
+<li><b>卸载site, 重新安装notebook</b></li>
+</ul>
+</p>
+
+<ul>
+<li>输入[<a href="http://localhost/项目名称/index.php/default.html">http://localhost/项目名称/index.php/default.html</a>]，效果如下：
+<p><br /><img border="0" alt="" align="middle" src="screen-14.png" />
+<li>现在页面显得稍微有点凌乱，我们可以尝试修改视图文件：<b>app/notebook/view/default.html</b>，将html 的头和尾去掉。最终效果如下：</li>
+</p>
+</li>
+</ul>
+
+<p><br /><img border="0" alt="" align="middle" src="screen-21.png" /></p>
+<h2><a name="id5">访问出错后解决方案</a></h2>
+<ul>
+<li>如果没有出现预期的结果或者是出现警告信息，可以尝试下载一个新模板然后<b>切换模板</b>。操作步骤如下：</ul>
+
+<ol>
+<ol>
+<li>点击<b>在线安装模板</b>按钮，在弹出模板列表页中选择并安装一个新的模块。如下图所示：
+<p><br /><img border="0" alt="" align="middle" src="image/site01.png" />
+<li>点击刚下载的新模板的<b>启用此模板</b>。如下图所示：<br /><img border="0" alt="" align="middle" src="image/site02.png" />
+<li>最后再点击我们之前的模板<b>notebook</b>中的<b>启用此模板</b>，启用我们自建的模板。然后再访问[<a href="http://localhost/项目名称/index.php/default.html">http://localhost/项目名称/index.php/default.html</a>]。</li>
+</li>
+</p>
+</li>
+</ol>
+</ol>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">为notebook app提供 site app支持</a>
+    <li><a href="#id2" class="reference internal">创建自己的个性化模板</a>
+    <li><a href="#id3" class="reference internal">创建前台导航widget</a>
+    <li><a href="#id4" class="reference internal">让我们的前端支持site</a>
+    <li><a href="#id5" class="reference internal">访问出错后解决方案</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="desktop.html"
+                                  title="上一章">Desktop - 添加后台管理功能</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="pam.html"
+                                  title="下一章">pam - 添加登录功能</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="pam.html" title="pam - 添加登录功能" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="desktop.html" title="Desktop - 添加后台管理功能" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">快速入门</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">创建一个带后端的留言版</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

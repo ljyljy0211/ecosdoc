@@ -1,0 +1,452 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      Doczen用户指南 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="doc.html" />
+    <link rel="up" title="ECOS百科全书" href="doc.html" />
+
+        <link rel="next" title="misc/index" href="未归档.html" />
+        <link rel="prev" title="ecae/webshell/index" href="webshell.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="misc/index.html" title="未归档" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="ecae/webshell/index.html" title="webshell" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="doc.html">ECOS百科全书</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> Doczen用户指南</h1>
+            <h2><a name="id1">Doczen是神马东西</a></h2>
+<p>Doczen的中文名字为：文档之禅 (doc是文档，zen是禅)。 它是为t2t增加了链接的文档生成系统。</p>
+
+<p>目前所支持的文档转换类型
+<table class="docutils">
+<tr>
+<th>格式</th>
+
+<th>需要安装的软件</th>
+</tr>
+
+<tr>
+<td>html</td>
+
+<td>无</td>
+</tr>
+
+<tr>
+<td>t2t</td>
+
+<td>txt2tags</td>
+</tr>
+
+<tr>
+<td>txt</td>
+
+<td>txt2tags</td>
+</tr>
+
+<tr>
+<td>tex</td>
+
+<td>txt2tags</td>
+</tr>
+
+<tr>
+<td>pdf</td>
+
+<td>xelatex</td>
+</tr>
+</table>
+</p>
+</table>
+
+<p>Doczen的作者 ShopEx 王磊(flaboy) 现在Doczen由chenxiaoxiao维护, 如有问题RTX找chenxiaoxiao或发邮件chenxiaoxiao@shopex.cn</p>
+<h2><a name="id2">获取方式</a></h2>
+<p>微盘 <a href="http://t.cn/StXmb9">点击下载</a></p>
+
+<p>svn形式获取
+<ul>
+<li>doczen for all<pre>https://svn.dev.shopex.cn/ecos-edu/doczen/trunk
+</pre>
+<li>doczen for ued<pre>https://svn.dev.shopex.cn/ecos-edu/doczen/branches/ued/doczen-ued
+</pre></li>
+</li>
+</ul>
+</p>
+
+<p>文档相关
+<ul>
+<li>《ECOS百科全书》<pre class="mark">https://svn.dev.shopex.cn/docs/ecos/ecosdoc
+</pre></li>
+</ul>
+</p>
+<h2><a name="id3">环境配置</a></h2><h3><a name="id4">window</a></h3></ul>
+
+<ol>
+<ol>
+<li>安装php, 并将php可执行文件放在系统环境变量（PATH）中
+<li>下载linux命令工具 <a href="http://unxutils.sourceforge.net">UnxUtils</a>, 解压之后把目录中的 usr/local/wbin 目录的绝对路径添加到系统环境变量（PATH）的最前面</li>
+</li>
+</ol>
+</ol>
+
+<p>测试</p>
+
+<p>进入doczen目录输入<pre>doczen.bat
+</pre>显示如下所示表示配置成功<pre>Usage: ========================================
+        doczen make-doc:
+            生成t2t格式
+
+        doczen make-tex:
+            生成tex格式
+
+        doczen make-txt:
+            生成txt格式
+
+        doczen make-pdf:
+            生成pdf格式
+
+        doczen init:
+            初始化文档
+
+</pre></p>
+<h3><a name="id5">linux</a></h3>
+<p>注意权限问题</p>
+
+<p><b>以ubuntu为例</b></p>
+
+<ol>
+<li>安装配置php环境<pre>sudo apt-get install php5 php5-cgi php5-cli
+</pre></li>
+</ol>
+
+<p>测试</p>
+
+<p>进入doczen目录输入<pre>./doczen
+</pre>显示如下所示表示配置成功<pre>Usage: ========================================
+        doczen make-doc:
+            生成t2t格式
+
+        doczen make-tex:
+            生成tex格式
+
+        doczen make-txt:
+            生成txt格式
+
+        doczen make-pdf:
+            生成pdf格式
+
+        doczen init:
+            初始化文档
+
+</pre></p>
+<h2><a name="id6">使用手册</a></h2><h3><a name="id7">重要</a></h3>
+<p>需要掌握txt2tags; 语法简单, 轻松上手。</p>
+
+<p>txt2tags</ol>
+
+<ul>
+<ul>
+<li><a href="http://txt2tags.org/zh/manpage-zh.html">中文文档</a>
+<li><a href="http://txt2tags.org/zh/userguide-zh.pdf">用户指南</a></li>
+</li>
+</ul>
+</ul>
+<h2><a name="id8">建立文档</a></h2>
+<ul>
+<li>主要分为四个步骤
+<ol>
+<li>创建你的文档目录
+<li>编写文档(t2t格式)
+<li>使用 doczen 编译</li>
+</li>
+</li>
+</ol>
+</li>
+</ul>
+
+<p>以后每次改动文档文件, 只需要在文档主目录make一下就好了。清除命令是make clean</p>
+<h3><a name="id9">第一步</a></h3>
+<p><b>创建文档目录</b></p>
+
+<p>doczen目录树如下:<pre>|~mydoc/
+| |+build/
+| |~site/
+| | `-index.html
+| |~source/
+| | |~_static/
+| | | |-basic.css
+| | | |-default.css
+| | | `-pygments.css
+| | |~_template/
+| | | `-default.tpl
+| | `-doc.t2t
+| |-config.mk
+| `-Makefile
+</pre></p>
+
+<p><b>目录结构介绍</b></ol>
+
+<ul>
+<li>mydoc
+<ul>
+<li>文档目录名称</ul>
+
+<li>build
+<ul>
+<li>Doczen编译之后自动生成, html文档目录</ul>
+
+<li>site
+<ul>
+<li>index.html 设置文档首页<pre>&lt;script&gt;
+    window.location=&quot;doc.html&quot;;
+&lt;/script&gt;
+</pre></ul>
+
+<li>source
+<ul>
+<li>t2t文档目录, 我们把编写的文档文件都存放在这里。文档文件为t2t格式, 当我们编写的文档完成之后由 doczen 统一编译为最终的格式。
+<li>source 里面的 _static 和 _template 目录主要是针对编译之后生成 html 类型文档的外观设置
+<ul>
+<li>_static : 文档的 css 样式
+<li>_template : 文档的 html 模板</ul>
+</ul>
+
+<li>config.mk<pre>DOCZEN   = /host/icore/data/svn/doczen/doczen # Doczen 可执行文件路径
+DOC_PATH = /host/icore/data/svn/mydoc         # 文档目录
+PHP_CMD  = php                                # 需要 php 环境, 此处可以直接跟php可执行文件的全路径
+</pre>
+<li>Makefile<pre>include config.mk
+all: html
+    @echo done
+html:
+    ${DOCZEN} make-html doc.t2t
+doc:
+	${DOCZEN} make-doc doc.t2t
+txt:
+	make doc
+	txt2tags -t txt ${DOC_PATH}/build/doc/doc.t2t
+tex:
+	make doc
+	txt2tags -t tex --toc --enum-title --encoding=utf8 --style=fontspec,xunicode,xltxtra,shopex ${DOC_PATH}/build/doc/doc.t2t
+	sed -i -e 's@phics{@phics\[scale=0.6\]{${DOC_PATH}/build/doc/@g' ${DOC_PATH}/build/doc/doc.tex
+	sed -i -e 's/section\*/section/g' ${DOC_PATH}/build/doc/doc.tex
+pdf:
+	make tex
+	mkdir ${DOC_PATH}/build/pdf
+	cd ${DOC_PATH}/build/pdf; xelatex ${DOC_PATH}/build/doc/doc.tex; xelatex ${DOC_PATH}/build/doc/doc.tex
+clean:
+    rm -rf build
+</pre></li>
+</li>
+</ul>
+</li>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3><a name="id10">第二步</a></h3>
+<p><b>新建第一个文档</b></p>
+
+<p>进入工作路径<pre>/mydoc/source/
+</pre></p>
+
+<p>新建文件 doc.t2t<pre>我的文档
+ShopEx
+Wed Aug 31 18:32:59
+
+Hi! This is my test document.
+</pre></p>
+
+<p><b>注:</b> doc.t2t 这个文件通常是用来关联所有单个 t2t 文档。</p>
+<h3><a name="id11">第三步</a></h3>
+<p><b>doczen 编译</b></p>
+
+<p>终端或者cmd进入文档主目录, 输入'make'<pre>cd mydoc/
+make html
+</pre></p>
+
+<p>用浏览器打开文档首页<pre>build/html/doc.html
+</pre></p>
+<h2><a name="id12">链接文档</a></h2>
+<p>doczen 会把所有单个 t2t 文档关联到一起。</p>
+
+<p>关联文件通常使用 source下的 doc.t2t</p>
+
+<p><b>语法:</b><pre>%!link your_name.t2t max-depth=n
+</pre></p>
+
+<p>假如 source 中的目录结构是这样的<pre>  | | | |~source/
+  | | | | |~test2/
+  | | | | | |-append-a.t2t
+  | | | | | |-append-b.t2t
+  | | | | | `-index.t2t
+  | | | | |-doc.t2t
+  | | | | `-test1.t2t
+</pre></p>
+
+<p>这里 doc.t2t 中的内容如下:<pre>我的文档
+ShopEx
+Wed Aug 31 17:29:07
+
+%!link test1.t2t max-depth=1
+%!link test2/index.t2t max-depth=2
+</pre></p>
+
+<p><b>注:</b>
+<ol>
+<ol>
+<li>在 doc.t2t 中链接文档 test1.t2t , 层级显示级别为1级
+<li>在 doc.t2t 中链接文档 test2 目录中的 index.t2t , 层级显示级别为2级</li>
+</li>
+</ol>
+</ol>
+</p>
+
+<p><tt class="docutils literal"><span class="pre">source/test2/index.t2t</span></tt> 中的内容如下:<pre>test2
+
+
+%!link *.t2t max-depth=2
+</pre></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">Doczen是神马东西</a>
+    <li><a href="#id2" class="reference internal">获取方式</a>
+    <li><a href="#id3" class="reference internal">环境配置</a>
+        <ul>
+        <li><a href="#id4" class="reference internal">window</a>
+        <li><a href="#id5" class="reference internal">linux</a>
+    </ul>
+    <li><a href="#id6" class="reference internal">使用手册</a>
+        <ul>
+        <li><a href="#id7" class="reference internal">重要</a>
+    </ul>
+    <li><a href="#id8" class="reference internal">建立文档</a>
+        <ul>
+        <li><a href="#id9" class="reference internal">第一步</a>
+        <li><a href="#id10" class="reference internal">第二步</a>
+        <li><a href="#id11" class="reference internal">第三步</a>
+    </ul>
+    <li><a href="#id12" class="reference internal">链接文档</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="ecae/webshell/index.html"
+                                  title="上一章">webshell</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="misc/index.html"
+                                  title="下一章">未归档</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="misc/index.html" title="未归档" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="ecae/webshell/index.html" title="webshell" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="doc.html">ECOS百科全书</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

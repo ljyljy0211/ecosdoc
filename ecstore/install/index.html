@@ -1,0 +1,420 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      ECStore安装部署手册 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="ECStore 开发指南" href="../index.html" />
+
+        <link rel="next" title="../api" href="API.html" />
+        <link rel="prev" title="../tools/detect" href="检测ECStore基本环境.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../api.html" title="API" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../tools/detect.html" title="检测ECStore基本环境" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> ECStore安装部署手册</h1>
+            <h2><a name="id1">ECStore系统安装环境说明</a></h2>
+<p>与一般的软件不同，运行ECStore需要特殊的环境支持，如果环境不适合，则安装会无法进行。本小节包括4部分，通过本节说明，您可以了解到ECStore运行的具体环境要求与参数。</p>
+
+<ul>
+<li>安装环境要求
+<li>php环境下必须要启用的函数
+<li>Nginx下配置环境的需求
+<li>目录结构说明</li>
+</li>
+</li>
+</li>
+</ul>
+<h3><a name="id2">安装环境要求</a></h3>
+<ul>
+<li>服务器环境：Linux、Unix均可，推荐Linux
+<li>Web环境：Apache、Ngix均可，推荐Apache
+<li>语言环境：PHP 5.3.0 及以上
+<li>数据库：MySQL 5.0 及以上（如果采用MySQL数据库）
+<li>其他：Zend Guard Loader 5.5.0及以上</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+
+<p>推荐使用软件环境：Linux + Apache2.2* + PHP5.3* + MySQL5.1*</p>
+<h3><a name="id3">PHP环境下必须要启用的函数</a></h3>
+<p>在Php配置文件php.ini中设置开启如下函数，如果不开启，则某些功能会有影响
+<ul>
+<li>allow_url_fopen，
+<li>GD扩展库
+<li>MySQL扩展库
+<li>系统函数 —— phpinfo、dir</li>
+</li>
+</li>
+</li>
+</ul>
+</p>
+<h3><a name="id4">Nginx下配置环境的需求</a></h3>
+<p>ECStore采用pathinfo做资源定位，所以要求$_SERVER环境变量中必须要有PATHINFO或则ORGI_PATHINFO一般在apache或者iis下都没有什么问题，但是在nginx下需要对配置文件做一些设置才可以这些设置主要是在php fast cgi的配置文件中，设置代码为</p>
+<pre>set $real_script_name $fastcgi_script_name;
+if ($fastcgi_script_name ~ &quot;(.+?\.php)(/.+)&quot;) {
+set $real_script_name $1;
+set $path_info $2; }
+fastcgi_param SCRIPT_FILENAME $document_root$real_script_name;
+fastcgi_param SCRIPT_NAME $real_script_name;
+fastcgi_param PATH_INFO $path_info;
+</pre><h3><a name="id5">基本目录结构说明</a></h3>
+<ul>
+<li>/
+<li>../app 基于ECOS框架上建立的所有的app的集合
+<li>../config 系统配置文件目录，需要设置为可写
+<li>../data 系统运行过程中产生的数据缓存
+<li>../public 用于存放上传的图片、文本
+<li>../themes 存放ECStore的模板文件</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+<h2><a name="id6">单机环境下安装ECStore系统</a></h2>
+<p>ECStore系统只有安装后才可以正常使用，一般情况下只要满足如下三个条件就可以正常安装了。</p>
+
+<ul>
+<li>能够支持ECStore系统运行的系统环境：php环境、mysql环境。
+<li>一个可以访问到系统的域名。
+<li>拥有服务器FTP权限或者SSH权限、数据库信息。</li>
+</li>
+</li>
+</ul>
+<h3><a name="id7">linux环境搭建</a></h3>
+<p>请参照笑大师，笑的艺术之lnmp <a href="http://ec-os.net/xbox/linux/ubuntu/lnmp.html">http://ec-os.net/xbox/linux/ubuntu/lnmp.html</a></p>
+<h3><a name="id8">获得ECStore系统安装程序</a></h3>
+<p>通过ShopEx网站提供的链接或通道，获得ECStore安装程序，并解压做好上传准备。</p>
+<h3><a name="id9">获得服务器FTP权限或者SSH权限及数据库信息，并上传代码准备安装</a></h3>
+<p>一般系统运维人员会给出服务器的FTP权限或者SSH权限供您上传代码文件，登录服务器后，将文件正确的传输到系统设定的web目录下。如果采用FTP方式传输文件，请注意文件必须使用二进制模式传输。</p>
+<h3><a name="id10">开始安装</a></h3>
+<ul>
+<li>输入绑定的域名开始安装
+<p><br /><img border="0" alt="" align="middle" src="image/install01.png" /></p>
+</li>
+</ul>
+
+<ul>
+<li>点击“开始安装”，跳出“协议对话框”，点击“同意协议并下一步”
+<p><br /><img border="0" alt="" align="middle" src="image/install02.png" /></p>
+</li>
+</ul>
+
+<ul>
+<li>请填写相应的数据库配置信息以及管理员账户的设置
+<p><br /><img border="0" alt="" align="middle" src="image/install03.png" /><pre>说明：
+(1).如果数据库信息不正确，此界面中不会出现数据库名，需要与系统运维确认。
+(2).此处设置的管理员拥有系统最高权限。
+</pre></p>
+</li>
+</ul>
+
+<ul>
+<li>安装过程画面
+<p><br /><img border="0" alt="" align="middle" src="image/install04.png" /></p>
+</li>
+</ul>
+
+<ul>
+<li>安装完成，填写ShopEx通行证
+<p><br /><img border="0" alt="" align="middle" src="image/install05.png" /><br /><img border="0" alt="" align="middle" src="image/install06.png" /></p>
+</li>
+</ul>
+
+<ul>
+<li>安装完成
+<p><br /><img border="0" alt="" align="middle" src="image/install07.jpg" /></p>
+</li>
+</ul>
+
+<ul>
+<li>邀请码
+<p><br /><img border="0" alt="" align="middle" src="image/install08.png" /></p>
+</li>
+</ul>
+
+<p>附（邀请码申请方式）：<pre>  1、将需求邮件发送到：ctp@shopex.cn（接口人：郑哦秋，项目管理经理/紧急联系方式：18616792168/13918554853）
+  2、邮件需注明以下信息：
+     a、邀请码申请用途
+     b、使用多少时间（例：从2011-12-06～2012-12-06）
+     c、ECStore产品版本号（选填）
+     d、申请人（公司）
+  3、邀请码将在收到申请邮件后，1工作日内发送到申请者邮箱。（如1工作日后没有收到请联系接口人）
+</pre></p>
+<h3><a name="id11">设置data目录权限</a></h3>
+<p>Linux下在安装ECStore时会有权限问题。所以在安装成功后还要对data目录做一番“处理”。执行以下命令：</p>
+<pre>    sun@ubuntu:/www/bugfix$ sudo chmod -R 777 data/
+</pre><h2><a name="id12">用cmd方式进行安装</a></h2>
+<p>应用场景（以下场景适合用cmd方式）:</p>
+<pre>   1、用户提供ssh和管理员权限；
+   2、web安装方式不成功；
+   3、认为cmd安装方式才是最好的安装方式。
+</pre><h3><a name="id13">cmd安装方法</a></h3>
+<ul>
+<li>首先要把/ecstore/base/cmd 设置为运行权限。先定位到base下，然后运行以下命令即可：<pre>  sun@ubuntu:www/bugfix/app/base$ sudo chmod 777 cmd
+</pre></li>
+</ul>
+
+<ul>
+<li>在项目base目录下输入./cmd install b2c 开始安装<pre>  sun@ubuntu:/www/bugfix/app/base$ ./cmd install b2c
+  1. 数据库主机     localhost
+  2. 数据库用户名  roots
+  3. 数据库密码     (empty)
+  4. 数据库名
+  5. 数据库表前缀  sdb_
+  6. 默认时区        (北京时间) 北京、重庆、香港、新加坡
+________________________________________
+输入项目编号,或输入井号&quot;#&quot;确认:
+</pre></li>
+</ul>
+
+<ul>
+<li>在出现的数据库信息列表中,输入4，选择一个要安装的数据库<pre>输入项目编号,或输入井号&quot;#&quot;确认:4
+
+选择合适的数据库名:
+  1. information_schema
+  2. mysql
+  3. ecstore
+输入合适的数据库名编号:
+</pre></li>
+</ul>
+
+<ul>
+<li>输入3,按回车<pre>  1. 数据库主机     localhost
+  2. 数据库用户名  root
+  3. 数据库密码     (empty)
+  4. 数据库名        notebook
+  5. 数据库表前缀  sdb_
+  6. 默认时区        (北京时间) 北京、重庆、香港、新加坡
+________________________________________
+输入项目编号,或输入井号&quot;#&quot;确认: #
+</pre></li>
+</ul>
+
+<ul>
+<li>回到最开始的菜单，我们输入#继续安装。<pre>...
+Scanning local Applications... ok.
+Application libaray is updated, ok.
+Application base installed... ok.
+notebook &quot;zh-cn&quot; language resource stored
+Application notebook installed... ok.
+</pre></li>
+</ul>
+
+<ul>
+<li>在下面的交互框中输入后台超级管理员的用户名和密码<pre>1.用户名     admin
+2.密码       (empty)
+3.重复密码   (empty)
+</pre></li>
+</ul>
+
+<ul>
+<li>分别输入2，3后输入密码和重复密码后按回车<pre>1.用户名     admin
+2.密码       *****
+3.重复密码   *****
+________________________________________
+输入项目编号,或输入井号&quot;#&quot;确认: 
+</pre></li>
+</ul>
+
+<ul>
+<li>输入#继续安装<pre>...
+Installing widgets b2c:im
+Installing widgets b2c:goodscat
+Register b2c meta
+Initial b2c
+Init b2c member
+Application b2c installed...ok.
+</pre></li>
+</ul>
+
+<ul>
+<li>经过以上步骤后，ecstore就安装成功了。要安装体验数据请看下面文档。</li>
+</ul>
+<h3><a name="id14">安装体验数据</a></h3>
+<ul>
+<li>输入以下命令，开始安装体验数据<pre>sun@ubuntu:/www/bugfix/app/base$ ./cmd install install_demodata
+
+1.是否安装体验数据    安装体验数据
+________________________________________
+输入项目编号,或输入井号&quot;#&quot;确认: 
+</pre></li>
+</ul>
+
+<ul>
+<li>输入1，按回车出现下面画面：<pre>选择合适的是否安装体验数据：
+1.不安装体验数据
+2.安装体验数据
+________________________________________
+输入合适的是否安装体验数据编号：
+</pre></li>
+</ul>
+
+<ul>
+<li>输入编号2，按回车,回到开始的菜单按#开始安装体验数据<pre>Import demo data
+...
+Application demodata installed... ok.
+</pre></li>
+</ul>
+
+<ul>
+<li>稍等片刻后，体验数据安装成功。</li>
+</ul>
+<h2><a name="id15">"神器"webshell的使用</a></h2>
+<p>应用场景:<pre>1、没有ssh权限。
+2、web安装方式不成功。
+3、想膜拜一下webshell。
+</pre></p>
+
+<p>请参照webshell文档 <a href="http://ec-os.net/ecae/webshell/index.html#id3">http://ec-os.net/ecae/webshell/index.html#id3</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">ECStore系统安装环境说明</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">安装环境要求</a>
+        <li><a href="#id3" class="reference internal">PHP环境下必须要启用的函数</a>
+        <li><a href="#id4" class="reference internal">Nginx下配置环境的需求</a>
+        <li><a href="#id5" class="reference internal">基本目录结构说明</a>
+    </ul>
+    <li><a href="#id6" class="reference internal">单机环境下安装ECStore系统</a>
+        <ul>
+        <li><a href="#id7" class="reference internal">linux环境搭建</a>
+        <li><a href="#id8" class="reference internal">获得ECStore系统安装程序</a>
+        <li><a href="#id9" class="reference internal">获得服务器FTP权限或者SSH权限及数据库信息，并上传代码准备安装</a>
+        <li><a href="#id10" class="reference internal">开始安装</a>
+        <li><a href="#id11" class="reference internal">设置data目录权限</a>
+    </ul>
+    <li><a href="#id12" class="reference internal">用cmd方式进行安装</a>
+        <ul>
+        <li><a href="#id13" class="reference internal">cmd安装方法</a>
+        <li><a href="#id14" class="reference internal">安装体验数据</a>
+    </ul>
+    <li><a href="#id15" class="reference internal">"神器"webshell的使用</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../tools/detect.html"
+                                  title="上一章">检测ECStore基本环境</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../api.html"
+                                  title="下一章">API</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../api.html" title="API" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../tools/detect.html" title="检测ECStore基本环境" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

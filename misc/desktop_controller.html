@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      desktop_controller &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="未归档" href="index.html" />
+
+        <link rel="next" title="archlinux" href="archlinux.html" />
+        <link rel="prev" title="order/save_order" href="订单.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="archlinux.html" title="archlinux" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="order/save_order.html" title="订单" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> desktop_controller</h1>
+            <h2><a name="id1">desktop_controller提供的函数方法</a></h2><h3><a name="id2">__construct</a></h3>
+<ol>
+<li>定义后台不使用缓存
+<li>开启session，因此如果是调用了desktop_controller需要用到session的时候不需要在开启session;
+<li>判断自动登录
+<li>判断登录者的权限
+<li>获取注册service desktop_controller_content.*：修改输出内容
+<li>获取注册service desktop_controller_content_finderdetail.****，修改tab detail 里的内容</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ol>
+<h3><a name="id3">redirect</a></h3>
+<p>直接跳转到指定地址<pre class="mark">参数
+    array   $url
+
+返回
+   null
+</pre></p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">...<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">redirect</span><span style="color: #007700">(array(</span><span style="color: #DD0000">'app'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'desktop'</span><span style="color: #007700">,</span><span style="color: #DD0000">'ctl'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'admin_default'</span><span style="color: #007700">,</span><span style="color: #DD0000">'act'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'index'</span><span style="color: #007700">));<br />&nbsp;&nbsp;&nbsp;&nbsp;...<br /></span>
+</span>
+</code></div><h3><a name="id4">location_to</a></h3>
+<p>跳转到当前页面<pre class="mark">function location_to()
+</pre></p>
+<h3><a name="id5">finder</a></h3>
+<p>显示后台列表函数</p>
+
+<p><a href="http://www.ec-os.net/advance/desktop/index.html#id5">http://www.ec-os.net/advance/desktop/index.html#id5</a></p>
+<h3><a name="id6">url_frame</a></h3>
+<p>后台的列表区域自定义iframe<pre>function index(){
+   $this-&gt;url_frame('www.baidu.com');
+}
+</pre><br /><img border="0" alt="" align="middle" src="image/url_frame.png" /></p>
+<h3><a name="id7">singlepage</a></h3>
+<p>显示页面,默认配合target=_blank使用时，显示的页面不包含框架的其他页面，只是本身页面</p>
+<pre>'href'=&gt;'index.php?app=b2c&amp;ctl=admin_goods_editor&amp;act=add',
+'target'=&gt;'_blank'),
+...
+$this-&gt;singlepage('admin/goods/detail/frame.html');
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="image/singlepage.png" /></p>
+<h3><a name="id8">page</a></h3>
+<p>显示页面,如果page配合target=_blank使用时,显示的页面包含在框架里面，显示在后台的自定义列表中</p>
+
+<p>如果是page配合target=dialog使用时，则显示的是弹出层页面（display配合target=dialog使用时也有同样的效果）</p>
+
+<p>例1<pre>'href'=&gt;'index.php?app=b2c&amp;ctl=admin_goods_editor&amp;act=add',
+'target'=&gt;'_blank'),
+...
+$this-&gt;page('admin/goods/detail/frame.html');
+</pre><br /><img border="0" alt="" align="middle" src="image/desktop_page.png" /></p>
+
+<p>例2<pre>'href'=&gt;'index.php?app=b2c&amp;ctl=admin_member&amp;act=add_page','target'=&gt;'dialog::{title:\''.
+app::get('b2c')-&gt;_('添加会员').'\',width:460,height:460}'),
+...
+$this-&gt;page('admin/member/new.html');
+</pre><br /><img border="0" alt="" align="middle" src="image/display.png" /></p>
+<h3><a name="id9">splash</a></h3>
+<p>信息提示，ajax输出,begin end方法信息输出调用此方法</p>
+<pre class="mark">function splash($status='success',$url=null,$msg=null,$method='redirect',$params=array())
+
+参数
+    string  $status=error是输出错误信息，默认输出正确提示信息
+    string  $url自定义拼接的URL,一般为空
+    string  $msg要输出的信息
+    string  $method
+    array   $params当参数为array('splash'=&gt;'1') 时，则表示只是输出自定义信息
+</pre>
+<p>例1<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #FF8000">//输出正确信息<br /></span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">splash</span><span style="color: #007700">(</span><span style="color: #DD0000">'success'</span><span style="color: #007700">,</span><span style="color: #DD0000">''</span><span style="color: #007700">,</span><span style="color: #DD0000">'正确信息'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">//输出错误信息<br /></span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">splash</span><span style="color: #007700">(</span><span style="color: #DD0000">'error'</span><span style="color: #007700">,</span><span style="color: #DD0000">''</span><span style="color: #007700">,</span><span style="color: #DD0000">'错误信息'</span><span style="color: #007700">,</span><span style="color: #DD0000">'redirect'</span><span style="color: #007700">,array(</span><span style="color: #DD0000">'splash'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'1'</span><span style="color: #007700">));<br /></span>
+</span>
+</code></div></p>
+<h3><a name="id10">jumpTo</a></h3>
+<p>跳转到当前app的，控制器中的某个方法中进行运行<pre class="mark">function jumpTo($act='index',$ctl=null,$args=null){
+参数
+    string  $act控制器中的方法名
+    string  $ctl控制器名
+    array   $args参数
+</pre></p>
+<h3><a name="id11">has_permission</a></h3>
+<p>判断当前用户的权限</p>
+<h3><a name="id12">display</a></h3>
+<p>display和base_render中的display方法一样</p>
+
+<p>display配合target=dialog使用时，显示的页面为弹出层<pre>'href'=&gt;'index.php?app=b2c&amp;ctl=admin_member&amp;act=add_page','target'=&gt;'dialog::{title:\''.
+app::get('b2c')-&gt;_('添加会员').'\',width:460,height:460}'),
+...
+$this-&gt;display('admin/member/new.html');
+</pre><br /><img border="0" alt="" align="middle" src="image/display.png" /></p>
+<h3><a name="id13">pre_display</a></h3>
+<p>和base_render中的pre_display方法一样，只是注册的service是不一样的.</p>
+
+<p>这个service是desktop_render_pre_display</p>
+<h2><a name="id14">desktop_controller提供的service</a></h2><h3><a name="id15">app_pre_auth_use</a></h3>
+<p>后台登录之前的预先验证，可以在扩展此service在登录的之前做一些操作此servic是desktop_controller的构造方法提供</p>
+<h3><a name="id16">desktop_controller_content.%s.%s.%s</a></h3>
+<p>这个service常用到的service ID是 desktop_controller_content.desktop.default.index。因为这个service是在构造方法提供的，一般用于的是对后台统一的页面的修改，例如：<a href="https://ec-os.net/advance/desktop/dev.html#id18">修改后台logo</a></p>
+
+<p>可参考：site_controller_content.%s.$s.$s 只是这个是前台而desktop_controller_content.%s.%s.%s是后台</p>
+
+<p>service类的写法<pre class="mark">modify方法：和site_controller_content service类的写法一样
+boot方法：一般修改或则设置后台系统共用的一些配置，最后返回true
+</pre></p>
+<h3><a name="id17">desktop_controller_content_finderdetail.%s.%s.%s.%s</a></h3>
+<p>修改tab detail里的内容</p>
+<h3><a name="id18">desktop_controller_destruct</a></h3>
+<p>deskop_controller_destruct 是desktop_controller提供的析构方法例如：Ecstore中的后台中操作日志中记录管理员日志就是用这个service做的</p>
+
+<p>注册service<pre>···
+&lt;servic id=&quot;desktop_controller_destruct&quot;&gt;
+    &lt;class&gt;operatorlogmanage_service_desktop_controller&lt;/class&gt;
+&lt;/servic&gt;
+···
+</pre></p>
+
+<p>类的写法<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">operatorlogmanage_service_desktop_controller</span><span style="color: #007700">{<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">destruct</span><span style="color: #007700">(</span><span style="color: #0000BB">$controller</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//$controller是控制器中的所有属性&nbsp;$this<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">_logs</span><span style="color: #007700">(</span><span style="color: #0000BB">$controller</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">_logs</span><span style="color: #007700">(</span><span style="color: #0000BB">$controller</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//需要执行的代码&nbsp;不需要返回值<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">}<br /><br />}<br /></span>
+</span>
+</code></div></p>
+<h3><a name="id19">desktop_controller_display.%s.%s.%s</a></h3>
+<p>作用：控制器劫持，页面劫持</p>
+
+<p>这个是service是由desktop_controller中的page方法和singlepage方法提供，因此要使用此service则必须是</p>
+
+<p>，要劫持的控制中调用了page或则是singlepage方法，这样才能够进行页面劫持或则是控制器劫持</p>
+
+<p>用法：</p>
+
+<p>参考：1、<a href=" http://www.ec-os.net/best-practice/sun_ctl_hijack.html">控制器劫持</a>，2、页面劫持参考site_controller_display.%s.%s.%s</p>
+
+<p>desktop_controller_display.%s.%s.%s 用法和site_controller_display.%s.%s.%s原理是一样的，只是一个是后台一个是前台</p>
+<h3><a name="id20">tpl_source.</a></h3>
+<p>参照base_controller中的base_render中的tpl_source.方法，用法写法一样</p>
+<h3><a name="id21">desktop_render_pre_display</a></h3>
+<p>参照base_controller中的base_render中的deskop_render_pre_display方法，用法写法一样</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">desktop_controller提供的函数方法</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">__construct</a>
+        <li><a href="#id3" class="reference internal">redirect</a>
+        <li><a href="#id4" class="reference internal">location_to</a>
+        <li><a href="#id5" class="reference internal">finder</a>
+        <li><a href="#id6" class="reference internal">url_frame</a>
+        <li><a href="#id7" class="reference internal">singlepage</a>
+        <li><a href="#id8" class="reference internal">page</a>
+        <li><a href="#id9" class="reference internal">splash</a>
+        <li><a href="#id10" class="reference internal">jumpTo</a>
+        <li><a href="#id11" class="reference internal">has_permission</a>
+        <li><a href="#id12" class="reference internal">display</a>
+        <li><a href="#id13" class="reference internal">pre_display</a>
+    </ul>
+    <li><a href="#id14" class="reference internal">desktop_controller提供的service</a>
+        <ul>
+        <li><a href="#id15" class="reference internal">app_pre_auth_use</a>
+        <li><a href="#id16" class="reference internal">desktop_controller_content.%s.%s.%s</a>
+        <li><a href="#id17" class="reference internal">desktop_controller_content_finderdetail.%s.%s.%s.%s</a>
+        <li><a href="#id18" class="reference internal">desktop_controller_destruct</a>
+        <li><a href="#id19" class="reference internal">desktop_controller_display.%s.%s.%s</a>
+        <li><a href="#id20" class="reference internal">tpl_source.</a>
+        <li><a href="#id21" class="reference internal">desktop_render_pre_display</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="order/save_order.html"
+                                  title="上一章">订单</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="archlinux.html"
+                                  title="下一章">archlinux</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="archlinux.html" title="archlinux" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="order/save_order.html" title="订单" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

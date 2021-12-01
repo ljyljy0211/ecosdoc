@@ -1,0 +1,365 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      base_db_model &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../../doc.html" />
+    <link rel="up" title="模型(model)" href="../m.html" />
+
+        <link rel="next" title="base_db_connections" href="数据库操作类base_db_connections(强烈不建议直接调用).html" />
+        <link rel="prev" title="dbschema" href="dbschema 数据库表定义文件.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="base_db_connections.html" title="数据库操作类base_db_connections(强烈不建议直接调用)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="dbschema.html" title="dbschema 数据库表定义文件" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">MVC框架</a> &raquo;
+        </li>
+                <li>
+          <a href="../m.html">模型(model)</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> base_db_model</h1>
+            
+<p>base_db_model为Ecos的最基本的model基类</p>
+<h2><a name="id1">如何创建自己的model</a></h2><h3><a name="id2">model的命名规则</a></h3>
+<p>{$app_id}_mdl_{$mod_path}<pre class="mark">例如:
+model: b2c_mdl_cart_objects
+$app_id = b2c
+$mod_path = cart/objects.php
+</pre></p>
+<h3><a name="id3">model存放位置</a></h3>
+<p>app/{$app_id}/model/{mod_path}/<pre class="mark">例如:
+b2c_mdl_cart_objects
+存放位置: app/b2c/model/cart/objects.php
+</pre></p>
+<h3><a name="id4">创建自己的model</a></h3><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">base_mdl_apps&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">base_db_model</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;...<br />}<br /></span>
+</span>
+</code></div><h2><a name="id5">如何取得model对象</a></h2>
+<ul>
+<li>获取本app的model
+<p>在本app的model/controller里如果需要获取本app的model对象时可用以下方法<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$model&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">();<br /></span>
+</span>
+</code></div>
+<li>获取其他app的model<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$model&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">(</span><span style="color: #0000BB">$model</span><span style="color: #007700">);<br /></span>
+</span>
+</code></div></li>
+</p>
+</li>
+</ul>
+<h2><a name="id6">如何在model中获取数据库操作对象</a></h2>
+<p>有两种方式:</p>
+
+<ul>
+<li>通过调用基类成员变量$db
+<p>例如:<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">notebook_mdl_notebooks&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">base_db_model&nbsp;</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">show_one</span><span style="color: #007700">(</span><span style="color: #0000BB">$goods_id</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$sql&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">sprintf</span><span style="color: #007700">(</span><span style="color: #DD0000">'select&nbsp;name&nbsp;from&nbsp;sdb_b2c_goods&nbsp;where&nbsp;goods_id=%s'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$goods_id</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$result&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">db</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">select</span><span style="color: #007700">(</span><span style="color: #0000BB">$sql</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$result</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;}<br />}<br /></span>
+</span>
+</code></div>
+<li>通过kernel::database()直接获取数据库操作对象;<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">notebook_mdl_notebooks&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">base_db_model&nbsp;</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">show_one</span><span style="color: #007700">(</span><span style="color: #0000BB">$goods_id</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$sql&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">sprintf</span><span style="color: #007700">(</span><span style="color: #DD0000">'select&nbsp;name&nbsp;from&nbsp;sdb_b2c_goods&nbsp;where&nbsp;goods_id=%s'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$goods_id</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$result&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">database</span><span style="color: #007700">()-&gt;</span><span style="color: #0000BB">select</span><span style="color: #007700">(</span><span style="color: #0000BB">$sql</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$result</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;}<br /><br /></span>
+</span>
+</code></div></li>
+</p>
+</li>
+</ul>
+
+<p>默认的数据库操作类为base_db_connections</p>
+
+<p>要替换默认的数据库操作类, 可以在config/config.php中添加/修改<pre>define(DATABASE_OBJECT, 'db_class_name');
+</pre></p>
+<h2><a name="id7">函数接口</a></h2><h3><a name="id8">filter</a></h3>
+<p>filter顾名思义为过滤器. 当使用base_db_model所供给的函数getList/count/delete时, 都会隐性调用filter函数, 进行过滤.</p>
+
+<p>一个简单的直观感觉<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$filter&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'sex'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'male'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'age'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array&nbsp;(</span><span style="color: #0000BB">23</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">45</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">54</span><span style="color: #007700">)<br />&nbsp;&nbsp;&nbsp;&nbsp;);<br /></span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">delete</span><span style="color: #007700">(</span><span style="color: #0000BB">$filter</span><span style="color: #007700">);<br /></span>
+</span>
+</code></div></p>
+
+<p>可猜测以上代码的意图, 删除性别为男性, 年龄为23或45或54的记录.</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />clsss&nbsp;base_db_model&nbsp;</span><span style="color: #007700">implements&nbsp;</span><span style="color: #0000BB">base_interface_model</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">delete</span><span style="color: #007700">(</span><span style="color: #0000BB">$filter</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$sql&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'DELETE&nbsp;FROM&nbsp;`'</span><span style="color: #007700">.</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">table_name</span><span style="color: #007700">(</span><span style="color: #0000BB">1</span><span style="color: #007700">).</span><span style="color: #DD0000">'`&nbsp;where&nbsp;'</span><span style="color: #007700">.</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">filter</span><span style="color: #007700">(</span><span style="color: #0000BB">$filter</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">db</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">exec</span><span style="color: #007700">(</span><span style="color: #0000BB">$sql</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">skipModifiedMark</span><span style="color: #007700">)){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}else{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;...<br />}<br /></span>
+</span>
+</code></div>
+<p>看一下delete函数代码,可知filter将返回sql语句中where子句的部分</p>
+
+<p>在上例中, filter函数将返回<pre> sex='male' and (age=23 or age=45 or age=54)
+</pre>base_db_model提供的filter函数只做最基本的处理, 将$filter数组(参数), 数组单元里值为非数组的做and 拼接, 数组单元里值为数组的做 or拼接.</p>
+
+<p>如果你有特殊需求, 比方说你要处理一个虚拟列, 可以在你些的model里重载filter函数</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">notebook_mdl_notebooks&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">base_db_model&nbsp;</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">filter</span><span style="color: #007700">(</span><span style="color: #0000BB">$filter</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(isset(</span><span style="color: #0000BB">$filter</span><span style="color: #007700">[</span><span style="color: #DD0000">'_double_age'</span><span style="color: #007700">]){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$where&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">sprintf</span><span style="color: #007700">(</span><span style="color: #DD0000">'&nbsp;age=%s&nbsp;and&nbsp;'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unset(</span><span style="color: #0000BB">$filter</span><span style="color: #007700">[</span><span style="color: #DD0000">'_test'</span><span style="color: #007700">]);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$return&nbsp;$where</span><span style="color: #007700">.</span><span style="color: #0000BB">parent</span><span style="color: #007700">::</span><span style="color: #0000BB">filter</span><span style="color: #007700">()<br />&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;...<br />}<br /></span>
+</span>
+</code></div><pre class="mark">参数
+	array $filter 过滤条件
+返回
+	string 返回sql语句where子句
+</pre><h3><a name="id9">table_name</a></h3>
+<p>获取此model对应表的表名</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">notebook_mdl_notebooks&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">base_db_model&nbsp;</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//注意，此处方法名不可与父类方法同名<br />&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">function&nbsp;</span><span style="color: #0000BB">tablename</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">table_name</span><span style="color: #007700">(</span><span style="color: #0000BB">true</span><span style="color: #007700">));&nbsp;&nbsp;</span><span style="color: #FF8000">//完整表名<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">table_name</span><span style="color: #007700">(</span><span style="color: #0000BB">false</span><span style="color: #007700">));&nbsp;&nbsp;</span><span style="color: #FF8000">//short表名<br />&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">}<br />&nbsp;&nbsp;&nbsp;...<br />}<br /><br /></span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'notebook'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">(</span><span style="color: #DD0000">'notebooks'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">tablename</span><span style="color: #007700">();<br /></span>
+</span>
+</code></div><pre>sdb_notebook_notebooks
+notebooks
+</pre><pre class="mark">参数
+	bool $real 是否要完整的表名
+返回
+	表名
+</pre><h3><a name="id10">getList</a></h3>
+<p>获取model对应表的单/多行数据, 可根据需要重载</p>
+
+<p>$orderby参数设置排序方式, 会拼接到order by语句后, 可以是数组也可以是字符串. 数组只能设置一种排序方式, 字符串更为灵活</p>
+
+<p>数组:<pre>$orderby = array('name', 'desc');
+</pre></p>
+
+<p>字符串:<pre>$orderby = 'name desc, id asc, p_order';
+</pre><hr noshade size="5">例如:<pre>var_dump($this-&gt;getList('name, sex', array(), 0, 3,'name desc,id asc'));
+</pre>输出<pre>array(
+	0 =&gt; array('name' =&gt; 'laoda', sex=&gt;'male',
+	1 =&gt; array('name' =&gt; 'laoer', sex=&gt;'femail'
+	)
+</pre></p>
+<pre class="mark">参数
+	string $cols 设置要取哪些列的数据
+	array $filter 过滤条件,默认为array()
+	integer $offset 偏移量,从select出的第几条数据开始取
+	integer $limit 取几条数据, 默认值为-1, 取所有select出的数据
+	string/array $orderby 排序方式, 默认为无排序
+返回
+	array 二维数组, 多行数据, 每行数据对应表的以行, 所取列由$cols参数控制
+</pre><h3><a name="id11">tidy_data</a></h3>
+<p>多行数据, 在dbschema的type定义为serialize的数据, unserialize.</p>
+
+<p>通过getList取出的数据, 已经经过此处理. 此种处理通常应用于直至通过<b>db calss</b> select的数据</p>
+<pre class="mark">参数:
+	array $rows 通过getList出的数据
+	array $cols 需要取的列
+</pre><h3><a name="id12">count</a></h3>
+<p>通过过滤器,取得对应表的数据行数</p>
+<pre class="mark">参数:
+	array $filter 过滤条件
+返回:
+	integer 行数
+</pre><pre>app::get('notebook')-&gt;model('notebooks')-&gt;count($filter); //根据$filter条件
+</pre><h3><a name="id13">get_schema</a></h3>
+<p>获取数据库定义文件:$app/dbschema/$model_name定义的dbschema数组</p>
+<pre class="mark">返回:
+	array dbschema定义文件定义的数组
+</pre><h3><a name="id14">searchOptions</a></h3>
+<p>返回在dbschema定义文件中定义为搜索项的列(列属性里定义有searchtype), 详细可见<a href="dbschema.html#id25">dbschema数据库表定义文件</a>. 可以在自己的model中进行重载.</p>
+<pre class="mark">返回:
+	array 提供搜索的列
+</pre><h3><a name="id15">replace</a></h3>
+<p>更新model所对应表的多行数据</p>
+<pre class="mark">参数:
+	array $data 一维数组, 代表model对应表的一行数据
+	array $filter 过滤条件
+</pre><h3><a name="id16">update</a></h3>
+<p>更新model所对应表的多行数据</p>
+<pre>$data = array(
+            'name'=&gt;'wuwei',
+            'sex'=&gt;'male',
+        );
+$filter = array('id'=&gt;10);
+$this-&gt;update($data,$filter);
+</pre><pre class="mark">参数:
+	array $data 一维数组, 代表model对应表的一行数据
+	array $filter 过滤条件
+返回
+    成功    更新影响的条数
+    失败    false
+</pre><h3><a name="id17">save</a></h3>
+<p>保存数据,如果需要保存的数据中的字段存在主键，就会以主键为条件，执行更新操作。否则进行插入操作。<pre>$data = array(
+            'id'=&gt;10,
+            'name'=&gt;'sunjingrong',
+            'sex'=&gt;'male',
+        );
+$this-&gt;save($data);
+</pre><pre class="mark">参数
+    array   $data   新增/更新行数据
+返回
+    成功    1
+    失败    false
+</pre></p>
+<h3><a name="id18">insert</a></h3>
+<p>插入单行数据, 会根据dbschema的type做转义处理</p>
+<pre>$data = array('name' =&gt; 'bryant', 'sex' =&gt; 'male');
+$this-&gt;insert($data);
+</pre><pre class="mark">参数
+    array $data 新增行数库
+返回
+    bool|integer    如果插入成功且此表只有一个主键返回插入的主键ID号,
+                    如果插入成功且此表有多个主键则返回true,失败返回false
+</pre><h3><a name="id19">delete</a></h3>
+<p>删除指定单/多行</p>
+<pre>$filter = array('id'=&gt;10);
+$this-&gt;delete($filter);
+</pre><pre class="mark">参数
+    array $filter 过滤条件
+返回
+    bool 删除成功或失败
+</pre>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">如何创建自己的model</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">model的命名规则</a>
+        <li><a href="#id3" class="reference internal">model存放位置</a>
+        <li><a href="#id4" class="reference internal">创建自己的model</a>
+    </ul>
+    <li><a href="#id5" class="reference internal">如何取得model对象</a>
+    <li><a href="#id6" class="reference internal">如何在model中获取数据库操作对象</a>
+    <li><a href="#id7" class="reference internal">函数接口</a>
+        <ul>
+        <li><a href="#id8" class="reference internal">filter</a>
+        <li><a href="#id9" class="reference internal">table_name</a>
+        <li><a href="#id10" class="reference internal">getList</a>
+        <li><a href="#id11" class="reference internal">tidy_data</a>
+        <li><a href="#id12" class="reference internal">count</a>
+        <li><a href="#id13" class="reference internal">get_schema</a>
+        <li><a href="#id14" class="reference internal">searchOptions</a>
+        <li><a href="#id15" class="reference internal">replace</a>
+        <li><a href="#id16" class="reference internal">update</a>
+        <li><a href="#id17" class="reference internal">save</a>
+        <li><a href="#id18" class="reference internal">insert</a>
+        <li><a href="#id19" class="reference internal">delete</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="dbschema.html"
+                                  title="上一章">dbschema 数据库表定义文件</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="base_db_connections.html"
+                                  title="下一章">数据库操作类base_db_connections(强烈不建议直接调用)</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="base_db_connections.html" title="数据库操作类base_db_connections(强烈不建议直接调用)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="dbschema.html" title="dbschema 数据库表定义文件" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">MVC框架</a> &raquo;
+        </li>
+                <li>
+          <a href="../m.html">模型(model)</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

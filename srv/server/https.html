@@ -1,0 +1,236 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      https加密站点(nginx配置ssl证书) &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="集群部署文档" href="index.html" />
+
+        <link rel="next" title="lvs" href="负载均衡.html" />
+        <link rel="prev" title="lnmp/mysql" href="mysql.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="lvs.html" title="负载均衡" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="lnmp/mysql.html" title="mysql" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">集群部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> https加密站点(nginx配置ssl证书)</h1>
+            <h2><a name="id1">设置nginx</a></h2>
+<p>编译nginx时启用HttpSslModule模块，nginx版本需要0.8.7以上，我们集群中的已经编译好了<pre>./configure –user=www –group=www –prefix=/usr/local/nginx –with-http_ssl_module
+</pre>进入要创建证书和私钥的目录<pre>cd /usr/local/webserver/nginx/conf
+</pre>创建服务器私钥<pre>openssl genrsa -des3 -out server.key 1024
+</pre>创建证书签名请求 (CSR):<pre>openssl req -new -key server.key -out server.csr
+</pre>提交给 ssl 提供商的时候就是这个 csr 文件 。<pre>cp server.key server.key.org
+openssl rsa -in server.key.org -out server.key
+</pre>最后签署证书使用上述的私钥和CSR:<pre>openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+</pre>更新nginx站点文件<pre>server
+{
+        listen       80;
+        server_name  ecstore-bugfix;
+            rewrite ^(.*) https://$host$1 permanent;
+}
+server
+{
+        server_name  ecstore-bugfix;
+        #listen 80;
+        listen 443;
+
+        root  /data/www/ecstore-bugfix;
+        index index.html index.htm index.php;
+
+        ssl on;
+        ssl_certificate     /srv/nginx/conf/server.crt;
+        ssl_certificate_key /srv/nginx/conf/server.key;
+
+        if (!-e $request_filename) {
+                rewrite ^/(.*)$ /index.php/$1 last;
+                break;
+        }
+
+        location ~ \.php
+        {
+                fastcgi_param HTTPS on;
+                include php_fcgi.conf;
+                include pathinfo.conf;
+        }
+
+        location ~ .*\.(gif|jpg|jpeg|png|bmp|swf)$
+        {
+                expires      30d;
+        }
+
+        location ~ .*\.(js|css)?$
+        {
+                expires      1h;
+        }
+}
+</pre>重启 nginx</p>
+<h2><a name="id2">修改lvs</a></h2>
+<p>修改前记得关闭<pre>vim /etc/rc.d/init.d/lvs-server
+
+#!/bin/sh
+# lvs - this script starts and stops the lvs
+#
+# chkconfig:   - 85 15
+# description:  LVS/NAT
+VIP=192.168.51.119
+RIP1=10.0.0.2
+RIP2=10.0.0.3
+    case &quot;$1&quot; in
+    start)
+        echo &quot;Start LVS of DirectorServer&quot;
+        echo &quot;1&quot; &gt; /proc/sys/net/ipv4/ip_forward
+        #Set Lvs
+        /sbin/ipvsadm -A -t $VIP:443 -s rr
+        /sbin/ipvsadm -a -t $VIP:443 -r $RIP1:443 -m
+        /sbin/ipvsadm -a -t $VIP:443 -r $RIP2:443 -m
+        #Run Lvs
+        /sbin/ipvsadm
+    ;;
+    stop)
+        echo &quot;Close LVS Directorserver&quot;
+        echo &quot;0&quot; &gt; /proc/sys/net/ipv4/ip_forward
+        /sbin/ipvsadm -C
+    ;;
+    *)
+        echo &quot;Usage. $0 {start|stop}&quot;
+        exit 1
+    esac
+</pre>启动lvs，访问主机：<a href="https://192.168.51.119">https://192.168.51.119</a></p>
+<h2><a name="id3">ecstore-bugfix config.php</a></h2><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/**<br />&nbsp;*&nbsp;ShopEx&nbsp;licence<br />&nbsp;*<br />&nbsp;*&nbsp;@copyright&nbsp;&nbsp;Copyright&nbsp;(c)&nbsp;2005-2010&nbsp;ShopEx&nbsp;Technologies&nbsp;Inc.&nbsp;(http://www.shopex.cn)<br />&nbsp;*&nbsp;@license&nbsp;&nbsp;http://ecos.shopex.cn/&nbsp;ShopEx&nbsp;License<br />&nbsp;*/<br /><br />/**<br />&nbsp;*&nbsp;网店配置模板<br />&nbsp;*<br />&nbsp;*&nbsp;版本&nbsp;$Id:&nbsp;config.sample.php&nbsp;37482&nbsp;2009-12-08&nbsp;10:54:56Z&nbsp;ever&nbsp;$<br />&nbsp;*&nbsp;配置参数讨论专贴&nbsp;http://www.shopex.cn/bbs/thread-61957-1-1.html<br />&nbsp;*/<br /><br /><br />//&nbsp;**&nbsp;数据库配置&nbsp;**&nbsp;//<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'DB_USER'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'root'</span><span style="color: #007700">);&nbsp;&nbsp;</span><span style="color: #FF8000">#&nbsp;数据库用户名<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'DB_PASSWORD'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'123456'</span><span style="color: #007700">);&nbsp;</span><span style="color: #FF8000">#&nbsp;数据库密码<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'DB_NAME'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'ecstore_bugfix'</span><span style="color: #007700">);&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">#&nbsp;数据库名<br /><br />#&nbsp;数据库服务器&nbsp;--&nbsp;99%&nbsp;的情况下您不需要修改此参数<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'DB_HOST'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'localhost'</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">//define('DB_PCONNECT',1);&nbsp;#是否启用数据库持续连接？<br /><br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'WITH_REWRITE'</span><span style="color: #007700">,</span><span style="color: #0000BB">true</span><span style="color: #007700">);<br /><br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'STORE_KEY'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">''</span><span style="color: #007700">);&nbsp;</span><span style="color: #FF8000">#密钥<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'DB_PREFIX'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'sdb_'</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">#define('LANG',&nbsp;'');<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'DEFAULT_TIMEZONE'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'8'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'WITHOUT_CACHE'</span><span style="color: #007700">,</span><span style="color: #0000BB">true</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">#define('PAGE_CACHE_LOG',&nbsp;false);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'WITHOUT_KVSTORE_PERSISTENT'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">#启用触发器日志:&nbsp;home/logs/trigger.php<br />//define&nbsp;('TRIGGER_LOG',true);<br />//define&nbsp;('DISABLE_TRIGGER',true);&nbsp;#禁用触发器<br /><br />/*&nbsp;以下为调优参数&nbsp;*/<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'DB_CHARSET'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'utf8'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'DB_COLLATE'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">''</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'DEBUG_JS'</span><span style="color: #007700">,</span><span style="color: #0000BB">false</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'DEBUG_CSS'</span><span style="color: #007700">,</span><span style="color: #0000BB">false</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'ROOT_DIR'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">realpath</span><span style="color: #007700">(</span><span style="color: #0000BB">dirname</span><span style="color: #007700">(</span><span style="color: #0000BB">__FILE__</span><span style="color: #007700">).</span><span style="color: #DD0000">'/../'</span><span style="color: #007700">));<br /><br /></span><span style="color: #FF8000">//安全模式启用后将禁用插件<br />//define('SAFE_MODE',false);<br /><br />#您可以更改这个目录的位置来获得更高的安全性<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'DATA_DIR'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">ROOT_DIR</span><span style="color: #007700">.</span><span style="color: #DD0000">'/data'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'THEME_DIR'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">ROOT_DIR</span><span style="color: #007700">.</span><span style="color: #DD0000">'/themes'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'PUBLIC_DIR'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">ROOT_DIR</span><span style="color: #007700">.</span><span style="color: #DD0000">'/public'</span><span style="color: #007700">);&nbsp;&nbsp;</span><span style="color: #FF8000">#同一主机共享文件<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'MEDIA_DIR'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">PUBLIC_DIR</span><span style="color: #007700">.</span><span style="color: #DD0000">'/images'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'SECACHE_SIZE'</span><span style="color: #007700">,</span><span style="color: #DD0000">'15M'</span><span style="color: #007700">);&nbsp;</span><span style="color: #FF8000">#缓存大小,最大不能超过1G<br />//define('TEMPLATE_MODE','database');<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">"MAIL_LOG"</span><span style="color: #007700">,</span><span style="color: #0000BB">false</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'DEFAULT_INDEX'</span><span style="color: #007700">,</span><span style="color: #DD0000">''</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'SERVER_TIMEZONE'</span><span style="color: #007700">,</span><span style="color: #0000BB">8</span><span style="color: #007700">);&nbsp;</span><span style="color: #FF8000">#服务器时区<br />//define('APP_ROOT_PHP','index.php');&nbsp;#iis&nbsp;5<br />//define('HTTP_PROXY','127.0.0.1:8888');<br /></span><span style="color: #007700">@</span><span style="color: #0000BB">ini_set</span><span style="color: #007700">(</span><span style="color: #DD0000">'memory_limit'</span><span style="color: #007700">,</span><span style="color: #DD0000">'32M'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'WITHOUT_GZIP'</span><span style="color: #007700">,</span><span style="color: #0000BB">false</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'WITHOUT_STRIP_HTML'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">#&nbsp;Session&nbsp;配置<br />#&nbsp;define('SESS_NAME',&nbsp;'s');&nbsp;&nbsp;&nbsp;#used&nbsp;as&nbsp;cookie&nbsp;name<br />#&nbsp;define('SESS_CACHE_EXPIRE',&nbsp;60);&nbsp;&nbsp;#expires&nbsp;after&nbsp;n&nbsp;minutes<br /><br />#前台禁ip<br />//define('BLACKLIST','10.0.0.0/24&nbsp;192.168.0.1/24');<br /><br />#数据库集群.<br />//define('DB_SLAVE_NAME',DB_NAME);<br />//define('DB_SLAVE_USER',DB_USER);<br />//define('DB_SLAVE_PASSWORD',DB_PASSWORD);<br />//define('DB_SLAVE_HOST',DB_HOST);<br /><br />#支持泛解的时候才可以用这个,&nbsp;仅支持fs_storager<br />/*<br />&nbsp;*&nbsp;define('HOST_MIRRORS',<br />&nbsp;*&nbsp;'http://img0.example.com,<br />&nbsp;*&nbsp;http://img2.example.com,<br />&nbsp;*&nbsp;http://img2.example.com');<br />&nbsp;*/<br /><br />#使用ftp存放图片文件<br />//define('WITH_STORAGER','ftp_storager');<br /><br />#确定服务器支持htaccess文件时，可以打开下面两个参数获得加速。<br />//define&nbsp;('GZIP_CSS',true);<br />//define&nbsp;('GZIP_JS',true);<br /><br />/*&nbsp;日志&nbsp;*/<br />//define('LOG_LEVEL',E_ERROR);<br /><br />/*&nbsp;日志保存类型&nbsp;0=&gt;使用系统日志，&nbsp;3=&gt;保存文件&nbsp;*/<br />#define('LOG_TYPE',&nbsp;0);<br />#define('LOG_TYPE',&nbsp;3);<br /><br />#按日期分目录，每个ip一个日志文件。扩展名是php防止下载。<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'LOG_FILE'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">DATA_DIR</span><span style="color: #007700">.</span><span style="color: #DD0000">'/logs/{date}/{ip}.php'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">#log文件头部放上exit()保证无法下载。<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'LOG_HEAD_TEXT'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'&lt;'</span><span style="color: #007700">.</span><span style="color: #DD0000">'?php&nbsp;exit()?'</span><span style="color: #007700">.</span><span style="color: #DD0000">"&gt;\n"</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">//define('LOG_FORMAT',"{gmt}\t{request}\t{code}");<br /><br />#禁止运行安装<br />//define('DISABLE_SYS_CALL',1);<br /><br />#使用数据库存放改动过的模板<br />//define('THEME_STORAGE','db');<br /><br />#&nbsp;kvstroe后台存储类<br />#&nbsp;define('KVSTORE_STORAGE',&nbsp;'base_kvstore_filesystem');<br />#&nbsp;define('KVSTORE_STORAGE',&nbsp;'base_kvstore_mysql');<br />#&nbsp;define('KVSTORE_STORAGE',&nbsp;'base_kvstore_memcache');<br />#&nbsp;define('KVSTORE_STORAGE',&nbsp;'base_kvstore_dba');<br />#&nbsp;define('KVSTORE_STORAGE',&nbsp;'base_kvstore_tokyotyrant');<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'KVSTORE_STORAGE'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'base_kvstore_flare'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">#&nbsp;cache后端存储类<br />#&nbsp;define('CACHE_STORAGE',&nbsp;'base_cache_nocache');<br />#&nbsp;define('CACHE_STORAGE',&nbsp;'base_cache_secache');<br />&nbsp;</span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'CACHE_STORAGE'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'base_cache_memcache'</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">#&nbsp;define('CACHE_STORAGE',&nbsp;'base_cache_memcached');<br /><br />#&nbsp;kvstroe&nbsp;memcache服务器配置<br />#&nbsp;socket&nbsp;&nbsp;'unix:///tmp/memcached.sock'<br />#&nbsp;server&nbsp;&nbsp;'127.0.0.1:11211'<br />#&nbsp;multi&nbsp;&nbsp;&nbsp;'unix:///tmp/memcached.sock,127.0.0.1:11211,127.0.0.1:11212'<br />#&nbsp;define('KVSTORE_MEMCACHE_CONFIG',&nbsp;'unix:///tmp/memcached.sock');<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'KVSTORE_MEMCACHE_CONFIG'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'10.0.0.2:12121,10.0.0.3:12121'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">#&nbsp;cache&nbsp;memcache服务器配置<br />#&nbsp;socket&nbsp;&nbsp;'unix:///tmp/memcached.sock'<br />#&nbsp;server&nbsp;&nbsp;'127.0.0.1:11211'<br />#&nbsp;multi&nbsp;&nbsp;&nbsp;'unix:///tmp/memcached.sock,127.0.0.1:11211,127.0.0.1:11212'<br />#&nbsp;define('CACHE_MEMCACHE_CONFIG',&nbsp;'unix:///tmp/memcached.sock');<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'CACHE_MEMCACHE_CONFIG'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'10.0.0.2:11211,10.0.0.3:11211'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">#mongodb&nbsp;服务器配置<br />#server:<br />#"mongodb://${username}:${password}@localhost"&nbsp;,&nbsp;"mongodb:///tmp/mongo-27017.sock"<br />#define('MONGODB_SERVER_CONFIG',&nbsp;'mongodb://localhost:27017');<br />#option:<br />#array("connect"&nbsp;=&gt;&nbsp;TRUE),array("username"=&gt;'xxxx',&nbsp;"password"=&gt;'xxx');<br />#define('MONGODB_OPTION_CONFIG','return&nbsp;'.&nbsp;var_export(array('connect'=&gt;true),1).';');<br /><br />#&nbsp;KV_PREFIX&nbsp;KV引擎前缀<br />#&nbsp;define('KV_PREFIX',&nbsp;'default');<br /><br />#&nbsp;file_storage<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'FILE_STORAGER'</span><span style="color: #007700">,</span><span style="color: #DD0000">'flaresystem'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'STORAGE_MEMCACHED'</span><span style="color: #007700">,</span><span style="color: #DD0000">'10.0.0.2:12121,10.0.0.3:12121'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'STORAGE_HOST'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'http://192.168.51.119'</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">#define('FILE_STORAGER','filesystem');<br />#define('STORAGE_MEMCACHED','192.168.0.230:11211,192.168.0.231:11211');<br />#define('HOST_MIRRORS','http://img.demo.cn,http://img1.demo.cn');<br /><br />#&nbsp;app&nbsp;statics&nbsp;host<br />#define('APP_STATICS_HOST',&nbsp;'http://img.demo.cn;http://img1.demo.cn');<br /><br />/****************&nbsp;compat&nbsp;functions&nbsp;begin&nbsp;****************/<br />#此处程序自动生成，请勿修改<br /><br />/****************&nbsp;compat&nbsp;functions&nbsp;end&nbsp;****************/<br /></span><span style="color: #007700">[</span><span style="color: #0000BB">root</span><span style="color: #007700">@</span><span style="color: #0000BB">ecos02&nbsp;</span><span style="color: #007700">~]</span><span style="color: #FF8000">#&nbsp;vim&nbsp;/data/www/ecstore-bugfix/config/config.php<br />#&nbsp;define('KVSTORE_STORAGE',&nbsp;'base_kvstore_dba');<br />#&nbsp;define('KVSTORE_STORAGE',&nbsp;'base_kvstore_tokyotyrant');<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'KVSTORE_STORAGE'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'base_kvstore_flare'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">#&nbsp;cache后端存储类<br />#&nbsp;define('CACHE_STORAGE',&nbsp;'base_cache_nocache');<br />#&nbsp;define('CACHE_STORAGE',&nbsp;'base_cache_secache');<br />&nbsp;</span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'CACHE_STORAGE'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'base_cache_memcache'</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">#&nbsp;define('CACHE_STORAGE',&nbsp;'base_cache_memcached');<br /><br />#&nbsp;kvstroe&nbsp;memcache服务器配置<br />#&nbsp;socket&nbsp;&nbsp;'unix:///tmp/memcached.sock'<br />#&nbsp;server&nbsp;&nbsp;'127.0.0.1:11211'<br />#&nbsp;multi&nbsp;&nbsp;&nbsp;'unix:///tmp/memcached.sock,127.0.0.1:11211,127.0.0.1:11212'<br />#&nbsp;define('KVSTORE_MEMCACHE_CONFIG',&nbsp;'unix:///tmp/memcached.sock');<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'KVSTORE_MEMCACHE_CONFIG'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'10.0.0.2:12121,10.0.0.3:12121'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">#&nbsp;cache&nbsp;memcache服务器配置<br />#&nbsp;socket&nbsp;&nbsp;'unix:///tmp/memcached.sock'<br />#&nbsp;server&nbsp;&nbsp;'127.0.0.1:11211'<br />#&nbsp;multi&nbsp;&nbsp;&nbsp;'unix:///tmp/memcached.sock,127.0.0.1:11211,127.0.0.1:11212'<br />#&nbsp;define('CACHE_MEMCACHE_CONFIG',&nbsp;'unix:///tmp/memcached.sock');<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'CACHE_MEMCACHE_CONFIG'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'10.0.0.2:11211,10.0.0.3:11211'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">#mongodb&nbsp;服务器配置<br />#server:<br />#"mongodb://${username}:${password}@localhost"&nbsp;,&nbsp;"mongodb:///tmp/mongo-27017.sock"<br />#define('MONGODB_SERVER_CONFIG',&nbsp;'mongodb://localhost:27017');<br />#option:<br />#array("connect"&nbsp;=&gt;&nbsp;TRUE),array("username"=&gt;'xxxx',&nbsp;"password"=&gt;'xxx');<br />#define('MONGODB_OPTION_CONFIG','return&nbsp;'.&nbsp;var_export(array('connect'=&gt;true),1).';');<br /><br />#&nbsp;KV_PREFIX&nbsp;KV引擎前缀<br />#&nbsp;define('KV_PREFIX',&nbsp;'default');<br /><br />#&nbsp;file_storage<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'FILE_STORAGER'</span><span style="color: #007700">,</span><span style="color: #DD0000">'flaresystem'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'STORAGE_MEMCACHED'</span><span style="color: #007700">,</span><span style="color: #DD0000">'10.0.0.2:12121,10.0.0.3:12121'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">define</span><span style="color: #007700">(</span><span style="color: #DD0000">'STORAGE_HOST'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'http://192.168.51.119'</span><span style="color: #007700">);<br /></span><span style="color: #FF8000">#define('FILE_STORAGER','filesystem');<br />#define('STORAGE_MEMCACHED','192.168.0.230:11211,192.168.0.231:11211');<br />#define('HOST_MIRRORS','http://img.demo.cn,http://img1.demo.cn');<br /><br />#&nbsp;app&nbsp;statics&nbsp;host<br />#define('APP_STATICS_HOST',&nbsp;'http://img.demo.cn;http://img1.demo.cn');<br /><br />/****************&nbsp;compat&nbsp;functions&nbsp;begin&nbsp;****************/<br />#此处程序自动生成，请勿修改<br />/****************&nbsp;compat&nbsp;functions&nbsp;end&nbsp;****************/<br /></span>
+</span>
+</code></div>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">设置nginx</a>
+    <li><a href="#id2" class="reference internal">修改lvs</a>
+    <li><a href="#id3" class="reference internal">ecstore-bugfix config.php</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="lnmp/mysql.html"
+                                  title="上一章">mysql</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="lvs.html"
+                                  title="下一章">负载均衡</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="lvs.html" title="负载均衡" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="lnmp/mysql.html" title="mysql" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">集群部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

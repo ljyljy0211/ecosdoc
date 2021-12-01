@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      finder列表显示多表数据 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="ECOS开发指南" href="index.html" />
+
+        <link rel="next" title="db/transaction" href="事务处理.html" />
+        <link rel="prev" title="quickstart" href="开始Ecos之旅.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="db/transaction.html" title="事务处理" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="quickstart.html" title="开始Ecos之旅" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ECOS开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> finder列表显示多表数据</h1>
+            
+<p>我们知道默认的在后台中一个表对应一个dbschema，一个dbschema对应一个finder列表,但是有时候我们需要在一个finder列出两个或两个以上的表的数据，那么默认的情况下则不满足需求。如果需要在一个finder列表中显示多个表的数据有一下两种方法<pre>1)在finder列表中增加虚拟列
+2)通过在model中重构count getList get_schema等方法重组finder列表的数据显示
+</pre></p>
+<h2><a name="id1">在finder列表中增加虚拟列</a></h2>
+<p>在什么情况下选择使用增加虚拟列的方式来在finder列表中显示多表数据？<pre class="mark">1)在要显示的多个表中有一个是要主要显示的表,其他的表只是需要显示一两列即可
+2)在需求中不需要对增加的虚拟列进行列表排序
+</pre>那么怎么样增加虚拟列？
+<ul>
+<li>首先，看下在ECOS后台finder中增加自定义列的方法<a href="http://www.ec-os.net/advance/desktop/dev.html#id7">http://www.ec-os.net/advance/desktop/dev.html#id7</a><pre>增加自定义列中的services.xml中对应的model应该是finder列主要显示的表的model
+</pre>
+<li>获取其他表数据，返回给虚拟列返回数据的格式: <a href="http://www.ec-os.net/advance/desktop/dev.html#id19">http://www.ec-os.net/advance/desktop/dev.html#id19</a></li>
+</li>
+</ul>
+</p>
+<h2><a name="id2">重组finder列表数据返回</a></h2>
+<p>当增加虚拟列麻烦或不能虚拟列不能满足需求的时候则需要使用重组finder列表数据返回给finder的方法进行finder列表显示多表数据</p>
+
+<p>首先来看下finder列表是怎么获取数据显示的？<pre>这里只是为了说明finder数据的显示，做了简化。
+在默认的finder列表显示数据中，
+    1）finder显示的数据统计(共N条)是由对应的model中的count方法获取。
+    2）finder显示的数据是由对应model中的getlist方法获取。
+    3）finder列表title是根据对应model通过get_schema放来获取对应的dbschema的结构
+</pre>那么如果要使得finder列表能显示多表数据则需要在finder对用的model中重构以上几个方法即可</p>
+
+<ul>
+<li>建立finder对应的model文件,model继承dbeav
+<li>在model中重构count方法<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />public&nbsp;function&nbsp;</span><span style="color: #0000BB">count</span><span style="color: #007700">(</span><span style="color: #0000BB">$filter</span><span style="color: #007700">=</span><span style="color: #0000BB">null</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//自己写sql，返回满足条件的条数<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$sql&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'SELECT&nbsp;count(*)&nbsp;as&nbsp;_count&nbsp;FROM&nbsp;(SELECT&nbsp;I.goods_id&nbsp;FROM&nbsp;'</span><span style="color: #007700">.<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">database</span><span style="color: #007700">()-&gt;</span><span style="color: #0000BB">prefix</span><span style="color: #007700">.</span><span style="color: #DD0000">'b2c_orders&nbsp;as&nbsp;O&nbsp;LEFT&nbsp;JOIN&nbsp;'</span><span style="color: #007700">.<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">database</span><span style="color: #007700">()-&gt;</span><span style="color: #0000BB">prefix</span><span style="color: #007700">.</span><span style="color: #DD0000">'b2c_order_items&nbsp;as&nbsp;I&nbsp;ON&nbsp;O.order_id=I.order_id&nbsp;LEFT&nbsp;JOIN&nbsp;'</span><span style="color: #007700">.<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">database</span><span style="color: #007700">()-&gt;</span><span style="color: #0000BB">prefix</span><span style="color: #007700">.</span><span style="color: #DD0000">'b2c_goods&nbsp;as&nbsp;G&nbsp;ON&nbsp;G.goods_id=I.goods_id&nbsp;WHERE&nbsp;'</span><span style="color: #007700">.<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'O.disabled=\'false\'&nbsp;and&nbsp;O.pay_status!=\'0\'&nbsp;and&nbsp;'</span><span style="color: #007700">.</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">_filter</span><span style="color: #007700">(</span><span style="color: #0000BB">$filter</span><span style="color: #007700">).</span><span style="color: #DD0000">'&nbsp;Group&nbsp;By&nbsp;I.goods_id)&nbsp;as&nbsp;tb'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$row&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">db</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">select</span><span style="color: #007700">(</span><span style="color: #0000BB">$sql</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">intval</span><span style="color: #007700">(</span><span style="color: #0000BB">$row</span><span style="color: #007700">[</span><span style="color: #0000BB">0</span><span style="color: #007700">][</span><span style="color: #DD0000">'_count'</span><span style="color: #007700">]);<br />}<br />...<br /></span>
+</span>
+</code></div>
+<li>在model中重构getlist代替getList方法为finder提供数据<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />public&nbsp;function&nbsp;</span><span style="color: #0000BB">getlist</span><span style="color: #007700">(</span><span style="color: #0000BB">$cols</span><span style="color: #007700">=</span><span style="color: #DD0000">'*'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$filter</span><span style="color: #007700">=array(),&nbsp;</span><span style="color: #0000BB">$offset</span><span style="color: #007700">=</span><span style="color: #0000BB">0</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$limit</span><span style="color: #007700">=-</span><span style="color: #0000BB">1</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$orderType</span><span style="color: #007700">=</span><span style="color: #0000BB">null</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$sql&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'SELECT&nbsp;I.goods_id&nbsp;as&nbsp;rownum,G.name&nbsp;as&nbsp;pname,G.bn&nbsp;as&nbsp;bn,sum(I.nums)&nbsp;as&nbsp;saleTimes,sum(I.amount)&nbsp;as&nbsp;salePrice,I.goods_id&nbsp;FROM&nbsp;'</span><span style="color: #007700">.<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">database</span><span style="color: #007700">()-&gt;</span><span style="color: #0000BB">prefix</span><span style="color: #007700">.</span><span style="color: #DD0000">'b2c_orders&nbsp;as&nbsp;O&nbsp;LEFT&nbsp;JOIN&nbsp;'</span><span style="color: #007700">.<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">database</span><span style="color: #007700">()-&gt;</span><span style="color: #0000BB">prefix</span><span style="color: #007700">.</span><span style="color: #DD0000">'b2c_order_items&nbsp;as&nbsp;I&nbsp;ON&nbsp;O.order_id=I.order_id&nbsp;LEFT&nbsp;JOIN&nbsp;'</span><span style="color: #007700">.<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">database</span><span style="color: #007700">()-&gt;</span><span style="color: #0000BB">prefix</span><span style="color: #007700">.</span><span style="color: #DD0000">'b2c_goods&nbsp;as&nbsp;G&nbsp;ON&nbsp;G.goods_id=I.goods_id&nbsp;WHERE&nbsp;'</span><span style="color: #007700">.<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'O.disabled=\'false\'&nbsp;and&nbsp;O.pay_status!=\'0\'&nbsp;and&nbsp;G.goods_id!=\'0\'&nbsp;and&nbsp;'</span><span style="color: #007700">.</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">_filter</span><span style="color: #007700">(</span><span style="color: #0000BB">$filter</span><span style="color: #007700">).</span><span style="color: #DD0000">'&nbsp;Group&nbsp;By&nbsp;I.goods_id'</span><span style="color: #007700">;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">$orderType</span><span style="color: #007700">)</span><span style="color: #0000BB">$sql</span><span style="color: #007700">.=</span><span style="color: #DD0000">'&nbsp;ORDER&nbsp;BY&nbsp;'</span><span style="color: #007700">.(</span><span style="color: #0000BB">is_array</span><span style="color: #007700">(</span><span style="color: #0000BB">$orderType</span><span style="color: #007700">)?</span><span style="color: #0000BB">implode</span><span style="color: #007700">(</span><span style="color: #0000BB">$orderType</span><span style="color: #007700">,</span><span style="color: #DD0000">'&nbsp;'</span><span style="color: #007700">):</span><span style="color: #0000BB">$orderType</span><span style="color: #007700">);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$rows&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">db</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">selectLimit</span><span style="color: #007700">(</span><span style="color: #0000BB">$sql</span><span style="color: #007700">,</span><span style="color: #0000BB">$limit</span><span style="color: #007700">,</span><span style="color: #0000BB">$offset</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$rows<br /></span><span style="color: #007700">}<br />...<br /></span>
+</span>
+</code></div>
+<p>如果getlist方法的条件finder需要过滤，则还需要重构_filter方法
+<li>重构get_schema返回值本来get_schema方法会默认的去调用对应dbschema的数据，因为我们这个model没有对应的model那么，则需要重构对应的返回值给finder使用<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br />public&nbsp;function&nbsp;</span><span style="color: #0000BB">get_schema</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$schema&nbsp;</span><span style="color: #007700">=&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'columns'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//写法属性和dbschema差不多，对应的字段名是和上面的getlist中获取的字段一致的<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'rownum'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'number'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">0</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'排名'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'width'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">110</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'orderby'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'editable'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'hidden'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default_in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'realtype'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'mediumint(8)&nbsp;unsigned'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'pname'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'varchar(200)'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'pkey'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'sdfpath'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'pam_account/account_id'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'商品名称'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'width'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">210</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'searchtype'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'has'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'editable'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default_in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'realtype'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'mediumint(8)&nbsp;unsigned'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;);<br />&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$schema</span><span style="color: #007700">;<br />...<br /></span>
+</span>
+</code></div></li>
+</p>
+</li>
+</li>
+</li>
+</ul>
+<pre class="mark">注：参照案例
+    class  b2c_ctl_admin_analysis extends desktop_controller
+
+    class b2c_mdl_analysis_productsale extends dbeav_model
+
+另外：在ectools中的报表中也有对应的实例
+</pre>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">在finder列表中增加虚拟列</a>
+    <li><a href="#id2" class="reference internal">重组finder列表数据返回</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="quickstart.html"
+                                  title="上一章">开始Ecos之旅</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="db/transaction.html"
+                                  title="下一章">事务处理</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="db/transaction.html" title="事务处理" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="quickstart.html" title="开始Ecos之旅" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ECOS开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

@@ -1,0 +1,782 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      模板机制 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="优雅的前端- site" href="index.html" />
+
+        <link rel="next" title="../dbeav/index" href="增强型模型(Model) - dbeav.html" />
+        <link rel="prev" title="site_router" href="site路由处理类 - site_router.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../dbeav/index.html" title="增强型模型(Model) - dbeav" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="site_router.html" title="site路由处理类 - site_router" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">优雅的前端- site</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 模板机制</h1>
+            <h2><a name="id1">优势和创新</a></h2><h3><a name="id2">ShopEx模板机制的优势</a></h3>
+<ul>
+<li>面对后端开发人员
+<ul>
+<li>模板挂件机制灵活的接口调用让你轻松并且安全的将数据抛向前端,并可方便的构建数据筛选、配置规则和界面。
+<li>模板缓存、自定义URL帮你分担后端开发压力，可能你并不需要关心页面静态化。</ul>
+
+<li>面对前端开发人员
+<ul>
+<li>默认集成强大的前端开发框架和接口调用。
+<li>严格的要求前端工程师模块化的设计思想。</ul>
+
+<li>面对网店运营人员
+<ul>
+<li>运营人员无需懂得前端开发技术,可 以在管理后台进行所见即所得的网店的 布局调整,板块数据展示规则设定。
+<li>运营人员可以轻松更换、删减网店板 块,更换挂件板块的内置风格。
+<li>挂件机制可以满足你站外嵌入的需 求。</li>
+</li>
+</li>
+</ul>
+</li>
+</li>
+</ul>
+</li>
+</li>
+</ul>
+</li>
+</ul>
+<h3><a name="id3">ShopEx模板机制的创新</a></h3></ul>
+
+<ul>
+<li>所见既所得的可视化模板板块编辑机制
+<li>将布局、区块、边框、数据 真正细分化</li>
+</li>
+</ul>
+<h2><a name="id4">模板机制的名词解释</a></h2><h3><a name="id5">挂件区域(widgets)</a></h3>
+<p>挂件区域用于在某个页面预留挂件(widget)可挂入的区域。也可以理解为“插槽”、“坑”。</p>
+
+<p>每个挂件区域可以挂入多个挂件</p>
+<h3><a name="id6">挂件(widget)</a></h3>
+<p>挂件是ShopEx模板机制中的一个重要角色,它能根据条件从后端取得数据然后根据“挂件级页面模板”来包装成一个小板块。</p>
+
+<p>例如一个“商品板块挂件”,它要先由后端语言(php)来组织数据,然后返回到“挂件级页面模板”。组织数据的条件将会独 立出一个可配置页面。</p>
+<h3><a name="id7">边框(border)</a></h3>
+<p>边框用于包装一个挂件板块,一套模板里面可能由很多个边框风格,这些风格的名称和对应的边框文件 需要定义在模板的描述文件(theme.xml)中,以便可视化编辑时改变一个板块的风格。</p>
+
+<p>例如一个“商品板块挂件”在首页要以三种不同的风格展示(促销、热门、新品......),除了需要在挂件的配置面板中配置数 据的展示范围不同,还需要由边框机制的配合达到颜色风格的区别。特别是一些系统级挂件,为了适应不同模板的展示方 式,默认不会输出标题和边框,边框则可以协助包装一下挂件挂入到挂件区域。</p>
+<h3><a name="id8">系统级区域(main)</a></h3>
+<p>系统级区域用于输出系统的核心交互流程。这些区域的html\javascript是不能在模板包中直接定义的,模板包唯一能影响到这些系统级区域的是 css样式定义,因为模板包的样式表是在系统级样式之后加载。</p>
+<h3><a name="id9">默认模板页 (default.html)</a></h3>
+<p>默认模板页是在模板包中 未定义某个页面的布局时,默认调用的页面布局。例如你的模板包中只包含了两个页面的定义: 首页、默认页,那么其他未定义的页面在访问时将优先使用默认模板页,直到你单独定义它为止。</p>
+
+<p><br /><img border="0" alt="" align="middle" src="template-1.png" /></p>
+<h2><a name="id10">创建一个模板包</a></h2><h3><a name="id11">标准模板包必要的文件</a></h3>
+<p>创建一个模板包文件夹，例如 fsgw</p>
+
+<p>新模板包文件夹的名称应与描述文件中的 id保持一致，并且应该由数字和英文小写组成。</p>
+
+<p>在模板包文件夹内创建以下文件：3r</p>
+</ul>
+
+<ol>
+<ol>
+<li>theme.xml
+<p>此文件用来描述模板包的基本信息，以及模板可能包含的挂件。还用于模板的备份导出，和导入操作中的模板数据交换。例如：<pre>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;theme&gt;
+  &lt;name&gt;风尚购物&lt;/name&gt;
+  &lt;id&gt;fsgw&lt;/id&gt;
+  &lt;version&gt;ECcStore&lt;/version&gt;
+  &lt;info&gt;&lt;/info&gt;
+  &lt;author&gt;ShopEx-UED&lt;/author&gt;
+  &lt;site&gt;http://www.shopex.cn&lt;/site&gt;
+  &lt;update_url&gt;&lt;/update_url&gt;
+  &lt;borders&gt;
+    &lt;set key=&quot;边栏样式&quot; tpl=&quot;borders/border1.html&quot; /&gt;
+    &lt;set key=&quot;商品分类&quot; tpl=&quot;borders/border2.html&quot; /&gt;
+    &lt;set key=&quot;商品公告&quot; tpl=&quot;borders/border3.html&quot; /&gt;
+    &lt;set key=&quot;品牌热卖排行&quot; tpl=&quot;borders/border4.html&quot; /&gt;
+    &lt;set key=&quot;热销排行&quot; tpl=&quot;borders/border5.html&quot; /&gt;
+    &lt;set key=&quot;首页商品列表&quot; tpl=&quot;borders/border6.html&quot; /&gt;
+    &lt;set key=&quot;尾页文章列表&quot; tpl=&quot;borders/border9.html&quot; /&gt;
+    &lt;set key=&quot;购买过本商品的顾客还买过&quot; tpl=&quot;borders/border10.html&quot; /&gt;
+  &lt;/borders&gt;
+  &lt;views&gt;&lt;/views&gt;
+  &lt;config&gt;&lt;/config&gt;
+  &lt;proinstance&gt;&lt;/proinstance&gt;
+&lt;/theme&gt;
+</pre>
+<table class="docutils">
+<tr>
+<th>xml节点</th>
+
+<th>说明</th>
+</tr>
+
+<tr>
+<td>name</td>
+
+<td>模板包的名称,将会出现在管理后台模板列表中</td>
+</tr>
+
+<tr>
+<td>id</td>
+
+<td>首次由开发人员定义,应与模板包名称保持一致,(全英 文)</td>
+</tr>
+
+<tr>
+<td>version</td>
+
+<td>模板包的版本信息</td>
+</tr>
+
+<tr>
+<td>info</td>
+
+<td>模板包简介</td>
+</tr>
+
+<tr>
+<td>author</td>
+
+<td>模板包作者</td>
+</tr>
+
+<tr>
+<td>site</td>
+
+<td>模板包作者网址</td>
+</tr>
+
+<tr>
+<td>update_url</td>
+
+<td>升级地址,暂未启用</td>
+</tr>
+
+<tr>
+<td>borders</td>
+
+<td>模板包包含的边框定义描述</td>
+</tr>
+
+<tr>
+<td>widgets</td>
+
+<td>模板挂件描述。系统会在模板可视化编辑添加挂件后向 widgets序列化挂件描述</td>
+</tr>
+</table>
+此表只描述最关键的几个节点项
+<li>每个模板页将用到的公共页面引用 (header.html、footer.html)例如:(header.html)<pre>&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;{header}&gt; &lt;!--将输出系统级 style、javascript、meta--&gt;
+&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;images/fsgw-style.css&quot; /&gt;  &lt;!--模板包样式的引入,（”images/” 是必须的，因为在页面渲染时，它会被替换为绝对路径）--&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=”body”&gt;
+  &lt;div class=”top”&gt;
+    &lt;div class=”top-bar clearfix”&gt;
+      &lt;div class=”span-auto”&gt;Welcome&lt;/div&gt;
+      &lt;div class=”span-auto login”&gt;
+    &lt;{widgets id=”header-login”}&gt; &lt;!--一个挂件区域，（id 是唯一的）--&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=”header”&gt;
+    &lt;{widgets id=”header-nav”}&gt;  &lt;!--一个挂件区域，（id 是唯一的）--&gt;
+</pre>例如:(footer.html)<pre>  &lt;div class=&quot;footer&quot;&gt;
+    &lt;div class=&quot;copyright&quot;&gt;
+      &lt;{widgets id=&quot;footer-copyright&quot;}&gt;
+      &lt;!--一个挂件区域，（id 是唯一的）--&gt;
+    &lt;/div&gt;
+    &lt;{footer}&gt; &lt;!--将输出系统级 业务处理javascript\用户自定义的底部信息--&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+</pre>
+<li>首页模板（index.html）例如:<pre>&lt;{require file=&quot;header.html&quot;}&gt;  &lt;!--引入公共的头部（头部的挂件区块会被解析）--&gt;
+
+    &lt;div class=”main”&gt;
+               &lt;div class=”banner”&gt;
+            &lt;{widgets id=‘index-banner’}&gt;
+            &lt;!--预留一片广告展示挂件区--&gt;
+        &lt;/div&gt;
+        &lt;div class=”content c-1 clearfix”&gt;
+           &lt;div class=”span-4 m-l”&gt;
+        &lt;div class=”mod”&gt;
+            &lt;div class=”t”&gt;商品分类&lt;/div&gt;
+            &lt;div class=”b”&gt;
+                &lt;{widgets id=‘index-cat’}&gt;
+    &lt;!--预留一片商品分类挂件的挂入区--&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;{widgets id=‘index-m-l’}&gt;
+        &lt;!--预留一片首页左侧挂件区--&gt;
+            &lt;/div&gt;
+          &lt;div class=”span-10 m-r”&gt;
+        &lt;{widgets id=‘index-m-r’}&gt;
+        &lt;!--预留一片首页右侧挂件区--&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+&lt;{require file=&quot;footer.html&quot;}&gt; &lt;!--引入公共的底部（底部的挂件区块会被解析）--&gt;
+</pre><pre>&lt;{require file=&quot;header.html&quot;}&gt;  &lt;!--引入公共的头部（头部的挂件区块会被解析）--&gt;
+
+    &lt;div class=”main”&gt;
+        &lt;div class=”content clearfix”&gt;
+           &lt;div class=”span-4 m-l”&gt;
+        &lt;{widgets id=‘m-l’}&gt;
+        &lt;!--预留一片左侧挂件区--&gt;
+            &lt;/div&gt;
+          &lt;div class=”span-10 m-r”&gt;
+        &lt;{main}&gt;
+&lt;!--系统级区域输出（可能会是：会员中心、购物流程、商品搜索结果、商品详情、文章）--&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+
+&lt;{require file=&quot;footer.html&quot;}&gt; &lt;!--引入公共的底部（底部的挂件区块会被解析）--&gt;
+</pre>
+<li>默认模板页(default.html)
+<li>边框文件夹 （borders）应该建立 borders文件夹， 来存放 一个个的边框 html，html属性应统一用双引号，防止出现模板解析异常例如：borders/border1.html<pre>&lt;div class=&quot;border1 &lt;{$widgets_classname}&gt;&quot; id=&quot;&lt;{$widgets_id}&gt;&quot;&gt;
+&lt;!--将输出被包装挂件板块在后台定义的边框 className、id--&gt;
+    &lt;h3&gt;
+    &lt;{$title}&gt; &lt;!--将输出被包装挂件板块在后台定义的标题--&gt;
+    &lt;/h3&gt;
+    &lt;{$body}&gt; &lt;!--将输出被包装挂件板块内容--&gt;
+&lt;/div&gt;
+</pre>
+<li>资源文件夹 （images）存放模板资源文件，例如css\js\图片、swf
+<li>一张模板效果图（preview.jpg）模板效果图是一张直观的模板效果图片（120＊160 px）,可以在管理后台模板列表看到它以区分模板。</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</p>
+</li>
+</ol>
+</ol>
+<h3><a name="id12">标准模板包必要的文件结构</a></h3>
+<p><br /><img border="0" alt="" align="middle" src="template-2.png" /></p>
+<h2><a name="id13">模板包的首次加载</a></h2><h3><a name="id14">模板开发测试环境</a></h3>
+<p>目前模板的开发测试环境比较重要的一个地方就是网店的后台。</p>
+
+<p>如果你在做模板的开发，请先在管理后台应用中心安装一个应用程序：《开发者工具》app.</p>
+
+<p>安装方法：点击管理后台右上 “应用中心入口”，找到“开发者工具”，进行安装; 之后，你将在模板列表上方看到”维护“按钮。</p>
+
+<p><br /><img border="0" alt="" align="middle" src="template-3.png" /></p>
+<h3><a name="id15">模板包的首次加载</a></h3>
+<p>当首次构建好基础模板包。此刻应将模板文件夹复制到网店模板目录 </p>
+
+<p>既：/themes下</p>
+
+<p>这时你的模板列表中将出现此模板的记录（如下图）</p>
+
+<p><br /><img border="0" alt="" align="middle" src="template-4.png" />;</p>
+
+<p>首次的模板加载应通过文件夹复制的方式放置到指定位置（/themes/）下。不应该直接将其以压缩包的形式通过模板上传加载。</p>
+<h2><a name="id16">完善模板包</a></h2><h3><a name="id17">为模板添加页面布局</a></h3>
+<p>上文提到我们仅构建了标准的模板包。下面我们应为某些页面添加更丰富的布局页面文件</p>
+
+<p>(如下图)<br /><img border="0" alt="" align="middle" src="template-5.png" /></p>
+
+<p>添加页面布局文件时</p>
+
+<p>需要输入名称、文件名、和页面源码</p>
+
+<p>名称可以理解为对文件的备注，文件名会自动追加.html后缀,页面源码会模板复制 默认布局页源码。</p>
+
+<p>在此可以修改html源码页可以只输入 名称和文件名先生成html文件到模板包。统一用其他工具编辑页面源码。</p>
+<h3><a name="id18">为模板布局页添加挂件</a></h3></ol>
+
+<ul>
+<ul>
+<li>系统级常用挂件表
+<table class="docutils">
+<tr>
+<th>分类</th>
+
+<th>名称</th>
+
+<th>简介</th>
+</tr>
+
+<tr>
+<td>| |</td>
+</tr>
+</table>
+
+<li>挂件的添加和配置</li>
+</li>
+</ul>
+</ul>
+
+<p>（下图：版块中心）<br /><img border="0" alt="" align="middle" src="template-6.png" /></p>
+
+<p>（下图：挂件配置面板）<br /><img border="0" alt="" align="middle" src="template-7.png" /></p>
+
+<p>挂件的添加在模板页面可视化编辑中进行。</p>
+
+<p>添加挂件的基本交互：</p>
+
+<p>选择目标版块区域（一个挂件版块区域可以挂入多个挂件版块）－》选择挂件版块类型 －》配置版块标题（版块标题将会在边框中以&lt;{$title}&gt;调用，如果版块边框样式为无边框，则标题不会出现于前台）－》挂件版块模板选择（一个挂件可以由多个对应模板供选择）－》边框样式选择－》边框属性配置（className\ID）－》挂件相关配置（例如商品挂件，可以配置商品显示范围、数量、价格精度等）</p>
+
+<p>挂件添加后可以进行编辑 位置移动等操作。</p>
+
+<ul>
+<li>注意事项</li>
+</ul>
+
+<p> 公用头部和底部被挂入的挂件版块将共享于所有引入头部底部文件的页面。 如果要在源码编辑删除 一个&lt;{widgets}&gt;（挂件版块区域）标签，请先在可视化编辑中删除此区域中的所有的挂件实例。 模板可视化编辑结束后，注意保存编辑成果。</p>
+<h3><a name="id19">创建一个模板级挂件</a></h3>
+<p>当系统内置的挂件不能满足你的要求时，你可以自己动手建立一个挂件</p>
+
+<p>创建一个模板级挂件的必备文件结构
+<ul>
+<li>配置页（_config.html）配置页是在可视化编辑时用到的配置表单。
+<li>配置页拦截器（theme_widget_cfg_widgetname.php）［可选］配置页拦截器用于向配置页输出系统数据，例如输出一个系统当前的商品排序方式数组。供页面 &lt;select&gt;填充选择。［如果配置页不需要从系统内取得数据，则 此拦截器无需制作。］ 
+<li>挂件拦截器(theme_widget_widgetname.php) 挂件拦截器，用于向挂件模板供应后端数据 
+<li>挂件描述文件（widgets.php） 用于描述挂件基本信息，挂件模板文件、名称对应关系。 
+<li>挂件渲染模板 （widgettpl1.html....... widgettplN.html） 一个或多个挂件模板，需要在挂件描述文件中被描述，以便可视化编辑时选择挂件使用的模板。
+<li>可视化编辑占位模板 （_preview.html）［可选］此页面用于在可视化编辑时占位，例如广告挂件由许多效果和图片资源加载，在可视化编辑时影响效率，可以用此页面来代替挂件的渲染，但是挂件拦截器同样会把数据抛向此页面，你可以只取得一些尺寸信息，用边框和文字代替挂件。 ［如果挂件不需要在可视化编辑模式重定义，则无需制作此页］</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</p>
+
+<p>创建一个模板级挂件－mywidget</p>
+
+<p>mywidget 挂件的目的是实现一个根据管理员的配置在前台显示一组商品信息。</p>
+
+<ul>
+<li>在模板目录建立 widgets文件夹
+<li>在widgets文件夹内创建mywidget文件夹，并进入文件夹
+<li>创建挂件描述文件
+<p>widgets.php<div class="code"><code><span style="color: #000000">
+&lt;?php /*挂件的描述文件*/<br />$setting['author']='挂件作者';<br />$setting['version']='v1.0';<br />$setting['name']=”我的第一个挂件”;<br />$setting['stime']='2010-12-12';<br />$setting['catalog']=“风尚购物模板的挂件”;<br />$setting['description']&nbsp;&nbsp;&nbsp;&nbsp;=”我的第一个挂件的描述”;<br />$setting['usual']&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;'1';&nbsp;&nbsp;//是否出现在挂件中心首页.(1\0)<br />$setting['template']&nbsp;=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'default.html'=&gt;’HTML展示’，<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'flash.html'=&gt;’用flash展示’<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);&nbsp;//挂件包含的模板文件和名称<br />?&gt;<br /></span>
+</code></div>
+<li>创建挂件配置页_config.html （命名规则定死_config）<pre>&lt;!--
+    编写挂件配置页html时候，不需要body \title\ form等 html标签  。     此代码块共享 管理后台的 资源（javascript\css\）。
+    _config.html代码块只是挂件配置对话框中的一部分。
+           下列代码中的 $data 数组 由挂件配置页拦截器返回， smarty 协助抛向页面。     $setting数组 是被保存在数据库中的配置信息由系统取出，smarty协助抛向页面。
+ --&gt;
+  &lt;div class=&quot;division&quot;&gt;
+    &lt;h4&gt;商品展示规则&lt;/h4&gt;
+    &lt;label&gt;排序规则：&lt;/label&gt;
+    &lt;select name=&quot;orderby&quot;&gt;
+        &lt;{foreach from=$data item=orderby key=key}&gt;
+            &lt;option value=&quot;&lt;{$key}&gt;&quot; &lt;{if $setting.goods_orderby==$key}&gt;selected&lt;{/if}&gt;&gt;
+            &lt;{$orderby.label}&gt;
+             &lt;/option&gt;
+        &lt;{/foreach}&gt;
+    &lt;/select&gt;
+    &lt;label&gt;展示数量：&lt;/label&gt;
+    &lt;input name=”limit” value=”&lt;{$setting.limit}&gt;” /&gt;
+  &lt;/div&gt;
+</pre>
+<li>创建挂件配置页拦截器（用于取得系统相关数据）theme_widget_cfg_mywidget.php   （命名应于内部代码函数名保持一致）<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/*<br />&nbsp;&nbsp;&nbsp;&nbsp;命名规范&nbsp;以“theme_widget_cfg_”开头，挂件包名结尾。<br />&nbsp;&nbsp;&nbsp;&nbsp;运行时系统会传入一个参数，方便创建&nbsp;model&nbsp;等实例&nbsp;，用于取得数据 &nbsp;*/<br /></span><span style="color: #007700">function&nbsp;</span><span style="color: #0000BB">theme_widget_cfg_mywidget</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$app&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #0000BB">‘b2c’</span><span style="color: #007700">);&nbsp;</span><span style="color: #FF8000">//创建app实例,这里要用到b2c这个app下的goods&nbsp;model所有创建b2c&nbsp;app实例<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$model_goods</span><span style="color: #007700">=</span><span style="color: #0000BB">$app</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">(</span><span style="color: #DD0000">'goods'</span><span style="color: #007700">);&nbsp;&nbsp;</span><span style="color: #FF8000">//创建goods&nbsp;model实例<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">return&nbsp;</span><span style="color: #0000BB">$model_goods</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">orderBy</span><span style="color: #007700">();&nbsp;&nbsp;</span><span style="color: #FF8000">//返回商品排序规则datemap,在挂件配置模板smarty标签中，统一用&nbsp;$date&nbsp;获得<br /></span><span style="color: #007700">}<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>
+<li>创建挂件模板default.html  (命名规则应与widget.php挂件描述文件中 $setting['template'] 保持一致)<pre>&lt;!--
+    挂件模板同挂件配置模板页一样，都是一个代码片段，无需加入body\title\等html标签。
+    挂件模板中的 &lt;style&gt;&lt;/style&gt;中定义将会合并到一个css文件中被引入到&lt;head&gt;头部     （例如一个模板布局页面同时挂了两个 mywidget）。
+    挂件模板中的 ‘image/‘  将会被替换为绝对路径，你可以在挂件包中创建一个images文件夹用来存放挂件相关的资源。例如 &lt;style&gt;#&lt;{widgets_id}&gt;_mywidge{ background:url(‘images/bg.png’)} &lt;/style&gt;，在渲染到前台时，系统将自动替换images/为绝对路径。
+--&gt;
+&lt;div class=&quot;GoodsListWrap GoodsList GoodsShow&quot;  id=’&lt;{$widgets_id}&gt;_mywidget’&gt;
+&lt;{if count($data.goods) &gt; 0}&gt;
+&lt;dl&gt;
+      &lt;{foreach from=$data.goods item=product name=goodslist}&gt;
+      &lt;dd&gt;
+            商品名称：&lt;{$product.name}&gt;&lt;br /&gt;
+            商品价格：&lt;i&gt;&lt;{$product.price|default:'0'}&gt;&lt;/i&gt;元
+      &lt;/dd&gt;
+      &lt;{/foreach}&gt;
+&lt;/dl&gt;
+&lt;{else}&gt;
+  &lt;div class='notice'&gt;暂无商品数据&lt;/div&gt;
+&lt;{/if}&gt;
+&lt;/div&gt;
+</pre>
+<li>创建挂件拦截器 theme_widget_mywidget.php (命名应于内部代码函数名保持一致)<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/*<br />&nbsp;&nbsp;&nbsp;&nbsp;命名规范&nbsp;以“theme_widget_”开头，挂件包名结尾。<br />&nbsp;&nbsp;&nbsp;&nbsp;运行时系统会传入挂件配置信息 &nbsp;*/<br /></span><span style="color: #007700">function&nbsp;</span><span style="color: #0000BB">theme_widget_mywidget</span><span style="color: #007700">(&amp;</span><span style="color: #0000BB">$setting</span><span style="color: #007700">,&amp;</span><span style="color: #0000BB">$render</span><span style="color: #007700">)<br />{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$app&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #0000BB">‘b2c’</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$o&nbsp;</span><span style="color: #007700">=&nbsp;&amp;</span><span style="color: #0000BB">app</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">(</span><span style="color: #DD0000">'goods'</span><span style="color: #007700">);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$limit&nbsp;</span><span style="color: #007700">=&nbsp;(</span><span style="color: #0000BB">intval</span><span style="color: #007700">(</span><span style="color: #0000BB">$setting</span><span style="color: #007700">[</span><span style="color: #DD0000">'limit'</span><span style="color: #007700">])&gt;</span><span style="color: #0000BB">0</span><span style="color: #007700">)?</span><span style="color: #0000BB">intval</span><span style="color: #007700">(</span><span style="color: #0000BB">$setting</span><span style="color: #007700">[</span><span style="color: #DD0000">'limit'</span><span style="color: #007700">]):</span><span style="color: #0000BB">6</span><span style="color: #007700">;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$orderby</span><span style="color: #007700">=</span><span style="color: #0000BB">$setting</span><span style="color: #007700">[</span><span style="color: #DD0000">'goods_orderby'</span><span style="color: #007700">]?</span><span style="color: #0000BB">$o</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">orderBy</span><span style="color: #007700">(</span><span style="color: #0000BB">$setting</span><span style="color: #007700">[</span><span style="color: #DD0000">'goods_orderby'</span><span style="color: #007700">]):</span><span style="color: #0000BB">null</span><span style="color: #007700">;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$filter&nbsp;</span><span style="color: #007700">=&nbsp;array();<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$data</span><span style="color: #007700">[</span><span style="color: #DD0000">'goods'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">$o</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getList</span><span style="color: #007700">(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">,</span><span style="color: #0000BB">$filter</span><span style="color: #007700">,</span><span style="color: #0000BB">0</span><span style="color: #007700">,</span><span style="color: #0000BB">$limit</span><span style="color: #007700">,</span><span style="color: #0000BB">$orderby</span><span style="color: #007700">[</span><span style="color: #DD0000">'sql'</span><span style="color: #007700">]);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$data</span><span style="color: #007700">;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//根据挂件配置信息，取出数据&nbsp;返回给挂件模板<br /></span><span style="color: #007700">}<br /><br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>
+<li>创建可视化编辑占位模板_preview.html (命名规则定死_preview)<pre>&lt;!--
+    这个文件只用于模板可视化编辑时，如某些情况不方便直接将挂件呈现于可视化编辑视图。 
+    则可以创建此文件在可视化编辑中代替挂件真实显示
+--&gt;
+&lt;div class=&quot;note&quot;&gt;
+    我的第一个挂件
+&lt;/div&gt; 
+</pre></li>
+</li>
+</li>
+</li>
+</li>
+</p>
+</li>
+</li>
+</li>
+</ul>
+<h3><a name="id20">模板级挂件绑定到模板</a></h3>
+<p>当创建好一个模板级挂件。可以在管理后台通过模板列表上面的 “维护” 按钮绑定挂件到模板。</p>
+
+<p>（如下图，经过绑定维护后）</p>
+
+<p><br /><img border="0" alt="" align="middle" src="template-8.png" /></p>
+
+<p>挂件中心可以看到了<br /><img border="0" alt="" align="middle" src="template-9.png" /></p>
+<h3><a name="id21">测试我的第一个挂件</a></h3>
+<p>下图为挂件配置对话框，上文提到，_config.html正式挂件版块配置时的一部分，在挂入到模板挂件区域时，你还可以包装挂件所使用的边框，挂件版块所使用的挂件模板等信息。<br /><img border="0" alt="" align="middle" src="template-10.png" /></p>
+
+<p>可视化编辑中被挂入到挂件版块后。（由于我的第一个挂件定义了_preview.html）所以可视化编辑时和前台真实效果有区别。</p>
+
+<p><br /><img border="0" alt="" align="middle" src="template-11.png" /></p>
+
+<p>做一下模板编辑保存，看一下前台的效果吧</p>
+
+<p><br /><img border="0" alt="" align="middle" src="template-12.png" />j选择其他边框和挂件配置</p>
+
+<p><br /><img border="0" alt="" align="middle" src="template-13.png" /></p>
+
+<p>保存，再看一下效果。</p>
+
+<p><br /><img border="0" alt="" align="middle" src="template-14.png" /></p>
+<h2><a name="id22">系统资源的重用</a></h2><h3><a name="id23">重用脚本框架</a></h3>
+<p>在制作模板、挂件 的过程中，你可以随时使用 脚本框架 Mootools 的公开接口，它提供了强大的节点寻找、强化了javascript数组、封装了异步交互。</p>
+<h3><a name="id24">重用系统级样式表</a></h3>
+<p>我们在前台引入了一个简单的 样式表封装(frameworks.css)、里面有常用的布局、浮动、字体、内外补丁 等class定义。</p>
+<h3><a name="id25">重用前端效果库封装</a></h3>
+<p>前台有一个 强大的效果库封装（switchable.js），它提供了大部分广告效果的轻松实现机制。还提供了区块、图片延迟加载等机制。</p>
+<h2><a name="id26">系统级区域<{main}>的修改</a></h2><h3><a name="id27">site站点</a></h3><h4><a name="id28">站点管理</a></h4>
+<ul>
+<li>系统模块</li>
+</ul>
+
+<p>以b2c为例,它是根据b2c中的site.xml里面定义的生成对应的列表</p>
+
+<p>在默认的情况下不介意修改里面的参数，</p>
+
+<p>其中的参数默认的是在site.xml设置的参数，扩展名为html</p>
+
+<ul>
+<li>导航菜单</li>
+</ul>
+
+<p>导航菜单也是在site.xml中定义的</p>
+
+<p>其中的编辑可以从新定义 导航标题，是否是显示在导航栏上，是否在新窗口打开。</p>
+
+<p>新建导航有两种方式，一种是在系统（site.xml）中定义过的，这样只要显示出来就可以咯，</p>
+
+<p>还有一种方式所自定义链接，可以导入一个链接导航</p>
+
+<ul>
+<li>站点配置</li>
+</ul>
+
+<p>基本信息配置 可配置站点名称，备案号，和网页底部信息</p>
+
+<p>高级配置可以配置是否启用全页缓存，URL参数分割符（规定死了就一个没得选择），</p>
+
+<p>是否使用扩展名 和 扩展名是什么对应于系统全局，最后决定的还是后面那个是否检查url扩展名</p>
+
+<ul>
+<li>自定义URL</li>
+</ul>
+
+<p>能够添加一个url规则，能够把url改变成自定义的一个链接名</p>
+
+<ul>
+<li>seo 优化</li>
+</ul>
+
+<ul>
+<li>sitemap</li>
+</ul>
+
+<p>这是提供一个生成的sitemap，能够直接下载下来</p>
+<h4><a name="id29">页面管理</a></h4>
+<p>这是在content下的一个文章管理系统</p>
+
+<ul>
+<li>页面列表</li>
+</ul>
+
+<p>显示的是所有的文章列表，可以编辑是否发布.</p>
+
+<p>另外有三个添加文章的方式，</p>
+
+<p>1. 添加文章</p>
+
+<p>添加文章就只能对应的添加文章，它使用的模板对应的也是文章的模板，编辑的是文章的样式。</p>
+
+<p>2. 添加单独页</p>
+
+<p>添加单独页可以自定义布局，添加挂件。它就可以不必须是标题，文章的样式.可以自己设计。</p>
+
+<p>3. 添加自定义页</p>
+
+<p>添加自定义页就是页面所有的东西都要自己手动去写。</p>
+
+<ul>
+<li>文章栏目</li>
+</ul>
+
+<p>这是管理的文章分类，可以对节点进行添加，删除,编辑等操作。</p>
+
+<ul>
+<li>异常页面管理</li>
+</ul>
+
+<p>页面异常管理是管理据注册的service site_display_errorpage.conf 来获取到定义的异常页面，在对其进行管理重新定义</p>
+
+<p>异常页面是把这些提示信息以kvstore存储上，在对其进行获取调用。</p>
+<h4><a name="id30">友情链接</a></h4>
+<p>显示的是友情链接的列表，可以对其进行添加，删除，编辑操作。数据存放在sdb_site_link 表中。</p>
+
+<p>在b2c中是以广告相关/友情链接的挂件 对其进行调用。</p>
+<h2><a name="id31">site controller</a></h2><h2><a name="id32">系统级区域<{main}>的修改</a></h2><h3><a name="id33">创建一个模板级的系统区域</a></h3>
+<ul>
+<li>当系统内置的挂件不能满足你的要求时，你可以自己动手建立一个模板级的系统级区域。</li>
+</ul>
+</ul>
+
+<ol>
+<ol>
+<li>在模板目录建立customsite文件夹。
+<li>在customsite文件夹内创建你你想拦截以及重写的系统级页面。
+<p>（如下图，创建了商品详情页product1.html和规格页spec1.html.）<br /><img border="0" alt="" align="middle" src="template-15.png" />
+<li>修改模板级商品详情页（product1.html）配置<pre>&lt;!---购物面板---&gt;
+    &lt;div class='hightline'&gt;
+    &lt;div class='hightbox'&gt;
+    &lt;!---规格开始---&gt;
+    &lt;{if $goods.spec }&gt;
+    &lt;{include file='theme:customsite/spec1.html'}&gt;
+     //将系统级规格页面路径修改为模板级 theme: 路径下的customsite文件夹下的spec1.html
+    &lt;{/if}&gt;
+    &lt;!---规格结束---&gt;
+</pre><pre class="quote">（注:不能直接拦截功能区块页面任何调用方法&lt;{include file='theme:spec1.html'}&gt;的子页面，只支持直接拦截父级页面）
+</pre>
+<li>修改模板文件夹的theme.xml。<pre class="quote">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+&lt;theme&gt;
+    &lt;name&gt;风尚购物&lt;/name&gt;
+    &lt;id&gt;fsgw&lt;/id&gt;
+    &lt;version&gt;ECStore&lt;/version&gt;
+    &lt;info&gt;&lt;/info&gt;
+    &lt;author&gt;ShopEx&lt;/author&gt;
+    &lt;site&gt;http://www.shopex.cn&lt;/site&gt;
+    &lt;update_url&gt;&lt;/update_url&gt;
+    &lt;borders&gt;
+                &lt;set key=&quot;边栏样式&quot; tpl=&quot;borders/border1.html&quot; /&gt;
+                &lt;set key=&quot;商品分类&quot; tpl=&quot;borders/border2.html&quot; /&gt;
+                &lt;set key=&quot;商店公告&quot; tpl=&quot;borders/border3.html&quot; /&gt;
+    &lt;/borders&gt;
+    &lt;views&gt;
+         &lt;set app=&quot;b2c&quot;  view=&quot;site/product/index.html&quot;   tpl=&quot;customsite/product1.html&quot; /&gt;
+    //将根目录b2c的view文件夹内的site站点文件夹下的view系统级路径下的商品详情页product/index.html替换为tpl模板级路径下的商品详情页customsite/product1.html
+    &lt;/views&gt;
+    &lt;config&gt;&lt;/config&gt;
+    &lt;widgets&gt;&lt;/widgets&gt;
+    &lt;proinstances&gt;&lt;/proinstances&gt;
+&lt;/theme&gt;
+</pre>
+<li>在管理后台通过模板列表上的 “模板还原” 至“默认” (因上步骤修改的是theme.xml文件),如下图:<br /><img border="0" alt="" align="middle" src="template-16.png" /></ol>
+
+<ul>
+<li>商品详情页和商品规格字段已被更改。<br /><img border="0" alt="" align="middle" src="template-17.png" /></li>
+</ul>
+</li>
+</li>
+</p>
+</li>
+</li>
+</ol>
+</ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">优势和创新</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">ShopEx模板机制的优势</a>
+        <li><a href="#id3" class="reference internal">ShopEx模板机制的创新</a>
+    </ul>
+    <li><a href="#id4" class="reference internal">模板机制的名词解释</a>
+        <ul>
+        <li><a href="#id5" class="reference internal">挂件区域(widgets)</a>
+        <li><a href="#id6" class="reference internal">挂件(widget)</a>
+        <li><a href="#id7" class="reference internal">边框(border)</a>
+        <li><a href="#id8" class="reference internal">系统级区域(main)</a>
+        <li><a href="#id9" class="reference internal">默认模板页 (default.html)</a>
+    </ul>
+    <li><a href="#id10" class="reference internal">创建一个模板包</a>
+        <ul>
+        <li><a href="#id11" class="reference internal">标准模板包必要的文件</a>
+        <li><a href="#id12" class="reference internal">标准模板包必要的文件结构</a>
+    </ul>
+    <li><a href="#id13" class="reference internal">模板包的首次加载</a>
+        <ul>
+        <li><a href="#id14" class="reference internal">模板开发测试环境</a>
+        <li><a href="#id15" class="reference internal">模板包的首次加载</a>
+    </ul>
+    <li><a href="#id16" class="reference internal">完善模板包</a>
+        <ul>
+        <li><a href="#id17" class="reference internal">为模板添加页面布局</a>
+        <li><a href="#id18" class="reference internal">为模板布局页添加挂件</a>
+        <li><a href="#id19" class="reference internal">创建一个模板级挂件</a>
+        <li><a href="#id20" class="reference internal">模板级挂件绑定到模板</a>
+        <li><a href="#id21" class="reference internal">测试我的第一个挂件</a>
+    </ul>
+    <li><a href="#id22" class="reference internal">系统资源的重用</a>
+        <ul>
+        <li><a href="#id23" class="reference internal">重用脚本框架</a>
+        <li><a href="#id24" class="reference internal">重用系统级样式表</a>
+        <li><a href="#id25" class="reference internal">重用前端效果库封装</a>
+    </ul>
+    <li><a href="#id26" class="reference internal">系统级区域<{main}>的修改</a>
+        <ul>
+        <li><a href="#id27" class="reference internal">site站点</a>
+            <ul>
+            <li><a href="#id28" class="reference internal">站点管理</a>
+            <li><a href="#id29" class="reference internal">页面管理</a>
+            <li><a href="#id30" class="reference internal">友情链接</a>
+        </ul>
+    </ul>
+    <li><a href="#id31" class="reference internal">site controller</a>
+    <li><a href="#id32" class="reference internal">系统级区域<{main}>的修改</a>
+        <ul>
+        <li><a href="#id33" class="reference internal">创建一个模板级的系统区域</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="site_router.html"
+                                  title="上一章">site路由处理类 - site_router</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../dbeav/index.html"
+                                  title="下一章">增强型模型(Model) - dbeav</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../dbeav/index.html" title="增强型模型(Model) - dbeav" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="site_router.html" title="site路由处理类 - site_router" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">优雅的前端- site</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

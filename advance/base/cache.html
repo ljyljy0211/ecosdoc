@@ -1,0 +1,639 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      缓存机制 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="基础框架 - base" href="index.html" />
+
+        <link rel="next" title="kvstore" href="key-value存储机制.html" />
+        <link rel="prev" title="api" href="api机制.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="kvstore.html" title="key-value存储机制" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="api.html" title="api机制" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">基础框架 - base</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 缓存机制</h1>
+            
+<p>在ecos中设置了三层缓存结构，按顺序触发</p>
+
+<table class="docutils">
+<tr>
+<th>层次</th>
+
+<th>缓存名称</th>
+
+<th>存放位置</th>
+</tr>
+
+<tr>
+<td>1</td>
+
+<td>基于http的浏览器缓存</td>
+
+<td>用户浏览器本地</td>
+</tr>
+
+<tr>
+<td>2</td>
+
+<td>前台全页缓存</td>
+
+<td>/data/cache/secache.php</td>
+</tr>
+
+<tr>
+<td>3</td>
+
+<td>模板缓存</td>
+
+<td>/data/kvstore/cache/Template</td>
+</tr>
+</table>
+</table>
+<h2><a name="id1">基于http的浏览器缓存</a></h2>
+<p>调用流程图<br /><img border="0" alt="" align="middle" src="images/cache1.jpg" /></p>
+
+<p>浏览器都很聪明，他们懒的把同样的数据从网上下载两次。</p>
+
+<p>如果用户访问过这个网站，那么我们会在系统的header头里放一个Etag标签。这个Etag数据是和页面的内容相关的，如果页面内容变了，Etag也会不同。</p>
+
+<p>第一次访问一个shopex页面，服务器的返回情况， 使用抓包工具可以看到http头如下所示。</p>
+<pre class="mark">Server	nginx/0.8.54
+Date	Mon, 04 Jul 2011 06:33:27 GMT
+Content-Type	text/html;charset=utf-8
+Transfer-Encoding	chunked
+Connection	keep-alive
+X-Powered-By	PHP/5.3.5-1ubuntu7.2
+Cache-Control	public,max-age=1
+X-Cache	HIT from ecos-pagecache 2011-07-04 14:33:11    //生成全页缓存的时间
+Etag	878c43f39335f4be2f92275cd65b9ed3              //header头存放的Etag标签
+Content-Encoding	gzip
+</pre>
+<p>最后一行就是Etag数据:878c43f39335f4be2f92275cd65b9ed3，当用户第二次访问这个页面的时候(访问，或者按F5刷新)，</p>
+
+<p>浏览器会把Etag里的数据放在请求的http头中：</p>
+<pre class="mark">Host	localhost
+User-Agent	Mozilla/5.0 (X11; Linux i686; rv:5.0) Gecko/20100101 Firefox/5.0
+Accept	text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language	zh-cn,zh;q=0.5
+Accept-Encoding	gzip, deflate
+Accept-Charset	UTF-8,*
+Connection	keep-alive
+Referer	http://localhost/ecstore-bugfix/index.php/shopadmin/
+Cookie	s=000ce07480ffe56e4cec9be04f739479; vary=5657700ac3fb591e8d63271bb0f9a9726b14a9e2750671e6fbbfba8dfe436267
+If-None-Match	878c43f39335f4be2f92275cd65b9ed3
+</pre>
+<p>最后一行：浏览器会把上次的etag值放在<b>If-None-Match</b>里面。如果网店程序端检测到:</p>
+
+<p>1. 存在这个页面的全页缓存</p>
+
+<p>2. 该全页缓存的页面数据未过期</p>
+
+<p>3. 全页缓存的Etag值和浏览器传过来的If-None-Match得相同</p>
+
+<p>则发送给浏览器一个304的头信息，浏览器就将自己本地缓存的页面数据直接显示出来，避免了网络传输。</p>
+
+<p>此时，网络上传输的数据只有以上两次，并没有实际的内容传输，所以响应会非常快.</p>
+<h2><a name="id2">前台全页缓存</a></h2><h3><a name="id3">全页缓存加载机制</a></h3>
+<p>前台全页缓存加载流程图<br /><img border="0" alt="" align="middle" src="images/cache2.jpg" /></p>
+
+<p>当基于http的浏览器缓存机制被打破的时候,则会调用前台全页缓存,来生成全页缓存。</p>
+
+<p>此时系统并不是为每次生成页面内容的请求都重新运行一次，而是将页面的结果整体缓存下来，</p>
+
+<p>如果该页面所包含的数据都没有更新，则是直接输出被缓存下来的内容。</p>
+
+<p>ecos在数据库的操作底层设置了一个触发动作，当有任何表的更新，插入，删除操作时，</p>
+
+<p>将当时的时间和被操作的表明记录在一个特殊的表里:<b>sdb_base_cache_expires</b>.</p>
+
+<p>此表的结构如下：</p>
+
+<table class="docutils">
+<tr>
+<th>Type</th>
+
+<th>name</th>
+
+<th>expire</th>
+
+<th>app</th>
+</tr>
+</table>
+
+<p>| 类型 | 缓存的名字| 操作时间| 所在的app|
+<table class="docutils">
+<tr>
+<td>DB</td>
+
+<td>SITE_SEO</td>
+
+<td>1309145527</td>
+
+<td>site</td>
+</tr>
+</table>
+</p>
+</table>
+
+<p>如果发现有缓存过期的时候，则会生成新的全页缓存。此时先回判断其中的挂件缓存是否过期，如果没有过期这会</p>
+
+<p>把没过期的挂件缓存直接进行加载,如果有过期挂件这生成新的挂件缓存，在加载到整体页面中，此时生成全页缓存</p>
+
+<p>之后再进行输出。</p>
+<h3><a name="id4">使用cmd查看前台全页缓存加载过程</a></h3>
+<p>在使用cmd查看的log日志的时候，可以看到前台全页缓存的加载过程，也可以看到缓存是否命中，是哪个挂件使得缓存失效，</p>
+
+<p>这个就可以找到经常会影响缓存失效的数据，这样就可以通过ajax来调用数据，提高缓存命中率。</p>
+
+<ul>
+<li>windows预先安装工具：UnxUtils，使能在windows下使用linux命令，linux系统跳过
+<li>config/config.php 开启 define(‘PAGE_CACHE_LOG’, true);//调试结束应关掉
+<li>查看目录：data/logs/{当前日期}/{当前IP}.php
+<li>监控命令：tail  -f  {当前IP}.php</li>
+</li>
+</li>
+</li>
+</ul>
+
+<p>CMD查看到全页缓存有效,可以看到如果缓存有效hit命中</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/cache3.png" /></p>
+
+<p>CMD查看到全页缓存失效时,就可以看到是哪个widgets是全页缓存失效，miss没有命中<br /><img border="0" alt="" align="middle" src="images/cache4.png" /></p>
+<h3><a name="id5">前台全页缓存中-全局vary</a></h3>
+<p>问题：不同等级会员访问同一个商品详情页，商品的id是相同的，所以访问链接是相同的，但是不同等级会员显示的价格是不同的</p>
+
+<p>，那这时我们对这个商品详情页是缓存一份数据还是根据不同会员等级缓存多份呢？如果是要缓存多份要怎么存放呢？</p>
+<pre class="mark">如果是只缓存一份，那么我们就可以看到，一个A级用户访问系统，那么我们就用一个标识这个页面的key来缓存一个A等级看到的页
+面，而当一个B等级用户再来访问的时候，系统就根据这个页面的key还获取到的是A级用户的缓存来给B等级用户输出，那么这样B级用
+户看到的是A等级用户看到的页面，因此在Ecstore中就引入了一个全局vary作为一个辅助变量使得完成一个页面标识key，缓存多份页面
+</pre>
+<p>Ecstore缓存key生成图：<br /><img border="0" alt="" align="middle" src="images/cache5.jpg" /></p>
+<pre>$key        是唯一标识一个页面的key,Ecstore系统可通过这个key获取到对应页面的缓存
+全局vary    $key的一个辅助变量，影响页面内容（数据）的变量
+$new_key    是$key加上全局vary生成的唯一标识缓存的key,例如：页面根据会员等级显示不同价格，那么就可以把会员等级作为
+            全局vary，那么这个页面的就根据$key加上获取到的会员等级生成$new_key，再来缓存当前等级的页面缓存
+</pre>
+<p>知道了全局vary的作用那么就来看看在Ecstore系统中目前已有那些全局vary</p>
+<pre>已有全局vary
+    base:      host信息，是否支持rewirte,语言环境，ECAE环境
+    site:      URL分隔符，是否启用扩展
+     b2c:      会员等级，货币
+
+查看全局vary具体实现代码：在对应的app中的services.xml中找到 service ID 为 cachemgr_global_vary的标签，找到对应的类查看
+</pre><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">base_service_cachevary</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">get_varys</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$varys</span><span style="color: #007700">[</span><span style="color: #DD0000">'HOST'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">base_url</span><span style="color: #007700">(</span><span style="color: #0000BB">true</span><span style="color: #007700">);&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//host信息<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$varys</span><span style="color: #007700">[</span><span style="color: #DD0000">'REWRITE'</span><span style="color: #007700">]&nbsp;=&nbsp;(</span><span style="color: #0000BB">defined</span><span style="color: #007700">(</span><span style="color: #DD0000">'WITH_REWRITE'</span><span style="color: #007700">))&nbsp;?&nbsp;</span><span style="color: #0000BB">WITH_REWRITE&nbsp;</span><span style="color: #007700">:&nbsp;</span><span style="color: #DD0000">''</span><span style="color: #007700">;&nbsp;&nbsp;</span><span style="color: #FF8000">//是否有rewirte支持<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$varys</span><span style="color: #007700">[</span><span style="color: #DD0000">'LANG'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">get_lang</span><span style="color: #007700">();&nbsp;</span><span style="color: #FF8000">//语言环境<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">return&nbsp;</span><span style="color: #0000BB">$varys</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}</span><span style="color: #FF8000">//End&nbsp;Function<br /></span><span style="color: #007700">}<br /></span>
+</span>
+</code></div>
+<p>那么如果在二次开发的时候需要添加全局vary这个扩展,这个时候就只需要在b2c这个全局vary类中参照b2c的写法扩展</p>
+<pre class="mark">注意：在扩展全局vary的时候需要注意的是，如果全局vary是 会员等级，货币。会员有4个等级，货币有2种，那么一个页面就会
+      缓存4X2=8份，如果再扩展的话就要保证一个页面不要缓存过多的份数
+</pre>
+<p>如果是要再其他的app中添加这个扩展，那么就只要扩展 cachemgr_global_vary 这个service，可参照b2c</p>
+<h2><a name="id6">静态全页缓存(ecstore1.3)</a></h2>
+<p>静态全页缓存会忽略除全局vary的其实改变，而只检测expires.使用静态缓存需要注册service: site.router.cache, 实现该service 必需实现get_cache_methods方法，返回值格式为</p>
+<pre>class b2c_cache{
+
+    function get_cache_methods() {
+        return array(
+            array(
+                'name' =&gt; '商品详情页',                 //缓存名称
+                'app'=&gt;'b2c',                           //app名称
+                'ctl'=&gt;'site_product',                  //控制器名称
+                'act'=&gt;'index',                         //方法名
+                'expires'=&gt;'80',                        //静态缓存默认过期时间
+                ),
+            
+            );
+    }
+
+}
+</pre><h2><a name="id7">widgets 缓存</a></h2>
+<p>通过前台全页缓存加载可以看到在全页缓存失效的时候，会加载widgets缓存，那么如果一个widgets中也会有一些系统变量会影响到widgets的显示数据</p>
+
+<p>那么在widgets中提供了一个widgets vary,使一个widgets来缓存多份</p>
+
+<p>Ecstore中已有的已有的widgets vary<pre>member //用户等级
+money //货币
+</pre></p>
+
+<p>扩展：写在全局vary扩展类中，参照b2c/lib/service/cachemgr/globalvary.php<pre>$GLOBALS[‘runtime’][‘$vary_name’] = $vary_value;
+$vary_name  widgets vary 的名字
+$vary_value widgets vary 变量数据来源
+</pre></p>
+
+<p>使用：在widgets 中的 widgets.php 中添加<pre>$setting[‘vary’] = ‘money’; //根据货币缓存
+$setting[‘vary’] =‘money,member’; //根据member,money排列组合缓存
+</pre></p>
+
+<p>注意：wiogets必须缓存,如果有不需要的缓存数据则用ajax</p>
+<h3><a name="id8">全局vary和widgets vary的区别和联系</a></h3>
+<ul>
+<li>全局vary是在缓存底端处理的，开发者不可以选择是否使用，而widgets vary是针对于widgets来说的，那么开发者就可以选择是否使用widgets vary。
+<li>widgets开发者在不知道影响widgets显示的数据的变量是否已经在全局vary中已经定义，那么widgets开发者就可以自己来定义widgets vary使用widgets vary</li>
+</li>
+</ul>
+<h2><a name="id9">区域缓存</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="images/cache6.png" /></p>
+
+<p>如图：Ecstore后台报表当数据量大时，数据统计慢，但是报表是一天统计一次，数据更新慢，那么我们就可以把这个页 面缓存，或者把数据缓存，</p>
+
+<p>做成一个区域缓存。</p>
+
+<p>首先要找到影响你要缓存区域的数据获取或页面输出的代码代码在哪里,然后在参照下面格式写，先判断获取缓存，没有获取到则重新缓存<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">//获取缓存<br /></span><span style="color: #007700">if(</span><span style="color: #0000BB">cachemgr</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #0000BB">md5</span><span style="color: #007700">(</span><span style="color: #0000BB">‘$cache_key_name‘</span><span style="color: #007700">),</span><span style="color: #0000BB">$content</span><span style="color: #007700">)){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$content</span><span style="color: #007700">;</span><span style="color: #FF8000">//如果获取到缓存，返回缓存中的数据<br /></span><span style="color: #007700">}else{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//重新设置缓存<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">cachemgr</span><span style="color: #007700">::</span><span style="color: #0000BB">co_start</span><span style="color: #007700">();&nbsp;</span><span style="color: #FF8000">//开始缓存<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">…<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//这个是影响你要缓存区域的数据获取，或页面输出的代码<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$cache_data&nbsp;</span><span style="color: #007700">=</span><span style="color: #0000BB">…</span><span style="color: #007700">;&nbsp;&nbsp;</span><span style="color: #FF8000">//要缓存的数据，或页面<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">…<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//保存，结束缓存，cachemgr::co_end()是从co_start到co_end之间的代码调用到的数据表的最后修改时间和setConf配置最后修改的时间<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//用于判断缓存是否有效<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">cachemgr</span><span style="color: #007700">::</span><span style="color: #0000BB">set</span><span style="color: #007700">(</span><span style="color: #0000BB">md5</span><span style="color: #007700">(</span><span style="color: #0000BB">‘$cache_key_name’</span><span style="color: #007700">),</span><span style="color: #0000BB">$cache_data</span><span style="color: #007700">,</span><span style="color: #0000BB">cachemgr</span><span style="color: #007700">::</span><span style="color: #0000BB">co_end</span><span style="color: #007700">());<br />}<br /><br />&nbsp;</span><span style="color: #0000BB">如果看不懂可参照：site</span><span style="color: #007700">/</span><span style="color: #0000BB">lib</span><span style="color: #007700">/</span><span style="color: #0000BB">router</span><span style="color: #007700">.</span><span style="color: #0000BB">php&nbsp;dispatch方法中的缓存全页缓存<br /></span>
+</span>
+</code></div></p>
+<h2><a name="id10">方法缓存</a></h2>
+<p>方法缓存，顾名思义是对一个方法进行运算后的数据进行缓存，如果在调用一个方法的时候输入的参数一般不变，并且在这个方法调用的数据较多，运算复杂，影响了程序运行的效率，那么就有必要使用方法缓存</p>
+
+<p>平常调用一个方法：<pre>$data = $this-&gt;kernel_single(‘$class_name’)-&gt;$action($params);
+</pre></p>
+
+<p>使用方法缓存<pre>$data = cachemgr::exec(array‘$class_name’,’$action’),array(‘$params’),$ttl);
+
+参数：
+    $class_name 需要缓存的方法的控制器
+    $action	需要缓存的方法
+    $params	array 缓存方法调用的参数
+    $ttl	缓存的有效时间/秒
+</pre>如果使用了方法缓存，那么只要在缓存有效期内，那么调用这个方法都是使用缓存的数据，如果缓存过期，则在运行一遍缓存的方法</p>
+<h2><a name="id11">缓存过期判断条件</a></h2><h3><a name="id12">一个缓存的最小存储单元</a></h3>
+<p>一个缓存单元类似一个数据报，包含报头和报文，而一个缓存存储单元也包含一个头和一个正文<pre>
+1、在一个缓存存储单元中头部包含的是影响这个缓存是否有效的信息，而缓存的正文则是缓存的内容
+2、缓存存储单元的头部
+   影响缓存是否有效的信息是：这个缓存内容调用的数据表的的最后操作时间，和setConf配置的最后修改时间，这些信息会和sdb_base_cache_expire
+   中存储的信息去做对比
+</pre></p>
+
+<p>ecos中在设置一个缓存的时候，会收集这个缓存所调用的数据表的最后操作时间和所使用setConf配置的最后修改时间，放到缓存的头部，在获取缓存的时候则把这个头部的信息去和sdb_base_cache_expire做对比，不一致则缓存失效</p>
+<h3><a name="id13">影响缓存有效期的条目</a></h3>
+<p>在ecos中影响缓存有效的条目是放在 sdb_base_cache_expires 中的.</p>
+
+<p>其中系统内置的有两个类型可以影响缓存的有效期，</p>
+
+<p>1. DB类型</p>
+<pre>DB 类型的表示的是所对应的表进行了改变. 如果某个缓存中的所包含了对应表的数据改变了，那么这个缓存也就失效了。
+</pre>
+<p>2.CONF类型<pre>CONF类型是配置信息的改变所让缓存失效。其配置信息是setConf()所配置的信息。
+</pre></p>
+
+<p>扩展：</p>
+
+<p>如果需要扩展影响缓存有效期条目的类型可以调用 cachemgr 中的 set_modified方法，来进行扩展。参照setConf<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">public&nbsp;function&nbsp;</span><span style="color: #0000BB">setConf</span><span style="color: #007700">(</span><span style="color: #0000BB">$key</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$value</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">base_kvstore</span><span style="color: #007700">::</span><span style="color: #0000BB">instance</span><span style="color: #007700">(</span><span style="color: #DD0000">'setting/'</span><span style="color: #007700">.</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app_id</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">store</span><span style="color: #007700">(</span><span style="color: #0000BB">$key</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$value</span><span style="color: #007700">)){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">__appConf</span><span style="color: #007700">[</span><span style="color: #0000BB">$key</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">$value</span><span style="color: #007700">;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//todo：更新当前进程缓存<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">set_modified</span><span style="color: #007700">(</span><span style="color: #0000BB">$key</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}else{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br /></span>
+</span>
+</code></div></p>
+<h2><a name="id14">模板缓存</a></h2>
+<p>如果全页缓存失效，最后可以调用到模板缓存.根据smarty原则，每个html文件会编译成一个php文件，</p>
+
+<p>每次在调用执行html,则根据此html文件的最后的修改时间获取模板缓存，如果不存在模板缓存则需要从新编译，</p>
+
+<p>再次进行模板缓存。</p>
+<h2><a name="id15">缓存管理</a></h2><h3><a name="id16">缓存开启，关闭</a></h3>
+<ul>
+<li>缓存关闭，config/config.php{define('WITHOUT_CACHE',true);}
+<li>缓存开启，config/config.php{define('WITHOUT_CACHE',false);}</li>
+</li>
+</ul>
+<h3><a name="id17">关闭某个前台全页缓存</a></h3>
+<p>在开启缓存的情况下，购物车控制器不需要缓存，那这么样在开启全页缓存的前提下自定义关闭某个控制器缓存</p>
+
+<p>在site/lib/router.php 中有个dispatch方法 可以找到这么一句话<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">...<br /></span><span style="color: #FF8000">//判断是否缓存<br /></span><span style="color: #007700">if(</span><span style="color: #0000BB">count</span><span style="color: #007700">(</span><span style="color: #0000BB">$post</span><span style="color: #007700">)==</span><span style="color: #0000BB">0&nbsp;</span><span style="color: #007700">&amp;&amp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">_response</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">get_http_response_code</span><span style="color: #007700">()==</span><span style="color: #0000BB">200&nbsp;</span><span style="color: #007700">&amp;&amp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">has_page_cache_control</span><span style="color: #007700">()===</span><span style="color: #0000BB">true<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">&amp;&amp;&nbsp;</span><span style="color: #0000BB">$config_page_cache</span><span style="color: #007700">===</span><span style="color: #DD0000">'true'</span><span style="color: #007700">)<br /></span>
+</span>
+</code></div><pre class="mark">$this-&gt;has_page_cache_control()
+这个判断的是
+$this-&gt;_response-&gt;get_header('cache-control', $header) //$header = no_cahce 或则是$header = no_store就可以了
+</pre></p>
+
+<p>那么如果要关闭一个控制器不要缓存那就只要在这个控制器的构造方法中写上<pre>$this-&gt;_response-&gt;set_header(‘cache_control’,no_cache); 或则是$this-&gt;_response-&gt;set_header(‘cache_control’,no_store);
+</pre>也可以用site_controller中封装好的方法就可以<pre>    $this-&gt;set_no_cache();
+或者是
+    $this-&gt;set_no_store();
+</pre></p>
+<h3><a name="id18">缓存存储器</a></h3>
+<p>cachemgr决定了哪些内容被缓存，缓存多久，如何被更新，怎样判别缓存过期。缓存存储器仅仅是负责缓存如何存放，如何读取。</p>
+
+<p>当缓存过多时如何被自动删除，删除哪一些。</p>
+
+<p>ecos系统默认的缓存存储器是secache。可以被替换为apc或者memcached.</p>
+
+<p>secache 存储机制可以参考[ <a href="http://docs.dev.shopex.cn/shopex-b2c/#toc46">http://docs.dev.shopex.cn/shopex-b2c/#toc46</a>]</p>
+<h4><a name="id19">更改缓存存储器为memcache</a></h4>
+<p>如果要改成为memcache 或则memcached,则在config.php 文件中有要开启下面的配置(单个memcache服务)<pre># cache后端存储类
+# define('CACHE_STORAGE', 'base_cache_nocache');
+# define('CACHE_STORAGE', 'base_cache_secache');
+# define('CACHE_STORAGE', 'base_cache_memcache');
+define('CACHE_STORAGE', 'base_cache_memcached');
+
+# cache memcache服务器配置
+# socket  'unix:///tmp/memcached.sock'
+# server  '127.0.0.1:11211'
+# multi   'unix:///tmp/memcached.sock,127.0.0.1:11211,127.0.0.1:11212'
+define('CACHE_MEMCACHE_CONFIG','127.0.0.1,11211'); //前面是ip,后面是端口
+#define('CACHE_MEMCACHE_CONFIG', '127.0.0.1:11211,127.0.0.1:11212'); //前面是ip,后面是端口
+</pre></p>
+<h3><a name="id20">cachemgr.php 提供的方法</a></h3>
+<p>cachemgr提供了，判断缓存是否过期，缓存设置，获取缓存等。对缓存的管理都是在 base/lib/static/cachemgr.php 中进行管理</p>
+<h4><a name="id21">常用的方法</a></h4><h5><a name="id22">init</a></h5>
+<p>static public function init($with_cache=true)</p>
+<pre class="mark">初始化 根据配置文件判断是否需要开启缓存，如果开启缓存则配置文件选择缓存存储器，默认的存储器是secache
+</pre><h5><a name="id23">enable</a></h5>
+<p>static public function enable()</p>
+<pre class="mark">判断是否开启缓存.
+
+return boolean
+</pre><h5><a name="id24">get_modified</a></h5>
+<p>static public function get_modified($type, $vary_key)<pre class="mark">获取modified 可以根据$type,和$vary_key获取到sdb_base_cache_expires中的数据,可以判断缓存是否过期。
+
+return 时间戳
+</pre></p>
+<h5><a name="id25">set_modified</a></h5>
+<p>static public function set_modified($type, $vary_key, $time=0)<pre class="mark">设置modified,其中的数据是放到sdb_base_cache_expires中的
+可设置影响缓存的条目vary
+</pre></p>
+<h5><a name="id26">get</a></h5>
+<p>static public function get($key, &amp;$return)<pre class="mark">获取缓存
+
+参数    $key sting 缓存的key
+        &amp;$return   返回缓存的内容
+
+return  boolean
+</pre></p>
+<h5><a name="id27">set</a></h5>
+<p>static public function set($key, $content, $params=array())<pre class="mark">设置缓存
+
+参数：  $key     string 缓存的key
+        $content mixed 缓存的内容
+        $params  array 影响缓存有效的varys和缓存有效时间
+
+return  boolean
+</pre></p>
+<h5><a name="id28">exec</a></h5>
+<p>static public function exec($func, $args, $ttl=3600)<pre class="mark">方法缓存
+
+参数   $func mixed  方法名
+       $args array  方法参数
+       $ttl  int    有效期
+
+return mixed
+</pre></p>
+<h5><a name="id29">co_start</a></h5>
+<p>static public function co_start()<pre class="mark">缓存检查开始
+</pre></p>
+<h5><a name="id30">co_end</a></h5>
+<p>static public function co_end()<pre class="mark">缓存检查结果
+</pre></p>
+<h4><a name="id31">不常用的方法</a></h4><h5><a name="id32">instance</a></h5>
+<p>static public function instance()</p>
+<pre class="mark">获取cache_storage实例
+</pre><h5><a name="id33">set_expiration</a></h5>
+<p>static public function set_expiration($time)<pre class="mark">设置当前区块过期时间
+</pre></p>
+<h5><a name="id34">get_key</a></h5>
+<p>static public function get_key($key)<pre class="mark">获取缓存key
+
+参数   $key string  缓存的key
+
+return string  对原始的key进行处理过得key
+</pre></p>
+<h5><a name="id35">get_cache_check_version</a></h5>
+<p>static public function get_cache_check_version()<pre class="mark">取得缓存版本
+</pre></p>
+<h5><a name="id36">get_cache_global_varys</a></h5>
+<p>static public function get_cache_global_varys()<pre class="mark">取得全局varys
+</pre></p>
+<h5><a name="id37">get_global_varys</a></h5>
+<p>static public function get_global_varys()<pre class="mark">获取全局key_varys属性，将影响全局key的生成
+</pre></p>
+<h5><a name="id38">ask_cache_check_version</a></h5>
+<p>static public function ask_cache_check_version($force=false)<pre class="mark">询问缓存版本号
+</pre></p>
+<h5><a name="id39">get_cache_check_version_key</a></h5>
+<p>static public function get_cache_check_version_key()<pre class="mark">获得版本号的key
+</pre></p>
+<h5><a name="id40">check_expires</a></h5>
+<p>static public function check_expires($type, $cache_name)<pre class="mark">检查过期
+</pre></p>
+<h5><a name="id41">check_current_co_depth</a></h5>
+<p>static public function check_current_co_depth()<pre class="mark">检查当前缓存深度
+</pre></p>
+<h5><a name="id42">check_current_co_objects_exists</a></h5>
+<p>static public function check_current_co_objects_exists($type, $cache_name)<pre class="mark">检查当前缓存层中是否已经check_expires 优化缓存性能
+</pre></p>
+<h5><a name="id43">store_vary_list</a></h5>
+<p>static public function store_vary_list($vary_list)<pre class="mark">保存vary_list 将sdb_base_cache_expires 中的数据存放到kvstore中
+</pre></p>
+<h5><a name="id44">fetch_vary_list</a></h5>
+<p>static public function fetch_vary_list($force=false)<pre class="mark">读取vary_list 先在kvstore中查找,如果没读到则到sdb_base_cache_expires中获取，再回写到kvstore
+</pre></p>
+<h5><a name="id45">status</a></h5>
+<p>static public function status(&amp;$msg)<pre class="mark">查看缓存状态
+</pre></p>
+<h5><a name="id46">optimize</a></h5>
+<p>static public function optimize(&amp;$msg)<pre class="mark">优化缓存
+</pre></p>
+<h5><a name="id47">clean</a></h5>
+<p>static public function clean(&amp;$msg)<pre class="mark">清空缓存
+
+注意： 不是真正删除
+      只是迭代新的缓存版本号
+</pre></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">基于http的浏览器缓存</a>
+    <li><a href="#id2" class="reference internal">前台全页缓存</a>
+        <ul>
+        <li><a href="#id3" class="reference internal">全页缓存加载机制</a>
+        <li><a href="#id4" class="reference internal">使用cmd查看前台全页缓存加载过程</a>
+        <li><a href="#id5" class="reference internal">前台全页缓存中-全局vary</a>
+    </ul>
+    <li><a href="#id6" class="reference internal">静态全页缓存(ecstore1.3)</a>
+    <li><a href="#id7" class="reference internal">widgets 缓存</a>
+        <ul>
+        <li><a href="#id8" class="reference internal">全局vary和widgets vary的区别和联系</a>
+    </ul>
+    <li><a href="#id9" class="reference internal">区域缓存</a>
+    <li><a href="#id10" class="reference internal">方法缓存</a>
+    <li><a href="#id11" class="reference internal">缓存过期判断条件</a>
+        <ul>
+        <li><a href="#id12" class="reference internal">一个缓存的最小存储单元</a>
+        <li><a href="#id13" class="reference internal">影响缓存有效期的条目</a>
+    </ul>
+    <li><a href="#id14" class="reference internal">模板缓存</a>
+    <li><a href="#id15" class="reference internal">缓存管理</a>
+        <ul>
+        <li><a href="#id16" class="reference internal">缓存开启，关闭</a>
+        <li><a href="#id17" class="reference internal">关闭某个前台全页缓存</a>
+        <li><a href="#id18" class="reference internal">缓存存储器</a>
+            <ul>
+            <li><a href="#id19" class="reference internal">更改缓存存储器为memcache</a>
+        </ul>
+        <li><a href="#id20" class="reference internal">cachemgr.php 提供的方法</a>
+            <ul>
+            <li><a href="#id21" class="reference internal">常用的方法</a>
+                <ul>
+                <li><a href="#id22" class="reference internal">init</a>
+                <li><a href="#id23" class="reference internal">enable</a>
+                <li><a href="#id24" class="reference internal">get_modified</a>
+                <li><a href="#id25" class="reference internal">set_modified</a>
+                <li><a href="#id26" class="reference internal">get</a>
+                <li><a href="#id27" class="reference internal">set</a>
+                <li><a href="#id28" class="reference internal">exec</a>
+                <li><a href="#id29" class="reference internal">co_start</a>
+                <li><a href="#id30" class="reference internal">co_end</a>
+            </ul>
+            <li><a href="#id31" class="reference internal">不常用的方法</a>
+                <ul>
+                <li><a href="#id32" class="reference internal">instance</a>
+                <li><a href="#id33" class="reference internal">set_expiration</a>
+                <li><a href="#id34" class="reference internal">get_key</a>
+                <li><a href="#id35" class="reference internal">get_cache_check_version</a>
+                <li><a href="#id36" class="reference internal">get_cache_global_varys</a>
+                <li><a href="#id37" class="reference internal">get_global_varys</a>
+                <li><a href="#id38" class="reference internal">ask_cache_check_version</a>
+                <li><a href="#id39" class="reference internal">get_cache_check_version_key</a>
+                <li><a href="#id40" class="reference internal">check_expires</a>
+                <li><a href="#id41" class="reference internal">check_current_co_depth</a>
+                <li><a href="#id42" class="reference internal">check_current_co_objects_exists</a>
+                <li><a href="#id43" class="reference internal">store_vary_list</a>
+                <li><a href="#id44" class="reference internal">fetch_vary_list</a>
+                <li><a href="#id45" class="reference internal">status</a>
+                <li><a href="#id46" class="reference internal">optimize</a>
+                <li><a href="#id47" class="reference internal">clean</a>
+            </ul>
+        </ul>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="api.html"
+                                  title="上一章">api机制</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="kvstore.html"
+                                  title="下一章">key-value存储机制</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="kvstore.html" title="key-value存储机制" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="api.html" title="api机制" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">基础框架 - base</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

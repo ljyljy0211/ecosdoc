@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      入门 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="使用教程" href="index.html" />
+
+        <link rel="next" title="advanced" href="进阶.html" />
+        <link rel="prev" title="index" href="使用教程.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="advanced.html" title="进阶" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="使用教程" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECAE</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">使用教程</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 入门</h1>
+            <h2><a name="id1">安装SVN工具</a></h2><h3><a name="id2">windows用户</a></h3>
+<p><a href="http://www.subversion.org.cn/?action-channel-name-product#download">下载地址</a></p>
+<h3><a name="id3">linux用户</a></h3>
+<ul>
+<li>arch<pre class="mark">pacman -S subversion
+</pre>
+<li>centos<pre class="mark">yum install subversion
+</pre>
+<li>ubuntu<pre class="mark">apt-get install subversion
+</pre></li>
+</li>
+</li>
+</ul>
+<h2><a name="id4">创建应用</a></h2><h3><a name="id5">创建新的应用</a></h3>
+<p>我们做一个'Hello World'的小例子</p>
+
+<p>(1) 登录<a href="http://www.ec-ae.com">ECAE</a></p>
+
+<p>(2) 访问导航栏中的 &quot;我的应用&quot; 如图1</p>
+
+<p>图1: 导航栏<br /><img border="0" alt="" align="middle" src="imgs/ecae_01.jpg" /></p>
+
+<p>(3) 单击右侧按钮 &quot;创建新的应用&quot; 如图2</p>
+
+<p>图2: 创建新的应用按钮<br /><img border="0" alt="" align="middle" src="imgs/ecae_02.jpg" /></p>
+
+<p>(4) 填写之后点击 &quot;创建&quot; 如图3</p>
+
+<p>图3: 创建新的应用窗口<br /><img border="0" alt="" align="middle" src="imgs/ecae_03.jpg" /></p>
+
+<p>(5) 应用创建之后左边会显示 如图4</p>
+
+<p>图4: 应用信息<br /><img border="0" alt="" align="middle" src="imgs/ecae_04.jpg" /></p>
+
+<p>(6) 点击 &quot;查看详情&quot;, 里面是新建应用的基本信息 如图5</p>
+
+<p>图5: 基本信息<br /><img border="0" alt="" align="middle" src="imgs/ecae_05.jpg" /></p>
+<h3><a name="id6">同步/上传数据</a></h3><h4><a name="id7">windows用户</a></h4>
+<p><b>第一步 同步数据</b></p>
+
+<p>右键菜单选择 SVN Checkout 如图6</p>
+
+<p>图6: svn checkout<br /><img border="0" alt="" align="middle" src="imgs/svn_01.jpg" /></p>
+
+<p>图7: checkout信息<br /><img border="0" alt="" align="middle" src="imgs/svn_02.jpg" /></p>
+
+<p>登录提示输入SVN账户和密码 如图8</p>
+
+<p>图8: SVN账户和密码<br /><img border="0" alt="" align="middle" src="imgs/svn_03.jpg" /></p>
+
+<p>图9: 同步完成<br /><img border="0" alt="" align="middle" src="imgs/svn_04.jpg" /></p>
+
+<p><b>第二步 新建文件</b></p>
+
+<p>进入同步下来的文件夹 如图10</p>
+
+<p>图10: show文件夹外<br /><img border="0" alt="" align="middle" src="imgs/svn_05.jpg" /></p>
+
+<p>建立一个index.php文件，里面输入php语言'Hello World' 如图11</p>
+
+<p>图11: show文件夹内<br /><img border="0" alt="" align="middle" src="imgs/svn_06.jpg" /></p>
+
+<p><b>第三步 上传数据</b></p>
+
+<p>把新建的index.php添加到版本里 如图12</p>
+
+<p>图12: svn add<br /><img border="0" alt="" align="middle" src="imgs/svn_07.jpg" /></p>
+
+<p>然后svn提交 如图13</p>
+
+<p>图13: svn commit<br /><img border="0" alt="" align="middle" src="imgs/svn_08.jpg" /></p>
+
+<p>这里需要注意svn提交信息有字数限制 如图14</p>
+
+<p>图14: svn -m<br /><img border="0" alt="" align="middle" src="imgs/svn_09.jpg" /></p>
+
+<p>图15: 上传成功<br /><img border="0" alt="" align="middle" src="imgs/svn_10.jpg" /></p>
+
+<p>图16: 上传后目录<br /><img border="0" alt="" align="middle" src="imgs/svn_11.jpg" /></p>
+
+<p><b>访问站点</b></p>
+
+<p>在基本信息里面找到域名点击访问 效果如图17</p>
+
+<p>图17: show站点<br /><img border="0" alt="" align="middle" src="imgs/svn_00.jpg" /></p>
+<h4><a name="id8">linux用户</a></h4>
+<p><b>第一步 同步数据</b><pre>svn co http://scm.ec-ae.com/2283/trunk show
+</pre></p>
+
+<p><b>第二步 新建文件</b><pre>cat &gt; index.php &lt;&lt; &quot;EOF&quot;
+&lt;?php
+    echo 'Hello ECAE!';
+EOF
+</pre></p>
+
+<p><b>第三步 上传文件</b><pre>svn add index.php
+
+svn ci -m 'adding index.php' index.php
+</pre></p>
+
+<p><b>访问站点</b></p>
+
+<p>在基本信息里面找到域名点击访问 效果如图17</p>
+
+<p>图17: show站点<br /><img border="0" alt="" align="middle" src="imgs/svn_00.jpg" /></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">安装SVN工具</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">windows用户</a>
+        <li><a href="#id3" class="reference internal">linux用户</a>
+    </ul>
+    <li><a href="#id4" class="reference internal">创建应用</a>
+        <ul>
+        <li><a href="#id5" class="reference internal">创建新的应用</a>
+        <li><a href="#id6" class="reference internal">同步/上传数据</a>
+            <ul>
+            <li><a href="#id7" class="reference internal">windows用户</a>
+            <li><a href="#id8" class="reference internal">linux用户</a>
+        </ul>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">使用教程</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="advanced.html"
+                                  title="下一章">进阶</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="advanced.html" title="进阶" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="使用教程" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECAE</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">使用教程</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

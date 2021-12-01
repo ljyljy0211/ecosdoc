@@ -1,0 +1,1044 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      促销 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="ECStore 开发指南" href="../index.html" />
+
+        <link rel="next" title="../product/index" href="商品.html" />
+        <link rel="prev" title="../member/trust_login" href="信任登录.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../product/index.html" title="商品" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../member/trust_login.html" title="信任登录" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 促销</h1>
+            <h2><a name="id1">ECstore中促销的几大模块</a></h2>
+<ul>
+<li>商品促销<pre>商品促销是指基于商品开展的各种促销规则，优惠直接显示在购物车中。
+</pre></li>
+</ul>
+
+<ul>
+<li>订单促销<pre>订单促销则是针对订单、购物车中所有商品的促销，优惠在购物车下订单结算时显示。
+</pre></li>
+</ul>
+
+<ul>
+<li>优惠券<pre>优惠券在促销这块的规则是订单促销的一种
+</pre></li>
+</ul>
+<h2><a name="id2">ECstore中促销的几大因素</a></h2>
+<ul>
+<li>优先级<pre>执行顺序以数值 从高到低 执行
+</pre>
+<li>排它原则<pre>优惠规则的冲突解决。如：商品促销中，同种方案在``同一商品``上适用排他原则。
+</pre>
+<li>优惠条件<pre>判断该促销是否适用于当前场景，如：当订单商品总价满X时,对所有商品优惠。
+</pre>
+<ul>
+<li>应用条件(优惠方案要应用到的商品)<pre>指定优惠方案的应用范围，特指订单促销当中，商品促销中没有此项。
+</pre></ul>
+
+<li>优惠方案<pre>指满足应用条件的商品或者订单等享受的优惠结果。如：符合应用条件的商品送赠品。
+</pre></li>
+</ul>
+</li>
+</li>
+</li>
+</ul>
+<h2><a name="id3">优惠条件-概念</a></h2>
+<p>优惠条件，就ecstore系统来说就是商品促销或者订单促销中的优惠条件，是一个过滤规则</p>
+
+<p>包括聚合器和条件项,一个聚合器可以包含多个聚合器和条件项</p>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">聚合器</span></tt><pre>优惠条件的基础、每个条件都是从聚合器开始的，聚合器是优惠条件的一个容器，
+可以容纳更多的聚合器和条件项组成一个完整的促销过滤条件。
+public function getItem()
+返回标准化数据
+
+下面以商品聚合器为例：
+class b2c_sales_goods_aggregator_combine extends b2c_sales_goods_aggregator{
+    public function getItem() {
+        // 其实一个aggregator 只有一条记录的哈
+        return array(
+            'b2c_sales_goods_aggregator_combine' =&gt; array(
+                'name'=&gt;app::get('b2c')-&gt;_('商品条件'),
+                'value'=&gt;'goods_combine',
+                'object'=&gt;'b2c_sales_goods_aggregator_combine',
+                'support'=&gt;array(
+                    'aggregator'=&gt;'all',
+                    'item'=&gt;array(
+                        'goods' =&gt; app::get('b2c')-&gt;_('-----商品属性-----'),
+                        'brand' =&gt; app::get('b2c')-&gt;_('-----商品品牌-----'),
+                        'type'  =&gt; app::get('b2c')-&gt;_('-----商品类型-----'),
+                        'cat'   =&gt; app::get('b2c')-&gt;_('-----商品分类-----'),
+                    )
+                ),
+            )
+        );
+    }
+}
+该数组为其返回值。item属性标明了包含项{goods:商品属性;brand:商品品牌;type:商品类型;cat:商品分类}
+
+具体商品项加载项相关请看下边 ··促销概念-项·· 的介绍
+</pre></li>
+</ul>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">项</span></tt><pre>基于聚合器详细的阐述了包含哪些具体的属性。
+
+接上：以商品属性为例说明。
+
+class b2c_sales_goods_item_goods extends b2c_sales_goods_item{
+    public function getItem() {
+        return array(
+            'goods_goods_id'      =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品'),       'path'=&gt;'goods_id',      'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('contain'), 'input'=&gt;'dialog', 'table'=&gt;'goods',),
+            'goods_brand_id'      =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品品牌'),   'path'=&gt;'brand_id',      'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('contain'), 'input'=&gt;'checkbox', 'options'=&gt;'table:SELECT brand_id AS id,brand_name AS name FROM sdb_b2c_brand'),
+            'goods_cat_id'        =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品分类'),   'path'=&gt;'cat_id',        'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('contain'), 'input'=&gt;'checkbox', 'options'=&gt;'table:SELECT cat_id AS id,cat_name AS name, parent_id AS pid FROM sdb_b2c_goods_cat'),
+            'goods_type_id'       =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品类型'),   'path'=&gt;'type_id',       'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('contain'), 'input'=&gt;'checkbox', 'options'=&gt;'table:SELECT type_id AS id,name FROM sdb_b2c_goods_type'),
+
+            'goods_name'          =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品名称'),   'path'=&gt;'name',          'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','contain','contain1')),
+            'goods_brief'         =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品简介'),   'path'=&gt;'brief',         'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','contain','contain1','null')),
+            'goods_intro'         =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品介绍'),   'path'=&gt;'intro',         'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','contain','contain1','null')),
+            'goods_mktprice'      =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品市场价'), 'path'=&gt;'mktprice',      'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','equal1'),  'vtype'=&gt;'unsigned'),
+            'goods_cost'          =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品成本价'), 'path'=&gt;'cost',          'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','equal1'),  'vtype'=&gt;'unsigned'),
+            'goods_price'         =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品销售价'), 'path'=&gt;'price',         'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','equal1'),  'vtype'=&gt;'unsigned'),
+            'goods_bn'            =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品货号'),   'path'=&gt;'bn',            'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','contain','contain1'),  'vtype'=&gt;'alphaint'),
+            'goods_weight'        =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品重量'),   'path'=&gt;'weight',        'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','equal1'),  'vtype'=&gt;'unsigned'),
+            'goods_unit'          =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品单位'),   'path'=&gt;'unit',          'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','contain','contain1'),  'vtype'=&gt;'alphanum'),
+            'goods_store'         =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品库存'),   'path'=&gt;'store',         'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','equal1'),  'vtype'=&gt;'digits'),
+            'goods_score'         =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品积分'),   'path'=&gt;'score',         'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','equal1'),  'vtype'=&gt;'digits'),
+            'goods_last_modify'   =&gt; array('name'=&gt;app::get('b2c')-&gt;_('修改时间'),   'path'=&gt;'last_modify',   'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','equal1'),  'input'=&gt;'datetime','vtype'=&gt;'date'),
+            'goods_rank'          =&gt; array('name'=&gt;app::get('b2c')-&gt;_('商品评分'),   'path'=&gt;'rank',          'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','equal1'),  'vtype'=&gt;'number'),
+            'goods_rank_count'    =&gt; array('name'=&gt;app::get('b2c')-&gt;_('评分次数'),   'path'=&gt;'rank_count',    'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','equal1'),  'vtype'=&gt;'digits'),
+            'goods_view_count'    =&gt; array('name'=&gt;app::get('b2c')-&gt;_('浏览次数'),   'path'=&gt;'view_count',    'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','equal1'),  'vtype'=&gt;'digits'),
+            'goods_buy_count'     =&gt; array('name'=&gt;app::get('b2c')-&gt;_('购买次数'),   'path'=&gt;'buy_count',     'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','equal1'),  'vtype'=&gt;'digits'),
+            'goods_comment_count' =&gt; array('name'=&gt;app::get('b2c')-&gt;_('评论次数'),   'path'=&gt;'comment_count', 'type'=&gt;'goods', 'object'=&gt;'b2c_sales_goods_item_goods', 'operator'=&gt;array('equal','equal1'),  'vtype'=&gt;'digits'),
+        );
+    }
+}
+
+getItem()详解
+| name     | 名称 |
+| path     | 购物车中的相对路径 |
+| type     | 类型 |
+| object   | 所属对象 |
+| operator | 操作符 |
+| name     | 名称 |
+| input    | html显示类型，默认text文本框 dialog弹窗 对应属性table 弹窗罗列的数据表名称 |
+| input    | checkbox 对应属性options 支持sql语句 如上 |
+| input    | datetime 日期 |
+
+</pre></li>
+</ul>
+<h2><a name="id4">促销-service</a></h2><h3><a name="id5">促销的service</a></h3>
+<ul>
+<li>b2c_promotion_tpl_goods_apps <tt class="docutils literal"><span class="pre">商品 预过滤 条件模板</span></tt><pre>&lt;service id=&quot;b2c_promotion_tpl_goods_apps&quot;&gt;
+    &lt;class&gt;b2c_promotion_conditions_goods_allgoods&lt;/class&gt;
+    &lt;class&gt;b2c_promotion_conditions_goods_brand&lt;/class&gt;
+    &lt;class&gt;b2c_promotion_conditions_goods_cat&lt;/class&gt;
+    &lt;class&gt;b2c_promotion_conditions_goods_selectgoods&lt;/class&gt;
+    &lt;class&gt;b2c_promotion_conditions_goods_type&lt;/class&gt;
+    &lt;class&gt;b2c_promotion_conditions_goods_typeandbrand&lt;/class&gt;
+&lt;/service&gt;
+
+以b2c_promotion_conditions_goods_brand举例说明。
+
+class b2c_promotion_conditions_goods_brand{
+    var $tpl_name = &quot;商品品牌&quot;;
+    var $tpl_type = 'config';  // 类型 分为 html(写死的html) | config(可选项的) | auto(全开放的配置)
+
+    function getConfig($aData = array()) {
+        return  array(
+            'type'=&gt; 'b2c_sales_goods_aggregator_combine',
+            'aggregator'=&gt; 'all',
+            'conditions'=&gt; array(
+                0 =&gt; array(
+                    'type' =&gt; 'b2c_sales_goods_item_goods',
+                    'attribute' =&gt; 'goods_brand_id'
+                )
+            )
+        );
+    }
+}
+
+tpl_name 模板显示title
+tpl_type 模板类型
+
+getConfig函数
+	tpl_type 为 html 类型时 返回html
+	tpl_type 为 config 类型时 返回标准化数组
+	tpl_type 为 auto 返回空数组即可
+</pre></li>
+</ul>
+
+<ul>
+<li>b2c_promotion_tpl_order_apps <tt class="docutils literal"><span class="pre">订单促销  条件模板</span></tt><pre>&lt;service id=&quot;b2c_promotion_tpl_order_apps&quot;&gt;
+    &lt;class&gt;b2c_promotion_conditions_order_allorderallgoods&lt;/class&gt;
+    &lt;class&gt;b2c_promotion_conditions_order_itemsquanityallgoods&lt;/class&gt;
+    &lt;class&gt;b2c_promotion_conditions_order_itemsquanityuserdefinedgoods&lt;/class&gt;
+    &lt;class&gt;b2c_promotion_conditions_order_subtotalallgoods&lt;/class&gt;
+    &lt;class&gt;b2c_promotion_conditions_order_subtotalselectgoods&lt;/class&gt;
+    &lt;class&gt;b2c_promotion_conditions_order_subtotaluserdefinedgoods&lt;/class&gt;
+&lt;/service&gt;
+
+注：参数同上（预过滤 条件模板)
+</pre></li>
+</ul>
+
+<ul>
+<li>b2c_promotion_solution_tpl_apps <tt class="docutils literal"><span class="pre">优惠方案模板</span></tt><pre>&lt;service id=&quot;b2c_promotion_solution_tpl_apps&quot;&gt;
+    &lt;class&gt;b2c_promotion_solutions_byfixed&lt;/class&gt;
+    &lt;class&gt;b2c_promotion_solutions_bypercent&lt;/class&gt;
+    &lt;class&gt;b2c_promotion_solutions_tofixed&lt;/class&gt;
+    &lt;class&gt;b2c_promotion_solutions_topercent&lt;/class&gt;
+    &lt;class&gt;b2c_promotion_solutions_addscore&lt;/class&gt;
+    &lt;class&gt;b2c_promotion_solutions_toscore&lt;/class&gt;
+&lt;/service&gt;
+
+public function config($aData = array())
+@return 优惠方案html模板
+
+/*
+ * 优惠方案应用
+ * @param array $object  // 引用的一个商品信息
+ * @param array $aConfig // 优惠的设置
+ * @param array $cart_object // 购物车信息(预过滤的时候这个为null)
+ * @return void // 引用处理了,没有返回值
+ */
+public function apply(&amp;$object,$aConfig,&amp;$cart_object = null) {
+  ......
+}
+
+/*
+ * 优惠方案应用
+ *
+ * 应用于订单促销中针对于订单项
+ *
+ * @param array $object  // 引用的一个商品信息
+ * @param array $aConfig // 优惠的设置
+ * @return void // 引用处理了,没有返回值
+ */
+public function apply_order(&amp;$object, &amp;$aConfig,&amp;$cart_object = null) {
+  .....
+}
+
+public function get_status()
+@return bool
+@当前类型促销是否可用。场景：积分促销（后台积分未开启时 此处返回false)
+</pre></li>
+</ul>
+
+<ul>
+<li>b2c_sales_basic_operator_apps <tt class="docutils literal"><span class="pre">促销操作符</span></tt><pre>&lt;service id=&quot;b2c_sales_basic_operator_apps&quot;&gt;
+    &lt;class&gt;b2c_sales_basic_operator_equal&lt;/class&gt;
+    &lt;class&gt;b2c_sales_basic_operator_equal1&lt;/class&gt;
+    &lt;class&gt;b2c_sales_basic_operator_contain&lt;/class&gt;
+    &lt;class&gt;b2c_sales_basic_operator_contain1&lt;/class&gt;
+    &lt;class&gt;b2c_sales_basic_operator_belong&lt;/class&gt;
+    &lt;class&gt;b2c_sales_basic_operator_null&lt;/class&gt;
+&lt;/service&gt;
+
+/*
+ * @操作符数组
+ *
+ * @return array
+ */
+public function getOperators()
+
+/*
+ * validate
+ *
+ * @param string $operator  // 操作符
+ * @param mix $value        // 规则里设定的值
+ * @param mix $validate     // 购物车项中取出的对应的'attribute'[path] 的值
+ * @return boolean
+ */
+public function validate($operator,$value,$validate)
+</pre></li>
+</ul>
+
+<ul>
+<li>b2c_sales_goods_aggregator_apps <tt class="docutils literal"><span class="pre">商品促销 预过滤 聚合器</span></tt><pre>&lt;service id=&quot;b2c_sales_goods_aggregator_apps&quot;&gt;
+    &lt;class&gt;b2c_sales_goods_aggregator_combine&lt;/class&gt;
+&lt;/service&gt;
+
+注：参考··优惠条件-概念 聚合器··
+</pre></li>
+</ul>
+
+<ul>
+<li>b2c_sales_goods_item_apps <tt class="docutils literal"><span class="pre">商品促销 预过滤 项</span></tt><pre>&lt;service id=&quot;b2c_sales_goods_item_apps&quot;&gt;
+    &lt;class&gt;b2c_sales_goods_item_goods&lt;/class&gt;
+    &lt;class&gt;b2c_sales_goods_item_brand&lt;/class&gt;
+    &lt;class&gt;b2c_sales_goods_item_cat&lt;/class&gt;
+    &lt;class&gt;b2c_sales_goods_item_type&lt;/class&gt;
+&lt;/service&gt;
+
+注：参考··优惠条件-概念 项··
+</pre></li>
+</ul>
+
+<ul>
+<li>b2c_sales_order_aggregator_apps <tt class="docutils literal"><span class="pre">订单促销 聚合器</span></tt><pre>&lt;service id=&quot;b2c_sales_order_aggregator_apps&quot;&gt;
+    &lt;class&gt;b2c_sales_order_aggregator_combine&lt;/class&gt;
+    &lt;class&gt;b2c_sales_order_aggregator_found&lt;/class&gt;
+    &lt;class&gt;b2c_sales_order_aggregator_subselect&lt;/class&gt;
+&lt;/service&gt;
+
+注： 参考··优惠条件-概念 聚合器··
+</pre>
+<li>b2c_sales_order_item_apps <tt class="docutils literal"><span class="pre">订单促销 项</span></tt><pre>&lt;service id=&quot;b2c_sales_order_item_apps&quot;&gt;
+    &lt;class&gt;b2c_sales_order_item_goods&lt;/class&gt;
+    &lt;class&gt;b2c_sales_order_item_subgoods&lt;/class&gt;
+    &lt;class&gt;b2c_sales_order_item_order&lt;/class&gt;
+&lt;/service&gt;
+
+注：参考··优惠条件-概念 项··
+</pre></li>
+</li>
+</ul>
+<h2><a name="id6">添加一个后台促销规则</a></h2><h3><a name="id7">简单介绍</a></h3>
+<p>我们先介绍系统的优惠条件模板和应用条件模板等的配置添加。</p>
+
+<p>这里我们以添加商品促销规则为例，订单促销规则类似。</p>
+
+<p>商品促销针对的是一个产品的促销规则，显示在商品详情页，优惠直接显示在购物车中。</p>
+
+<p>首先在后台商品促销中点击添加规则，如图：<br /><img border="0" alt="" align="middle" src="images/promotion_1.png" /></p>
+
+<p>添加规则页面主要由三个部分组成，<i>基本信息</i>，<i>优惠条件</i>，<i>优惠方案</i>，分别如图：</p>
+
+<p><i>基本信息：</i><br /><img border="0" alt="" align="middle" src="images/promotion_2.png" /><pre class="mark">基本信息包括以下几点：
+规则名称：规则的名称
+规则描述：规则的描述，例如可以显示在商品详情页
+启用状态：即是否启用此条规则
+优先级：
+是否排它：是否跟其他规则进行排斥选择
+开始时间：
+结束时间：
+会员级别：指哪些等级的会员可以享受优惠
+</pre></p>
+
+<p><i>优惠条件：</i><br /><img border="0" alt="" align="middle" src="images/promotion_3.png" /><pre class="mark">优惠条件就是一组过滤条件，界定商品和订单的应用条件
+它一般包括几个优惠条件模板，例如：
+商品促销中：
+自定义商品促销模板(此条模板需要安装app(proundefined))
+商品类型+商品品牌
+商品类型
+指定商品
+商品分类
+商品品牌
+所有商品
+
+订单促销中：
+用户自定义订单促销模板(此条模板需要安装app(proundefined))
+当订单商品总价满X,对指定的商品优惠
+当订单商品总价满X时,对所有商品优惠
+当订单商品数量满X,给予优惠
+对所有订单给予优惠
+</pre></p>
+
+<p><i>优惠方案：</i><br /><img border="0" alt="" align="middle" src="images/promotion_4.png" /></p>
+<pre class="mark">指满足应用条件的商品或者订单等享受的优惠结果。
+
+商品促销中一般包括以下几点：
+符合应用条件的商品X倍积分
+符合应用条件的商品赠送积分
+符合应用条件的商品以固定折扣出售
+符合应用条件的商品固定价格购买
+符合应用条件的商品减去固定折扣出售
+符合应用条件的商品减固定价格购买
+符合应用条件的商品送赠品
+
+订单促销中：
+（商品促销中的几条优惠模板）
+订单免运费
+订单X倍积分
+订单赠送积分
+订单以固定折扣出售
+订单固定价格购买
+订单减去固定折扣出售
+订单减固定价格购买
+订单送赠品
+</pre><pre>注：对于以上所讲的优惠条件模板，我们做个解释，优惠条件中的自定义促销模板是需要安装名叫
+proundefined的app的，而其他固定的模板列表其实际上是一个自定义的过滤条件的一个实际规则抽
+出来作为单独的规则，本质都是自定义一个过滤条件，只不过把它固化了而已，方便直接选择。
+</pre><h3><a name="id8">案例讲解</a></h3>
+<p>我们添加一个自定义商品促销模版的优惠条件<br /><img border="0" alt="" align="middle" src="images/promotion_5.png" /></p>
+
+<p>的规则，然后它的优惠条件如下：<br /><img border="0" alt="" align="middle" src="images/promotion_6.png" /><pre>这里优惠条件的标准数据格式是这样的：
+return array(
+	'type'=&gt; array(
+		'input'=&gt; 'hidden',
+		'desc'=&gt; null,
+		'default'=&gt; $this-&gt;default,    // 默认值 如果有模板设置 按模板设定 如果有值 则按值的
+		'support'=&gt;$aTemp[get_class($this)]['support'],
+	),
+	'aggregator'=&gt; array(
+		'input'=&gt; 'select', // select | hidden
+		'vtype'=&gt; null,     // 验证类型(保留)
+		'desc'=&gt; null,      // 描述 标准为空 如果为空的话 使用default的名称 只在input='hidden'时有效
+		'options'=&gt; array(
+			'any'=&gt;array('name'=&gt;app::get('b2c')-&gt;_('任意一条规则')),
+			'all'=&gt;array('name'=&gt;app::get('b2c')-&gt;_('所有规则')),
+		),
+		'default'=&gt; 'all'    // 默认值 如果有模板设置 按模板设定 如果有值 则按值的
+	),
+	'value'=&gt; array(
+		'input'=&gt; 'select', // select | hidden
+		'vtype'=&gt; null,     // 验证类型(保留)
+		'desc'=&gt; null,      // 描述 标准为空 如果为空的话 使用default的名称 只在input='hidden'时有效
+		'options'=&gt; array(
+			'0'=&gt;array('name'=&gt;app::get('b2c')-&gt;_('不符合')),
+			'1'=&gt;array('name'=&gt;app::get('b2c')-&gt;_('符合')),
+	    ),
+		'default'=&gt; '1'    //
+	),
+	'conditions'=&gt; array()
+);
+
+数组中的conditions就是我们具体的一条过滤语句了
+我们这次添加的规则的conditions的数据格式为：
+array (
+	'type' =&gt; 'b2c_sales_goods_aggregator_combine',
+	'aggregator' =&gt; 'all', // 'all'|'any' [and连接条件 或 or连接条件]
+	'value' =&gt; '1', // 0|1   不满足以下条件 | 满足以下条件  (//不满足? 暂无很好的处理方法 可以用子查询实现 效率太低了 1暂时写死)
+	'conditions' =&gt; array (
+		2 =&gt; array (
+			'type' =&gt; 'b2c_sales_goods_item_goods',
+			'attribute' =&gt; 'goods_type_id',
+			'operator' =&gt; '()',
+			'value' =&gt; array (
+				0 =&gt; '5',
+			),
+		),
+		1 =&gt; array (
+			'type' =&gt; 'b2c_sales_goods_item_goods',
+			'attribute' =&gt; 'goods_price',  // 商品的属性
+			'operator' =&gt; '&gt;=',            // 操作
+			'value' =&gt; '200',              // 值 string | array
+		),
+		0 =&gt; array (
+			'type' =&gt; 'b2c_sales_goods_item_goods',
+			'attribute' =&gt; 'goods_brand_id',
+			'operator' =&gt; '()',
+			'value' =&gt; array (
+				0 =&gt; '2',
+			),
+		),
+	),
+)
+</pre></p>
+
+<p>应用的优惠方案如下：<br /><img border="0" alt="" align="middle" src="images/promotion_7.png" /></p>
+
+<p>下面重点讲优惠条件的添加，我们这里仍然讲的是怎么组合，具体的代码方法稍后祥讲，这里商品自定义促销模版如下：<br /><img border="0" alt="" align="middle" src="images/promotion_8.png" /></p>
+
+<p>集合器分为两种，一种是“所有规则”，它下面产生的条件是“与”的关系，即所有条件都符合则应用这个促销规则；另一种是“任一规则”，即其下面任意一个条件符合则应用这个规则，是一种“或”的关系。
+<table class="docutils">
+<tr>
+<td><b>集合器</b></td>
+
+<td><b>匹配值</b></td>
+
+<td><b>匹配结果</b></td>
+</tr>
+
+<tr>
+<td>所有规则</td>
+
+<td>符合</td>
+
+<td>所有条件都符合则应用此规则</td>
+</tr>
+
+<tr>
+<td>所有规则</td>
+
+<td>不符合</td>
+
+<td>所有条件都不符合则应用此规则</td>
+</tr>
+
+<tr>
+<td>任意一条规则</td>
+
+<td>符合</td>
+
+<td>任意一条条件都符合则应用此规则</td>
+</tr>
+
+<tr>
+<td>任意一条规则</td>
+
+<td>不符合</td>
+
+<td>任意一条条件都不符合则应用此规则</td>
+</tr>
+</table>
+</p>
+</table>
+
+<p>这里的“添加一个条件”，主要包括“条件组合”，“商品属性”，“商品品牌”，“商品类型”，“商品分类”五种条件，“条件组合”，就是再添加一个集合器，即：<br /><img border="0" alt="" align="middle" src="images/promotion_9.png" /></p>
+
+<p>只不过此集合器属于上面集合器的子类；而其他的几个条件则是单独的条件了，可以根据需求自己选择。</p>
+<h2><a name="id9">促销规则主要数据表</a></h2>
+<p><i>商品预过滤</i>
+<ul>
+<li><tt class="docutils literal"><span class="pre">商品促销规则表 sdb_b2c_sales_rule_goods</span></tt><pre>商品预过滤基表
+</pre>
+<table class="docutils">
+<tr>
+<td>rule_id</td>
+
+<td>规则id</td>
+</tr>
+
+<tr>
+<td>name</td>
+
+<td>规则名称</td>
+</tr>
+
+<tr>
+<td>description</td>
+
+<td>规则描述</td>
+</tr>
+
+<tr>
+<td>create_time</td>
+
+<td>修改时间</td>
+</tr>
+
+<tr>
+<td>from_time</td>
+
+<td>起始时间</td>
+</tr>
+
+<tr>
+<td>to_time</td>
+
+<td>截止时间</td>
+</tr>
+
+<tr>
+<td>member_lv_ids</td>
+
+<td>会员级别集合</td>
+</tr>
+
+<tr>
+<td>status</td>
+
+<td>开启状态//status 标志是否使用该规则执行预过滤</td>
+</tr>
+
+<tr>
+<td>conditions</td>
+
+<td>规则条件</td>
+</tr>
+
+<tr>
+<td>stop_rules_processing</td>
+
+<td>是否排斥</td>
+</tr>
+
+<tr>
+<td>sort_order</td>
+
+<td>优先级</td>
+</tr>
+
+<tr>
+<td>action_solution</td>
+
+<td>动作方案</td>
+</tr>
+
+<tr>
+<td>free_shipping</td>
+
+<td>免运费</td>
+</tr>
+
+<tr>
+<td>c_template</td>
+
+<td>过滤条件模板</td>
+</tr>
+
+<tr>
+<td>s_template</td>
+
+<td>优惠方案模板</td>
+</tr>
+
+<tr>
+<td>apply_time</td>
+
+<td>预过滤时间</td>
+</tr>
+</table>
+</li>
+</ul>
+</p>
+</table>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">商品与商品促销规则表 sdb_b2c_goods_promotion_ref</span></tt><pre>商品预过滤规则添加之后需要手动应用该规则。应用之后会把对应数据插入到预过滤关联表,关联到具体商品
+</pre>
+<table class="docutils">
+<tr>
+<td>ref_id</td>
+
+<td>id</td>
+</tr>
+
+<tr>
+<td>goods_id</td>
+
+<td>商品ID</td>
+</tr>
+
+<tr>
+<td>rule_id</td>
+
+<td>规则ID</td>
+</tr>
+
+<tr>
+<td>description</td>
+
+<td>规则描述</td>
+</tr>
+
+<tr>
+<td>member_lv_ids</td>
+
+<td>会员级别集合</td>
+</tr>
+
+<tr>
+<td>from_time</td>
+
+<td>起始时间</td>
+</tr>
+
+<tr>
+<td>to_time</td>
+
+<td>截止时间//预定字段</td>
+</tr>
+
+<tr>
+<td>status</td>
+
+<td>状态</td>
+</tr>
+
+<tr>
+<td>stop_rules_processing</td>
+
+<td>是否排斥其他规则</td>
+</tr>
+
+<tr>
+<td>sort_order</td>
+
+<td>优先级</td>
+</tr>
+
+<tr>
+<td>action_solution</td>
+
+<td>动作方案</td>
+</tr>
+
+<tr>
+<td>free_shipping</td>
+
+<td>免运费</td>
+</tr>
+</table>
+</li>
+</ul>
+</table>
+
+<p><i>订单促销</i></p>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">订单促销规则表 sdb_b2c_sales_rule_order</span></tt><pre>订单促销结构（优惠券形成的规则也会在该表记录 rule_type）
+</pre>
+<table class="docutils">
+<tr>
+<td>rule_id</td>
+
+<td>规则id</td>
+</tr>
+
+<tr>
+<td>name</td>
+
+<td>规则名称</td>
+</tr>
+
+<tr>
+<td>description</td>
+
+<td>规则描述</td>
+</tr>
+
+<tr>
+<td>from_time</td>
+
+<td>起始时间</td>
+</tr>
+
+<tr>
+<td>to_time</td>
+
+<td>截止时间</td>
+</tr>
+
+<tr>
+<td>member_lv_ids</td>
+
+<td>会员级别集合</td>
+</tr>
+
+<tr>
+<td>status</td>
+
+<td>开启状态</td>
+</tr>
+
+<tr>
+<td>conditions</td>
+
+<td>规则条件</td>
+</tr>
+
+<tr>
+<td>action_conditions</td>
+
+<td>动作执行条件</td>
+</tr>
+
+<tr>
+<td>stop_rules_processing</td>
+
+<td>是否排斥</td>
+</tr>
+
+<tr>
+<td>sort_order</td>
+
+<td>优先级</td>
+</tr>
+
+<tr>
+<td>action_solution</td>
+
+<td>动作方案</td>
+</tr>
+
+<tr>
+<td>free_shipping</td>
+
+<td>免运费/满足过滤条件的商品免运费/全场免运费</td>
+</tr>
+
+<tr>
+<td>rule_type</td>
+
+<td>N:普通规则/C:优惠券规则</td>
+</tr>
+
+<tr>
+<td>c_template</td>
+
+<td>过滤条件模板</td>
+</tr>
+
+<tr>
+<td>s_template</td>
+
+<td>优惠方案模板</td>
+</tr>
+</table>
+</li>
+</ul>
+</table>
+
+<p><i>优惠券</i></p>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">优惠券表 sdb_b2c_coupons</span></tt><pre>优惠券结构，基本信息会存储在sdb_b2c_coupons表中,形成的具体规则会放入sales_rule_order中
+</pre>
+<table class="docutils">
+<tr>
+<td>cpns_id</td>
+
+<td>优惠券方案id</td>
+</tr>
+
+<tr>
+<td>cpns_name</td>
+
+<td>优惠券名称</td>
+</tr>
+
+<tr>
+<td>pmt_id</td>
+
+<td>*暂时废弃</td>
+</tr>
+
+<tr>
+<td>cpns_prefix</td>
+
+<td>生成优惠券前缀/号码(当全局时为号码)</td>
+</tr>
+
+<tr>
+<td>cpns_gen_quantity</td>
+
+<td>总数量</td>
+</tr>
+
+<tr>
+<td>cpns_key</td>
+
+<td>优惠券生成的key</td>
+</tr>
+
+<tr>
+<td>cpns_status</td>
+
+<td>是否启用优惠券方案状态</td>
+</tr>
+
+<tr>
+<td>cpns_type</td>
+
+<td>优惠券类型：一张无限使用/多张使用一次/外部优惠券</td>
+</tr>
+
+<tr>
+<td>cpns_point</td>
+
+<td>兑换优惠券积分</td>
+</tr>
+
+<tr>
+<td>rule_id</td>
+
+<td>相关的订单促销规则ID // rule_type ='C'</td>
+</tr>
+</table>
+</li>
+</ul>
+</table>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">用户优惠券表 sdb_b2c_member_coupon</span></tt><pre>记录该会员兑换的优惠券信息
+</pre>
+<table class="docutils">
+<tr>
+<td>memc_code</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>cpns_id</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>member_id</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>memc_gen_orderid</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>memc_source</td>
+
+<td>全体优惠券/会员优惠券/ShopEx优惠券</td>
+</tr>
+
+<tr>
+<td>memc_enabled</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>memc_used_times</td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>memc_gen_time</td>
+
+<td></td>
+</tr>
+</table>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">ECstore中促销的几大模块</a>
+    <li><a href="#id2" class="reference internal">ECstore中促销的几大因素</a>
+    <li><a href="#id3" class="reference internal">优惠条件-概念</a>
+    <li><a href="#id4" class="reference internal">促销-service</a>
+        <ul>
+        <li><a href="#id5" class="reference internal">促销的service</a>
+    </ul>
+    <li><a href="#id6" class="reference internal">添加一个后台促销规则</a>
+        <ul>
+        <li><a href="#id7" class="reference internal">简单介绍</a>
+        <li><a href="#id8" class="reference internal">案例讲解</a>
+    </ul>
+    <li><a href="#id9" class="reference internal">促销规则主要数据表</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../member/trust_login.html"
+                                  title="上一章">信任登录</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../product/index.html"
+                                  title="下一章">商品</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../product/index.html" title="商品" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../member/trust_login.html" title="信任登录" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

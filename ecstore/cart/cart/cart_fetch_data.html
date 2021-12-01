@@ -1,0 +1,334 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      购物车数据加载 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../doc.html" />
+    <link rel="up" title="购物车" href="../index.html" />
+
+        <link rel="next" title="../../member/index" href="会员.html" />
+        <link rel="prev" title="../add_goodstype" href="扩展购物车项类型案例.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../../member/index.html" title="会员" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../add_goodstype.html" title="扩展购物车项类型案例" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">购物车</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 购物车数据加载</h1>
+            <h2><a name="id1">点击进入购物车</a></h2>
+<p>当点击进入购物车的时候进入控制器cart.php中的index方法，调用_common方法</p>
+<h3><a name="id2">_common方法</a></h3><pre>$this-&gt;_common(1);
+
+//组织购物车数据（一个大数组），定义购物车数据项的render,优惠信息项的render。。。
+public function _common($flag=0)
+
+//处理后的购物车数据的获取统一方法get_objects
+$aCart = $this-&gt;mCart-&gt;get_objects($this-&gt;_request-&gt;get_params(true));
+</pre><h3><a name="id3">get_objects</a></h3>
+<p>返回的是购物车中的数据，所有的数据都是处理过的，如果有商品促销或者订单促销都进行过处理</p>
+
+<p>get_objects方法是通过注册services的方式对购物车的数据进行处理的，根据get_order的大小进行优先级处理<pre>&lt;services id='b2c_cart_process_apps'&gt;
+    &lt;class&gt;b2c_cart_process_get&lt;/class&gt;  # get_order = 99
+    &lt;class&gt;b2c_cart_process_prefilter&lt;/class&gt; #get_order = 90
+    &lt;class&gt;b2c_cart_process_postfilter&lt;/class&gt; # ger_order = 80
+&lt;/services&gt;
+</pre></p>
+
+<p>b2c_cart_process_get:获取到的是购物车中的商品的详细数据</p>
+
+<p>b2c_cart_process_profilter：对购物车中的商品进行商品促销过滤及加载商品促销数据</p>
+
+<p>b2c_cart_process_postfilter：对购物车中的商品进行订单促销过滤及加载订单促销数据</p>
+
+<p>最先进入的是b2c_cart_process_get类中进行处理，调用的是process方法<pre>$object-&gt;process($aData,$aResult,$aConfig);
+</pre></p>
+<h4><a name="id4">b2c_cart_process_get</a></h4>
+<p>在b2c_cart_process_get类中主要是把购物车的数据进行组织，并不包含促销等处理</p>
+
+<p>通过servies b2c_cart_object_apps获取购物车不同数据(优惠劵，商品，赠品)<pre>//b2c services 注册的类
+&lt;services id='b2c_cart_object_apps'&gt;
+    &lt;class&gt;b2c_cart_object_goods&lt;/class&gt;  # get_order =  ,get_type = 'goods'
+    &lt;class&gt;b2c_cart_object_coupon&lt;/class&gt; #get_order =  ,get_type = 'coupon'
+&lt;/services&gt;
+
+
+//gift services 注册的类
+&lt;service id=&quot;b2c_cart_object_apps&quot;&gt;
+    &lt;class&gt;gift_cart_object_gift&lt;/class&gt;
+&lt;/service&gt;
+</pre></p>
+
+<p>b2c_cart_object_goods：获取到的是购物车中的商品数据</p>
+
+<p>b2c_cart_object_coupon：获取到的是购物车中优惠劵的数据</p>
+
+<p>gift_cart_object_gift：获取到的是购物车中赠品的数据</p>
+<pre>$aResult['object'][$type_name] = $object-&gt;getAll(true);
+</pre>
+<p>通过b2c_cart_object_goods,b2c_cart_object_coupon,gfit_cart_object_gift三个类获取到商品数据用<pre>//统计
+$this-&gt;app-&gt;model('cart')-&gt;count_objects($aResult);
+</pre></p>
+<h5><a name="id5">b2c_cart_object_goods</a></h5><pre>public function getAll($rich = false) {
+</pre>
+<p>getAll方法调用了model/cart/objects.php中的getlist方法来获取购物车中的数据<pre class="mark">已登录会员
+    先在kvstore中对数据进行获取，如果没有获取到则在sdb_b2c_cart_objects表中获取的数据
+
+未登陆会员
+    对应未登陆会员因为不会把购物车的数据存数据库而是把数据存放在session中的
+    所以未登录用户直接从session中把购物车中的数据获取到
+</pre>getlist方法获取的购物车中的数据结构如下：<pre>Array
+(
+    [0] =&gt; Array
+        (
+            [obj_ident] =&gt; goods_68_505
+            [member_ident] =&gt; ec3eff9a942294e8a178a08696209a50 //当前用户的唯一表示session_id
+            [obj_type] =&gt; goods   //类型(goods，coupon )
+            [quantity] =&gt; 1       //购买数量
+            [params] =&gt; Array
+                (
+                    [goods_id] =&gt; 68      //购买的商品ID
+                    [product_id] =&gt; 505   //购买的货品ID
+                    [adjunct] =&gt; Array   //配件数据信息
+                        (
+                            [0] =&gt; Array
+                                (
+                                    [group_id] =&gt; 0
+                                    [adjunct] =&gt; Array
+                                        (
+                                            [547] =&gt; 1
+                                        )
+
+                                )
+
+                        )
+
+                    [extends_params] =&gt;
+                )
+
+            [member_id] =&gt; -1  //-1 表示该用户未登录
+            [time] =&gt; 1328178598
+        )
+
+)
+</pre>在这获取到的数据是比较简单一些信息，getAll方法中再调用了_get方法把购物车商品详细数据信息进行加载</p>
+
+<ul>
+<li>_get方法，获取到购物车中信息的商品数据
+<ul>
+<li>_get_basic<pre class="mark">    1 在_get_basic方法中会把当前购物车中的货品ID提取出来，如果当前商品有配件那么页会把配件的
+      货品ID提取出来
+    2 在原有的购物车数据中增加配件信息（配件的对大购买量等）
+    3 会对当前购物车中的数据进行一些合法性检查(商品的上下架，库存，货品的上下架等)
+</pre>
+<li>_get_products<pre class="mark">    1 获取会员折扣，整理数据，将购物车中的未上架的商品在购物车中删除掉
+
+    2 根据货品ID获取得到对于货品的详细信息,并将其加载到购物车数据中
+</pre>
+<li>_check_goods<pre class="mark">    判断商品是否上架，是否有库存
+</pre>
+<li>_check_products<pre class="mark">    判断货品是否上架，是否有库存
+</pre>
+<li>get_products_real_store<pre class="mark">    获取购物车每个商品的库存
+</pre></li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</ul>
+<h5><a name="id6">b2c_cart_object_coupon</a></h5>
+<p>获取购物车中的优惠劵<pre class="mark">获取购物车优惠劵信息首先也是调用b2c_cart_object_coupon中的getALl方法来进行获取
+这个和b2c_cart_object_goods类似
+</pre></p>
+<h5><a name="id7">gift_cart_object_gift</a></h5>
+<p>获取到购物车的赠品数据<pre class="mark">获取购物车中的赠品的数据是表示用会员积分兑换的赠品，它是一个购买单元。
+gift_cart_object_gift的作用就是获取购物车中赠品的详细信息,和b2c_cart_object_goods类似
+</pre></p>
+<h4><a name="id8">b2c_cart_process_profilter</a></h4>
+<p>调用的是process方法，在process方法中调用b2c_cart_prefilter_apps services注册类中的filter</p>
+
+<p>方法来加载商品促销数据,加载完成后进行统计</p>
+<pre> &lt;service id=&quot;b2c_cart_prefilter_apps&quot;&gt;
+    &lt;class&gt;b2c_cart_prefilter_promotion_goods&lt;/class&gt;
+&lt;/service&gt;
+</pre><h5><a name="id9">b2c_cart_prefilter_promotion_goods</a></h5>
+<p>商品促销预过滤</p>
+</ul>
+
+<ul>
+<li>filter<pre>    filter作用：
+            1、 services b2c_promotion_use_check
+                object对应的方法 check_use_promotion
+                参数：goods_id
+                作用：用来验证当前购买商品是否可以参加商品促销
+                目前状态：预留services
+            2、 当前类中的 _init_rule方法
+                参数：goods_id,current_time=time()
+                作用：sdb_b2c_goods_promotion_ref表和sdb_b2c_sales_rule_goods表中的到
+                      购买商品满足商品促销的规则
+            3、 当前类中的 _filter 方法
+                作用：将满足商品促销的促销规则是执行优惠方案
+</pre></li>
+</ul>
+<h4><a name="id10">b2c_cart_process_postfilter</a></h4>
+<p>调用的是process方法，在process方法中调用b2c_cart_postfilter_apps services注册类中的filter</p>
+
+<p>方法来加载商品促销数据,加载完成后进行统计</p>
+<pre> &lt;service id=&quot;b2c_cart_postfilter_apps&quot;&gt;
+    &lt;class&gt;b2c_cart_postfilter_promotion&lt;/class&gt;
+&lt;/service&gt;
+</pre><h5><a name="id11">b2c_cart_postfilter_promotion</a></h5>
+<p>订单促销加载,优惠劵促销加载</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">点击进入购物车</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">_common方法</a>
+        <li><a href="#id3" class="reference internal">get_objects</a>
+            <ul>
+            <li><a href="#id4" class="reference internal">b2c_cart_process_get</a>
+                <ul>
+                <li><a href="#id5" class="reference internal">b2c_cart_object_goods</a>
+                <li><a href="#id6" class="reference internal">b2c_cart_object_coupon</a>
+                <li><a href="#id7" class="reference internal">gift_cart_object_gift</a>
+            </ul>
+            <li><a href="#id8" class="reference internal">b2c_cart_process_profilter</a>
+                <ul>
+                <li><a href="#id9" class="reference internal">b2c_cart_prefilter_promotion_goods</a>
+            </ul>
+            <li><a href="#id10" class="reference internal">b2c_cart_process_postfilter</a>
+                <ul>
+                <li><a href="#id11" class="reference internal">b2c_cart_postfilter_promotion</a>
+            </ul>
+        </ul>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../add_goodstype.html"
+                                  title="上一章">扩展购物车项类型案例</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../../member/index.html"
+                                  title="下一章">会员</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../../member/index.html" title="会员" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../add_goodstype.html" title="扩展购物车项类型案例" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">购物车</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      类的自动载入机制 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="创建一个带后端的留言版" href="index.html" />
+
+        <link rel="next" title="service" href="Service - app间的扩展机制.html" />
+        <link rel="prev" title="basic" href="创建数据表，实现基本功能代码.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="service.html" title="Service - app间的扩展机制" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="basic.html" title="创建数据表，实现基本功能代码" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">快速入门</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">创建一个带后端的留言版</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 类的自动载入机制</h1>
+            
+<p><b>Gravatar</b>是个提供头像服务的网站(网址:[<a href="http://www.gravatar.com">http://www.gravatar.com</a>])，只要用邮箱注册之后，就可以用邮箱获得上面的头像。</p>
+
+<p>下面我们要在每行留言的前面由留言者的<b>email</b>，生成其在<b>Gravatar</b>上注册的头像。</p>
+
+<p>为了演示我们的<b>autoload</b>，我们打算用一个独立的类完成这个操作。</p>
+
+<ul>
+<li>打开控制器文件<b>app/notebook/controller/default.php</b>，修改index方法。</li>
+</ul>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">notebook_ctl_default&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">base_controller</span><span style="color: #007700">{<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">index</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">pagedata</span><span style="color: #007700">[</span><span style="color: #DD0000">'items'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">(</span><span style="color: #DD0000">'item'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">getList</span><span style="color: #007700">(</span><span style="color: #DD0000">'*'</span><span style="color: #007700">);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//新加的内容开始<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$gravatar&nbsp;</span><span style="color: #007700">=&nbsp;new&nbsp;</span><span style="color: #0000BB">notebook_gravatar</span><span style="color: #007700">;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;foreach(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">pagedata</span><span style="color: #007700">[</span><span style="color: #DD0000">'items'</span><span style="color: #007700">]&nbsp;as&nbsp;</span><span style="color: #0000BB">$k</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$item</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">pagedata</span><span style="color: #007700">[</span><span style="color: #DD0000">'items'</span><span style="color: #007700">][</span><span style="color: #0000BB">$k</span><span style="color: #007700">][</span><span style="color: #DD0000">'avatar'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">$gravatar</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">get_avatar</span><span style="color: #007700">(</span><span style="color: #0000BB">$item</span><span style="color: #007700">[</span><span style="color: #DD0000">'item_email'</span><span style="color: #007700">]);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//新加的内容结束<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">display</span><span style="color: #007700">(</span><span style="color: #DD0000">'default.html'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;....<br /></span>
+</span>
+</code></div>
+<ul>
+<li>这里的<b>new notebook_gravatar</b> 我们没有指定类的地址，而是通过自动载入完成查找文件的操作。</li>
+</ul>
+
+<ul>
+<li>规则如下：</li>
+</ul>
+
+<p>以下划线_分隔类的名称，第一个区段标示<b>app</b>的名字，后面的部分为该<b>app</b>的<b>lib</b>目录下路径。 最后一个区段是具体的文件名。当<b>app</b>的名字是<b>core</b>时，则到<b>ecos</b>的<b>core/lib</b>目录下寻找指定的类。当类名中没有下划线时，则到<b>ecos</b>的<b>core/lib/static</b>目录下寻找指定的类。因此，<b>aaa_bbb_ccc_ddd</b>指向<b>app/aaa/lib/bbb/ccc/ddd.php</b>； <b>core_bbb_ccc</b>指向<b>core/lib/bbb/ccc.php</b>。</p>
+
+<ul>
+<li>此时，我们建立<b>notebook_gravatar</b>的文件<b>app/notebook/lib/gravatar.php</b>。 内容如下：</li>
+</ul>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">notebook_gravatar</span><span style="color: #007700">{<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">get_avatar</span><span style="color: #007700">(</span><span style="color: #0000BB">$email</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">sprintf</span><span style="color: #007700">(</span><span style="color: #DD0000">'http://www.gravatar.com/avatar/%s?s=48&amp;r=x'</span><span style="color: #007700">,</span><span style="color: #0000BB">md5</span><span style="color: #007700">(</span><span style="color: #0000BB">$email</span><span style="color: #007700">));<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />}<br /></span>
+</span>
+</code></div>
+<ul>
+<li>现在让头像显示出来。修改文件：<b>app/notebook/view/default.html</b></li>
+</ul>
+<pre>&lt;dl&gt;
+	&lt;{foreach from=$items item=item}&gt;
+	&lt;dt&gt;
+	&lt;{$item.item_subject}&gt;
+	&lt;span class=&quot;date&quot;&gt;日期: &lt;{$item.item_posttime|cdate}&gt;&lt;/span&gt;
+	&lt;/dt&gt;
+	&lt;dd&gt;
+	&lt;!-- 新加的内容开始 --&gt;
+	&lt;img src=&quot;&lt;{$item.avatar}&gt;&quot; style=&quot;float:left;margin-right:10px&quot; /&gt;
+	&lt;!-- 新加的内容结束 --&gt;
+	&lt;{$item.item_content}&gt;
+	&lt;/dd&gt;
+	&lt;{/foreach}&gt;
+	&lt;div style=&quot;margin-bottom:20px;clear:both&quot; /&gt;&amp;nbsp;&lt;/div&gt;
+&lt;/dl&gt;
+</pre>
+<ul>
+<li>看一下成果吧：
+<p><br /><img border="0" alt="" align="middle" src="screen-3.png" /></p>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="basic.html"
+                                  title="上一章">创建数据表，实现基本功能代码</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="service.html"
+                                  title="下一章">Service - app间的扩展机制</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="service.html" title="Service - app间的扩展机制" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="basic.html" title="创建数据表，实现基本功能代码" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">快速入门</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">创建一个带后端的留言版</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

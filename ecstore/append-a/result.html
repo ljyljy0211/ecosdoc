@@ -1,0 +1,1481 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      订单详情返回值(json(array)) &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="b2c.order.detail 查询订单详情" href="b2c.order.detail.html" />
+
+        <link rel="next" title="b2c.order.remark" href="b2c.order.remark 修改订单备注.html" />
+        <link rel="prev" title="b2c.order.detail" href="b2c.order.detail 查询订单详情.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="b2c.order.remark.html" title="b2c.order.remark 修改订单备注" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="b2c.order.detail.html" title="b2c.order.detail 查询订单详情" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../api.html">API</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore  被外部系统请求的api接口</a> &raquo;
+        </li>
+                <li>
+          <a href="b2c.order.detail.html">b2c.order.detail 查询订单详情</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 订单详情返回值(json(array))</h1>
+            
+<table class="docutils">
+<tr>
+<th>返回参数名称</th>
+
+<th>类型</th>
+
+<th>长度</th>
+
+<th>说明及示例</th>
+</tr>
+
+<tr>
+<td>tid</td>
+
+<td>string</td>
+
+<td>16</td>
+
+<td>订单号 (20140220158448)</td>
+</tr>
+
+<tr>
+<td>title</td>
+
+<td>string</td>
+
+<td>30 |当前交易标题 (默认Order Create)</td>
+</tr>
+
+<tr>
+<td>created</td>
+
+<td>date</td>
+
+<td></td>
+
+<td>订单创建时间 (Y-m-d H:i:s)</td>
+</tr>
+
+<tr>
+<td>modified</td>
+
+<td>date</td>
+
+<td></td>
+
+<td>订单更新时间 (Y-m-d H:i:s)</td>
+</tr>
+
+<tr>
+<td>lastmodify</td>
+
+<td>date</td>
+
+<td></td>
+
+<td>订单最后更新时间(Y-m-d H:i:s)</td>
+</tr>
+
+<tr>
+<td>status</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>订单状态（TRADE_ACTIVE活动订单 或  TRADE_CLOSED订单关闭）</td>
+</tr>
+
+<tr>
+<td>pay_status</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>支付状态（PAY_NO未支付 或 PAY_FINISH支付完成 或 PAY_TO_MEDIUM支付到担保方 或 PAY_PART 或 REFUND_PART 或 REFUND_ALL）</td>
+</tr>
+
+<tr>
+<td>ship_status</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>发货状态（SHIP_NO未发货 或 SHIP_FINISH 发货完成）</td>
+</tr>
+
+<tr>
+<td>has_invoice</td>
+
+<td>bool</td>
+
+<td></td>
+
+<td>是否开发票（true是 或 false否）</td>
+</tr>
+
+<tr>
+<td>invoice_title</td>
+
+<td>string</td>
+
+<td>50</td>
+
+<td>发票抬头</td>
+</tr>
+
+<tr>
+<td>invoice_fee</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>发票税费</td>
+</tr>
+
+<tr>
+<td>total_goods_fee</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>商品总价(商品结算价+商品优惠额)</td>
+</tr>
+
+<tr>
+<td>total_trade_fee</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>订单总价（商品总价+物流费用+保价费用+支付网关手续费+发票税费-商品优惠额-订单优惠额-其他折扣）</td>
+</tr>
+
+<tr>
+<td>discount_fee</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>其他折扣</td>
+</tr>
+
+<tr>
+<td>goods_discount_fee</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>商品优惠额</td>
+</tr>
+
+<tr>
+<td>orders_discount_fee</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>订单优惠额</td>
+</tr>
+
+<tr>
+<td>promotion_details</td>
+
+<td><a href="#Promotion_Details">Promotion_Details</a></td>
+
+<td></td>
+
+<td>优惠信息详情</td>
+</tr>
+
+<tr>
+<td>payed_fee</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>订单已支付金额</td>
+</tr>
+
+<tr>
+<td>currency</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>交易货币类型（ CNY人民币 USD美元)</td>
+</tr>
+
+<tr>
+<td>currency_rate</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>货币汇率</td>
+</tr>
+
+<tr>
+<td>total_currency_fee</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>相应货币的订单总价</td>
+</tr>
+
+<tr>
+<td>buyer_obtain_point_fee</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>此订单获取的积分</td>
+</tr>
+
+<tr>
+<td>point_fee</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>此订单使用的积分</td>
+</tr>
+
+<tr>
+<td>total_weight</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>订单总重</td>
+</tr>
+
+<tr>
+<td>receiver_time</td>
+
+<td>string</td>
+
+<td>100</td>
+
+<td>预定收货时间</td>
+</tr>
+
+<tr>
+<td>shipping_tid</td>
+
+<td>string</td>
+
+<td>16</td>
+
+<td>配送方式id</td>
+</tr>
+
+<tr>
+<td>shipping_type</td>
+
+<td>string</td>
+
+<td>50</td>
+
+<td>配送方式名称</td>
+</tr>
+
+<tr>
+<td>shipping_fee</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>配送费用</td>
+</tr>
+
+<tr>
+<td>is_protect</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>是否保价（true是 false否）</td>
+</tr>
+
+<tr>
+<td>protect_fee</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>保价费用</td>
+</tr>
+
+<tr>
+<td>payment_tid</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>支付方式id(alipay deposit)</td>
+</tr>
+
+<tr>
+<td>payment_type</td>
+
+<td>string</td>
+
+<td>50</td>
+
+<td>支付方式名称</td>
+</tr>
+
+<tr>
+<td>is_cod</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>是否货到付款 (true是 false否）</td>
+</tr>
+
+<tr>
+<td>receiver_name</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>收货人姓名</td>
+</tr>
+
+<tr>
+<td>receiver_email</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>收货人邮箱</td>
+</tr>
+
+<tr>
+<td>receiver_mobile</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>收货人电话</td>
+</tr>
+
+<tr>
+<td>receiver_state</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>收货地区</td>
+</tr>
+
+<tr>
+<td>receiver_city</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>收货城市</td>
+</tr>
+
+<tr>
+<td>receiver_district</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>收货区域</td>
+</tr>
+
+<tr>
+<td>receiver_address</td>
+
+<td>string</td>
+
+<td>50</td>
+
+<td>收货地址</td>
+</tr>
+
+<tr>
+<td>receiver_zip</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>收货邮政编码</td>
+</tr>
+
+<tr>
+<td>receiver_phone</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>收货人手机</td>
+</tr>
+
+<tr>
+<td>pay_cost</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>支付网关手续费</td>
+</tr>
+
+<tr>
+<td>buyer_memo</td>
+
+<td>string</td>
+
+<td>100</td>
+
+<td>留言</td>
+</tr>
+
+<tr>
+<td>orders_number</td>
+
+<td>int</td>
+
+<td></td>
+
+<td>订单数量（此处默认为1）</td>
+</tr>
+
+<tr>
+<td>buyer_uname</td>
+
+<td>string</td>
+
+<td>50</td>
+
+<td>购买人用户名</td>
+</tr>
+
+<tr>
+<td>buyer_name</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>购买者名称</td>
+</tr>
+
+<tr>
+<td>buyer_address</td>
+
+<td>string</td>
+
+<td>100</td>
+
+<td>购买人的详细地址</td>
+</tr>
+
+<tr>
+<td>buyer_mobile</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>购买人电话</td>
+</tr>
+
+<tr>
+<td>buyer_phone</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>购买人手机</td>
+</tr>
+
+<tr>
+<td>buyer_email</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>购买人邮箱</td>
+</tr>
+
+<tr>
+<td>buyer_zip</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>购买人邮编</td>
+</tr>
+
+<tr>
+<td>orders</td>
+
+<td><a href="#Orders">Orders</a></td>
+
+<td></td>
+
+<td>订单内容</td>
+</tr>
+
+<tr>
+<td>payment_lists</td>
+
+<td><a href="#Payment_lists">Payment_lists</a></td>
+
+<td></td>
+
+<td>支付单内容</td>
+</tr>
+</table>
+</table>
+<h4><a name="id1">Promotion_Details 参数内容</a></h4>
+<ul>
+<li>此参数是个二维数组，结构如下：<pre class="mark">'promotion_details' =&gt;
+array (
+        0 =&gt;
+        array (
+            'promotion_name' =&gt; '商品价格优惠￥3.00出售',
+            'promotion_fee' =&gt; '6.000',
+            ),
+        1 =&gt;
+        array (
+            'promotion_name' =&gt; '商品价格优惠￥8.00出售',
+            'promotion_fee' =&gt; '8.000',
+            ),
+        2 =&gt;
+        array (
+            'promotion_name' =&gt; '测试订单促销',
+            'promotion_fee' =&gt; '5.000',
+            ),
+      ),
+</pre>
+<li>参数解释
+<table class="docutils">
+<tr>
+<th>返回参数名称</th>
+
+<th>类型</th>
+
+<th>长度</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>promotion_name</td>
+
+<td>string</td>
+
+<td>50</td>
+
+<td>订单享受的优惠（如：商品优惠、订单优惠）</td>
+</tr>
+
+<tr>
+<td>promotion_fee</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>优惠的金额 （金额根据不同优惠规则来总和 如：商品规则a：6；商品规则b:8；订单规则a：5）</td>
+</tr>
+</table>
+</li>
+</li>
+</ul>
+</table>
+<h4><a name="id2">Orders 参数内容</a></h4>
+<ul>
+<li>此参数数组是一个根据商品个数生成的多维数组<pre class="mark">'orders' =&gt; 
+array (
+        'order' =&gt; 
+        array (
+            0 =&gt; 
+            array (
+                'oid' =&gt; '99',
+                'orders_bn' =&gt; 'P4C89F21B67024',
+                'type' =&gt; 'goods',
+                'type_alias' =&gt; '商品区块',
+                'iid' =&gt; '99',
+                'title' =&gt; '艺术风格皮质钱包',
+                'items_num' =&gt; 1,
+                'order_status' =&gt; 'SHIP_NO',
+                'price' =&gt; '198.000',
+                'total_order_fee' =&gt; 198,
+                'discount_fee' =&gt; 0,
+                'consign_time' =&gt; '',
+                'order_items' =&gt; 
+                array (
+                    'item' =&gt; 
+                    array (
+                        0 =&gt; 
+                        array (
+                            'sku_id' =&gt; '296',
+                            'iid' =&gt; '42',
+                            'bn' =&gt; 'P4C89F21B67024',
+                            'name' =&gt; '艺术风格皮质钱包',
+                            'sku_properties' =&gt; '颜色:深蓝色',
+                            'weight' =&gt; NULL,
+                            'score' =&gt; '0',
+                            'price' =&gt; '198.000',
+                            'num' =&gt; '1',
+                            'sendnum' =&gt; '0',
+                            'total_item_fee' =&gt; 198,
+                            'sale_price' =&gt; '190.000',
+                            'item_type' =&gt; 'product',
+                            'item_status' =&gt; 'normal',
+                            'discount_fee' =&gt; 8,
+                            ),
+                        ),
+                    ),
+                    'weight' =&gt; '0',
+                    ),)
+</pre>
+<li>$orders['order'][0]参数解释
+<table class="docutils">
+<tr>
+<th>参数名称</th>
+
+<th>类型</th>
+
+<th>长度</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>oid</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>order_objects 表中的id</td>
+</tr>
+
+<tr>
+<td>orders_bn</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>商品货号</td>
+</tr>
+
+<tr>
+<td>type</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>商品类型</td>
+</tr>
+
+<tr>
+<td>type_alias</td>
+
+<td></td>
+
+<td>商品区域块</td>
+</tr>
+
+<tr>
+<td>iid</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>order_objects 表中的id</td>
+</tr>
+
+<tr>
+<td>title</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>商品名称</td>
+</tr>
+
+<tr>
+<td>items_num</td>
+
+<td>int</td>
+
+<td></td>
+
+<td>货品购买数量</td>
+</tr>
+
+<tr>
+<td>order_status</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>商品发货状态</td>
+</tr>
+
+<tr>
+<td>price</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>商品单价</td>
+</tr>
+
+<tr>
+<td>total_order_fee</td>
+
+<td>int</td>
+
+<td></td>
+
+<td>订单中金额</td>
+</tr>
+
+<tr>
+<td>discount_fee</td>
+
+<td>int</td>
+
+<td></td>
+
+<td>商品优惠额</td>
+</tr>
+
+<tr>
+<td>consign_time</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>商品优惠额</td>
+</tr>
+
+<tr>
+<td>weight</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>商品重量</td>
+</tr>
+
+<tr>
+<td>order_items</td>
+
+<td><a href="#Order_items">Order_items</a></td>
+
+<td></td>
+
+<td>货品详情</td>
+</tr>
+</table>
+</li>
+</li>
+</ul>
+</table>
+<h5><a name="id3">Order_items 货品详情参数列表</a></h5>
+<ul>
+<li>order_items['item'][0]内容
+<table class="docutils">
+<tr>
+<th>参数名称</th>
+
+<th>类型</th>
+
+<th>长度</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>sku_id</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>货品id</td>
+</tr>
+
+<tr>
+<td>iid</td>
+
+<td>string</td>
+
+<td></td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>bn</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>货品编号</td>
+</tr>
+
+<tr>
+<td>name</td>
+
+<td>string</td>
+
+<td>100</td>
+
+<td>货品名称</td>
+</tr>
+
+<tr>
+<td>sku_properties</td>
+
+<td>50</td>
+
+<td>货品规格</td>
+</tr>
+
+<tr>
+<td>weight</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>货品重量</td>
+</tr>
+
+<tr>
+<td>score</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>货品积分</td>
+</tr>
+
+<tr>
+<td>price</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>货品销售价格</td>
+</tr>
+
+<tr>
+<td>num</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>货品购买数量</td>
+</tr>
+
+<tr>
+<td>sendnum</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>货品已发货数量</td>
+</tr>
+
+<tr>
+<td>total_item_fee</td>
+
+<td>string</td>
+
+<td>|货品总价</td>
+</tr>
+
+<tr>
+<td>sale_price</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>货品成交价</td>
+</tr>
+
+<tr>
+<td>item_type</td>
+
+<td>string</td>
+
+<td>50</td>
+
+<td>类型</td>
+</tr>
+
+<tr>
+<td>item_status</td>
+
+<td>string</td>
+
+<td></td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>discount_fee</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>货品优惠额</td>
+</tr>
+</table>
+</li>
+</ul>
+</table>
+<h4><a name="id4">payment_lists 参数内容</a></h4>
+<ul>
+<li>payment_lists 是一个多维数组，内容如下：<pre class="mark">'payment_lists' =&gt; array (
+        'payment_list' =&gt; 
+        array (
+            0 =&gt; 
+            array (
+                'tid' =&gt; '140221143604193',
+                'payment_id' =&gt; '13929645875070',
+                'seller_bank' =&gt; '预存款',
+                'seller_account' =&gt; '点此设置您商店的名称',
+                'buyer_account' =&gt; 'xinxin',
+                'currency' =&gt; 'CNY',
+                'pay_fee' =&gt; '447.000',
+                'paycost' =&gt; '0.000',
+                'currency_fee' =&gt; '447.000',
+                'pay_type' =&gt; 'deposit',
+                'payment_name' =&gt; '预存款',
+                'payment_code' =&gt; 'deposit',
+                't_begin' =&gt; '2014-02-21 14:36:27',
+                't_end' =&gt; '2014-02-21 14:36:27',
+                'status' =&gt; 'SUCC',
+                'memo' =&gt; '',
+                'outer_no' =&gt; '',
+                ),
+            ),
+            ),
+</pre>
+<li>payment_lists['payment_list'][0]参数解释
+<table class="docutils">
+<tr>
+<th>返回参数名称</th>
+
+<th>类型</th>
+
+<th>长度</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>tid</td>
+
+<td>string</td>
+
+<td>16</td>
+
+<td>订单号</td>
+</tr>
+
+<tr>
+<td>payment_id</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>支付单号</td>
+</tr>
+
+<tr>
+<td>seller_bank</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>支付银行</td>
+</tr>
+
+<tr>
+<td>seller_account</td>
+
+<td>string</td>
+
+<td>50</td>
+
+<td>商家店铺名称</td>
+</tr>
+
+<tr>
+<td>buyer_account</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>购买人用户名</td>
+</tr>
+
+<tr>
+<td>currency</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>货币类型</td>
+</tr>
+
+<tr>
+<td>pay_fee</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>支付金额</td>
+</tr>
+
+<tr>
+<td>paycost</td>
+
+<td>string</td>
+
+<td></td>
+
+<td></td>
+</tr>
+
+<tr>
+<td>currency_fee</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>货币金额</td>
+</tr>
+
+<tr>
+<td>pay_type</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>支付方式id</td>
+</tr>
+
+<tr>
+<td>payment_name</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>支付方式名称</td>
+</tr>
+
+<tr>
+<td>payment_code</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>支付账号</td>
+</tr>
+
+<tr>
+<td>t_begin</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>支付发起时间</td>
+</tr>
+
+<tr>
+<td>t_end</td>
+
+<td>string</td>
+
+<td>|支付结束时间</td>
+</tr>
+
+<tr>
+<td>status</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>支付状态</td>
+</tr>
+
+<tr>
+<td>memo</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>订单备注</td>
+</tr>
+
+<tr>
+<td>outer_no</td>
+
+<td>string</td>
+
+<td></td>
+
+<td></td>
+</tr>
+</table>
+</li>
+</li>
+</ul>
+</table>
+<h3><a name="id5">最终返回值示例</a></h3>
+<p>返回值列表<pre class="mark">data =&gt;array (
+  'tid' =&gt; '20140220158448',
+  'title' =&gt; 'Order Create',
+  'created' =&gt; '2014-02-20 15:33:13',
+  'modified' =&gt; '2014-02-20 15:33:22',
+  'lastmodify' =&gt; '2014-02-20 15:33:22',
+  'status' =&gt; 'TRADE_ACTIVE',
+  'pay_status' =&gt; 'PAY_FINISH',
+  'ship_status' =&gt; 'SHIP_NO',
+  'has_invoice' =&gt; false,
+  'invoice_title' =&gt; '',
+  'invoice_fee' =&gt; '0.000',
+  'total_goods_fee' =&gt; '198.00',
+  'total_trade_fee' =&gt; '193.000',
+  'discount_fee' =&gt; '0.000',
+  'goods_discount_fee' =&gt; '0.000',
+  'orders_discount_fee' =&gt; '5.000',
+  'promotion_details' =&gt; '[{&quot;promotion_name&quot;:&quot;asdfasdf&quot;,&quot;promotion_fee&quot;:&quot;5.000&quot;}]',
+  'payed_fee' =&gt; '193.000',
+  'currency' =&gt; 'CNY',
+  'currency_rate' =&gt; '1.0000',
+  'total_currency_fee' =&gt; '193.000',
+  'buyer_obtain_point_fee' =&gt; '0.000',
+  'point_fee' =&gt; '0.000',
+  'total_weight' =&gt; '0.000',
+  'receiver_time' =&gt; '任意日期任意时间段',
+  'shipping_tid' =&gt; '1',
+  'shipping_type' =&gt; '快递',
+  'shipping_fee' =&gt; '0.000',
+  'is_protect' =&gt; 'false',
+  'protect_fee' =&gt; '0.000',
+  'payment_tid' =&gt; 'deposit',
+  'payment_type' =&gt; '预存款',
+  'is_cod' =&gt; 'false',
+  'receiver_name' =&gt; '闪电宝宝',
+  'receiver_email' =&gt; '',
+  'receiver_mobile' =&gt; '13333333333',
+  'receiver_state' =&gt; '上海',
+  'receiver_city' =&gt; '上海市',
+  'receiver_district' =&gt; '徐汇区',
+  'receiver_address' =&gt; '上海市徐汇区虹桥路333号',
+  'receiver_zip' =&gt; '',
+  'receiver_phone' =&gt; '',
+  'pay_cost' =&gt; '0.000',
+  'buyer_memo' =&gt; '',
+  'orders_number' =&gt; 1,
+  'buyer_uname' =&gt; 'xinxin',
+  'buyer_name' =&gt; '',
+  'buyer_address' =&gt; '',
+  'buyer_mobile' =&gt; '',
+  'buyer_phone' =&gt; '',
+  'buyer_email' =&gt; 'xin@ww.com',
+  'buyer_zip' =&gt; NULL,
+  'orders' =&gt; 
+  array (
+    'order' =&gt; 
+    array (
+      0 =&gt; 
+      array (
+        'oid' =&gt; '40',
+        'orders_bn' =&gt; 'P4CB2898C0F44C',
+        'type' =&gt; 'goods',
+        'type_alias' =&gt; '商品区块',
+        'iid' =&gt; '40',
+        'title' =&gt; '圆形指南针不锈钢甜美手表',
+        'items_num' =&gt; 1,
+        'order_status' =&gt; 'SHIP_NO',
+        'price' =&gt; '198.000',
+        'total_order_fee' =&gt; 198,
+        'sale_price' =&gt; 198,
+        'discount_fee' =&gt; 0,
+        'consign_time' =&gt; '',
+        'order_items' =&gt; 
+        array (
+          'item' =&gt; 
+          array (
+            0 =&gt; 
+            array (
+              'sku_id' =&gt; '534',
+              'iid' =&gt; '82',
+              'bn' =&gt; 'P4CB2898C0F44C',
+              'name' =&gt; '圆形指南针不锈钢甜美手表',
+              'sku_properties' =&gt; '',
+              'weight' =&gt; '0',
+              'score' =&gt; '0',
+              'price' =&gt; '198.000',
+              'num' =&gt; '1',
+              'sendnum' =&gt; '0',
+              'total_item_fee' =&gt; 198,
+              'sale_price' =&gt; '198.000',
+              'item_type' =&gt; 'product',
+              'item_status' =&gt; 'normal',
+              'discount_fee' =&gt; 0,
+            ),
+          ),
+        ),
+        'weight' =&gt; '0',
+      ),
+    ),
+  ),
+  'payment_list' =&gt; 
+  array (
+    0 =&gt; 
+    array (
+      'tid' =&gt; '20140220158448',
+      'payment_id' =&gt; '13928816025034',
+      'seller_bank' =&gt; '预存款',
+      'seller_account' =&gt; '点此设置您商店的名称',
+      'buyer_account' =&gt; 'xinxin',
+      'currency' =&gt; 'CNY',
+      'pay_fee' =&gt; '193.000',
+      'paycost' =&gt; '0.000',
+      'currency_fee' =&gt; '193.000',
+      'pay_type' =&gt; 'deposit',
+      'payment_name' =&gt; '预存款',
+      'payment_code' =&gt; 'deposit',
+      't_begin' =&gt; '2014-02-20 15:33:22',
+      't_end' =&gt; '2014-02-20 15:33:22',
+      'status' =&gt; 'SUCC',
+      'memo' =&gt; '',
+      'outer_no' =&gt; '',
+    ),
+  ),
+)
+</pre></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+        <ul>
+            <ul>
+            <li><a href="#id1" class="reference internal">Promotion_Details 参数内容</a>
+            <li><a href="#id2" class="reference internal">Orders 参数内容</a>
+                <ul>
+                <li><a href="#id3" class="reference internal">Order_items 货品详情参数列表</a>
+            </ul>
+            <li><a href="#id4" class="reference internal">payment_lists 参数内容</a>
+        </ul>
+        <li><a href="#id5" class="reference internal">最终返回值示例</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="b2c.order.detail.html"
+                                  title="上一章">b2c.order.detail 查询订单详情</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="b2c.order.remark.html"
+                                  title="下一章">b2c.order.remark 修改订单备注</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="b2c.order.remark.html" title="b2c.order.remark 修改订单备注" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="b2c.order.detail.html" title="b2c.order.detail 查询订单详情" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../api.html">API</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore  被外部系统请求的api接口</a> &raquo;
+        </li>
+                <li>
+          <a href="b2c.order.detail.html">b2c.order.detail 查询订单详情</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

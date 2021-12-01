@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      模型(model) &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../doc.html" />
+    <link rel="up" title="MVC框架" href="index.html" />
+
+        <link rel="next" title="m/base" href="概述.html" />
+        <link rel="prev" title="basic" href="架构说明.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="m/base.html" title="概述" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="basic.html" title="架构说明" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">MVC框架</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 模型(model)</h1>
+            
+<ul>
+    <li><a href="m/base.html" class="">概述</a>
+        <ul>
+        <li><a href="m/base.html#id1" class="">model的命名规则</a>
+        <li><a href="m/base.html#id2" class="">model存放位置</a>
+    </ul>
+    <li><a href="m/dbschema.html" class="">dbschema 数据库表定义文件</a>
+        <ul>
+        <li><a href="m/dbschema.html#id1" class="">dbschema 是什么</a>
+        <li><a href="m/dbschema.html#id2" class="">用dbschema来描述表结构</a>
+        <li><a href="m/dbschema.html#id17" class="">用dbschema来定义 desktop的列表</a>
+        <li><a href="m/dbschema.html#id27" class="">bryant写的部分</a>
+    </ul>
+    <li><a href="m/base_db_model.html" class="">base_db_model</a>
+        <ul>
+        <li><a href="m/base_db_model.html#id1" class="">如何创建自己的model</a>
+        <li><a href="m/base_db_model.html#id5" class="">如何取得model对象</a>
+        <li><a href="m/base_db_model.html#id6" class="">如何在model中获取数据库操作对象</a>
+        <li><a href="m/base_db_model.html#id7" class="">函数接口</a>
+    </ul>
+    <li><a href="m/base_db_connections.html" class="">数据库操作类base_db_connections(强烈不建议直接调用)</a>
+        <ul>
+        <li><a href="m/base_db_connections.html#id1" class="">配置</a>
+        <li><a href="m/base_db_connections.html#id12" class="">函数接口</a>
+    </ul>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../doc.html">內容目录</a></h3>
+          
+<ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="basic.html"
+                                  title="上一章">架构说明</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="m/base.html"
+                                  title="下一章">概述</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="m/base.html" title="概述" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="basic.html" title="架构说明" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">MVC框架</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

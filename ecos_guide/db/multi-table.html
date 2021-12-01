@@ -1,0 +1,257 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      多表连接 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="ECOS开发指南" href="../index.html" />
+
+        <link rel="next" title="../upfile/index" href="多文件上传.html" />
+        <link rel="prev" title="transaction" href="事务处理.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../upfile/index.html" title="多文件上传" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="transaction.html" title="事务处理" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECOS开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 多表连接</h1>
+            <h2><a name="id1">插入</a></h2><h3><a name="id2">例子</a></h3>
+<ul>
+<li>表结构：
+<p>会员表members(member_id,password,name,email,...),会员详细信息表member_object('member_id','sex',msn,qq,...),
+<li>需求<pre class="mark">    1）在会员注册时，需要在两个表中插入对应数据成功，注册才成功。
+    2）需要批量导入会员数据到members表和member_object表
+</pre>
+<li>解决
+<ul>
+<li>问题一方法一 多表插入可以用到dbeav中的save方法来进行操作。<a href="http://www.ec-os.net/advance/dbeav/dbeav.html#id16">http://www.ec-os.net/advance/dbeav/dbeav.html#id16</a><pre>    配置  var $has_many = array('member_object'=&gt;'member_object:append:member_id^member_id');
+</pre>方法二 先把数据插入到members表,在得到member_id后再把数据插入到member_object<pre>    在dbeav中的delete会在删除主表的时候把关联子表的数据删除。如果在删除主表的数据后并不需要把关联的子表的数据删除，
+    那么则不能将两个表进行关联，这个时候则在代码中实现插入两遍即可。
+</pre>方法三 自己写sql,实现多表插入<pre class="mark">    在能够使用dbeav进行表关联的时候推荐使用方法一，不能则推荐使用方法二
+
+    对于数据一致性要求严格的可以使用事务处理
+</pre>
+<li>问题二<pre>    在ECOS中没有提供方法进行批量的多表插入数据，dbeav中的save方法是单条数据进行插入，那么在进行批量的时候则
+    使用循环save方法，
+</pre></li>
+</li>
+</ul>
+</li>
+</li>
+</p>
+</li>
+</ul>
+<h2><a name="id3">更新</a></h2><h3><a name="id4">例子</a></h3></ul>
+
+<ul>
+<li>表结构
+<p>员表members(member_id,password,name,email,enable,...),会员详细信息表member_object('member_id','sex',msn,qq,...),
+<li>需求<pre class="mark">    1)在会员修改信息时，需要在两个表中对应的数据信息更新。
+    2) 将会员中所有sex&lt;18的会员的members表中enable字段改为enable=false禁用
+</pre>
+<li>解决
+<ul>
+<li>问题一对于这样的单条数据的更新，而且知道要更新的members表的member_id,可以使用dbeav的<a href="http://www.ec-os.net/advance/dbeav/dbeav.html#id16">save</a>方法进行更新,save会根据has_many(has_one)的操作配置来判断save是插入还是更新处理<pre>    配置  var $has_many = array('member_object'=&gt;'member_object:contrast:member_id^member_id');
+</pre>
+<li>问题二save主要是作为插入保存数据的方法，对于这个的更新来说并不能实现。而如果两个不进行关联操作更新也是比较麻烦的，需要先在member_object表中查找出符合条件的会员,再到members表中去更新。<pre class="mark">    那么对于有这样需求的则写sql来进行实现
+</pre></li>
+</li>
+</ul>
+</li>
+</li>
+</p>
+</li>
+</ul>
+<h2><a name="id5">查询</a></h2><h3><a name="id6">例子</a></h3></ul>
+
+<ul>
+<li>表结构
+<p>商品表goods(goods_id,goods_type_id,name,marketable,...)商品类型表goods_type(goods_type_id,type_name,...)
+<li>需求<pre class="mark">    1)根据查询条件goods_id=1，查询到对应商品的类型的名字type_name
+    2)根据查询条件marketable=true（上架）并且商品类型是type_name=`笔记本`，查询到对应的商品
+</pre>
+<li>解决
+<ul>
+<li>问题一 可以通过dbeav中的dump进行查询在ECOS的dbeav中的dump提供的多表连查功能<a href="http://www.ec-os.net/advance/dbeav/dbeav.html#id13">http://www.ec-os.net/advance/dbeav/dbeav.html#id13</a><pre>    配置
+        var $has_many = array('goods_type'=&gt;'goods_type:append:goods_type_id^goods_type_id');
+        var $subSdf = array('default'=&gt;array('*'));
+
+    使用dump查询：
+        $this-&gt;app-&gt;model('goods')-&gt;dump('array(goods_id'=&gt;1'),'*','default');
+</pre>
+<li>问题二 对于第二个问题来说并不能使用dump<pre class="mark">    dump的使用限制:
+        1)  条件的限制，对于dump来说条件能设置的条件只能针对与主表,dump会先根据条件在主表中查找出一条符合
+            条件的数据，再将这条数据中的关联字段的数据作为关联子表的查询条件，在子表中进行查询，最后返回数据
+        2)  返回数据条数的限制，主表根据条件只能返回一条数据，关联子表没有限制
+</pre>根据dump的使用限制可以看出，对于第二个问题则不能使用dbeav中的dump进行查询，那么这个就只能自己写sql来进行实现</li>
+</li>
+</ul>
+</li>
+</li>
+</p>
+</li>
+</ul>
+<h2><a name="id7">删除</a></h2><h3><a name="id8">例子</a></h3></ul>
+
+<ul>
+<li>表结构
+<p>会员表members(member_id,password,name,email,enable,...),会员详细信息表member_object('member_id','sex',msn,qq,...),
+<li>需求<pre>    1)根据member_id删除一个用户
+    2)把满足members表中enable=true并且member_object表中sex&lt;18的会员信息删除
+</pre>
+<li>解决
+<ul>
+<li>问题一关联多表进行删除，可使用dbeav的delete方法<a href="http://www.ec-os.net/advance/dbeav/dbeav.html#id14">http://www.ec-os.net/advance/dbeav/dbeav.html#id14</a><pre>    在dbeav中的delete会在删除主表的时候把关联子表的数据删除。
+</pre>
+<li>问题二<pre class="mark">    delete条件限制
+        1)把delete的条件作为主表的条件进行删除，再把关联字段的数据作为子表的删除条件
+        2)子表数据不能作为主表删除的条件
+</pre>通过限制条件我们知道，对于第二个问题则不能用delete来进行删除,那么这个时候则需要自己写sql来进行删除</li>
+</li>
+</ul>
+</li>
+</li>
+</p>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">插入</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">例子</a>
+    </ul>
+    <li><a href="#id3" class="reference internal">更新</a>
+        <ul>
+        <li><a href="#id4" class="reference internal">例子</a>
+    </ul>
+    <li><a href="#id5" class="reference internal">查询</a>
+        <ul>
+        <li><a href="#id6" class="reference internal">例子</a>
+    </ul>
+    <li><a href="#id7" class="reference internal">删除</a>
+        <ul>
+        <li><a href="#id8" class="reference internal">例子</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="transaction.html"
+                                  title="上一章">事务处理</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../upfile/index.html"
+                                  title="下一章">多文件上传</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../upfile/index.html" title="多文件上传" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="transaction.html" title="事务处理" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECOS开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

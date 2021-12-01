@@ -1,0 +1,178 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      app机制概述 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../doc.html" />
+    <link rel="up" title="app机制" href="../app.html" />
+
+        <link rel="next" title="service" href="service机制.html" />
+        <link rel="prev" title="../app" href="app机制.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="service.html" title="service机制" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../app.html" title="app机制" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../app.html">app机制</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> app机制概述</h1>
+            
+<p>ECOS完全由APP组成的系统,每个APP采用统一的约定组装在一起, 如果说ecos像linux一样由许多包组成,那么base app就是ecos的内核(kernel)。</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/app-1.png" /></p>
+
+<p>app机制的特性</p>
+
+<ul>
+<li>最小的独立部署单元.
+<p>所有的开发资源都从属于某一个app, 每个app拥有自己的表, controller, model, view, library, service等资源. 我们推崇最小化部署原则, 将大的任务拆解为可独立部署的app单元
+<li>每个app可以安装, 卸载, 开启, 暂停
+<li>互相有依赖关系A app基于B app而开发, 当安装A app时, 如果系统没有安装B app, 会自动安装B app后, 再安装A app. 当B app被卸载时会先卸载A app, 再卸载B app
+<li>可通过service机制对app进行扩展</li>
+</li>
+</li>
+</p>
+</li>
+</ul>
+
+<p>OSGI是JAVA下的一个组件化设计,其代表产 品是编辑器Eclipse,该工具生命力非常强大,可以 通过组件来扩充使其适合软件开发工艺中的各个流 程。ECOS尝试作为一个类似OSGI的简易实现,简 化其开发成本,而不失去其灵活性。随着商派基于 ECOS的产品线发展,新的应用可以灵活的扩展原有 应用的界面和流程,证明该尝试是非常成功的。</p>
+
+<p>OSGI的部署单位是Bundle, 对应在ECOS中就 是APP。其共性是具有称为“服务”的扩展接口。通过 Service机制,App之间可以扩展功能,界面,和操作 流程。而不必担心原有应用升级带来的问题。</p>
+
+<p>与linux Kernel不同的是:BASE提供了软件包管理机制。BASE让软件包的安装和卸载非常方便</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../doc.html">內容目录</a></h3>
+          
+<ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../app.html"
+                                  title="上一章">app机制</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="service.html"
+                                  title="下一章">service机制</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="service.html" title="service机制" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../app.html" title="app机制" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../app.html">app机制</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

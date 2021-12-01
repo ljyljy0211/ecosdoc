@@ -1,0 +1,451 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      PHP 安装&配置 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="资料" href="../../_refs.html" />
+
+        <link rel="next" title="lnmp" href="Ecstore部署安装.html" />
+        <link rel="prev" title="nginx" href="NGINX 安装&配置.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="lnmp.html" title="Ecstore部署安装" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="nginx.html" title="NGINX 安装&配置" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../_refs.html">资料</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> PHP 安装&配置</h1>
+            
+<ul>
+<li>安装<pre>编译安装前的准备
+提示：默认的php安装后gd不支持jpg，只支持gif、png、bmp。所以首先要安装gd库
+
+wget http://www.boutell.com/gd/http/gd-2.0.33.tar.gz
+tar zxvf gd-2.0.33.tar.gz
+cd gd-2.0.33
+./configure --prefix=/usr/local/webserver/gd2/
+make &amp;&amp; make install
+</pre><pre>wget http://www.php.net/get/php-5.3.26.tar.gz/from/us2.php.net/mirror
+tar zxvf php-5.3.26.tar.gz
+cd php-5.3.26
+./configure --prefix=/usr/local/webserver/php --enable-fpm --with-mysql=/usr/local/webserver/mysql \
+--with-mysqli=/usr/local/webserver/mysql/bin/mysql_config --with-config-file-path=/usr/local/webserver/php  \
+--with-openssl --enable-mbstring --with-zlib --enable-xml --with-gd=/usr/local/webserver/gd2/ --with-jpeg-dir  \
+--enable-bcmath --with-mcrypt --with-iconv --enable-pcntl --enable-shmop --enable-simplexml --enable-ftp
+make &amp;&amp; make install
+
+cp php.ini-development /usr/local/webserver/php/php.ini
+
+</pre></li>
+</ul>
+
+<ul>
+<li>配置
+<ol>
+<li>php(php.ini)<pre>  将  ;date.timezone =
+  改为 date.timezone = prc
+</pre>
+<li>php+nginx（nginx.conf）<pre>  user  www www;
+  worker_processes  1;
+  events {
+      worker_connections  1024;
+  }
+    http {
+    include       mime.types;
+    default_type  application/octet-stream;
+    sendfile        on;
+    keepalive_timeout  65;
+    server {
+        listen       80;
+        server_name  192.168.65.144;
+
+        #Prohibited under the data directory php file is accessed
+        location ~ ^/(.*)/data/.*\.(php)?$
+        {
+            return 404;
+        }
+
+        #Prohibited under the public directory php file is accessed
+        location ~ ^/(.*)/public/.*\.(php)?$
+        {
+            return 404;
+        }
+
+        #Prohibited under the themes directory php file is accessed
+        location ~ ^/(.*)/themes/.*\.(php)?$
+        {
+            return 404;
+        }
+
+        #Prohibited under the wap_themes directory php file is accessed
+        location ~ ^/(.*)/wap_themes/.*\.(php)?$
+        {
+            return 404;
+        }
+
+
+        #配置站点伪静态(此处配置好之后，需要在ecstore/config/config.php中修改“define('WITH_REWRITE',true);”)
+        if ($request_uri ~ (.+?\.php)(|/.*)$ ){
+            break;                                                                                                                                  
+        }
+        if (!-e $request_filename) {
+            rewrite ^/(.*)$ /index.php/$1 last;
+        }
+
+
+        location / {
+            root   /data/www;
+            index  index.php index.html index.htm;
+        }
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+        location ~ \.php {
+            root /data/www;
+            include        fastcgi_params;
+            set $real_script_name $fastcgi_script_name;
+            
+            #设置pathinfo
+
+            set $path_info &quot;&quot;;
+            set $real_script_name $fastcgi_script_name;
+            if ($fastcgi_script_name ~ &quot;^(.+?\.php)(/.+)$&quot;) {
+                set $real_script_name $1;
+                set $path_info $2;
+            }
+            fastcgi_param SCRIPT_FILENAME $document_root$real_script_name;
+
+            fastcgi_param SCRIPT_NAME $real_script_name;
+            fastcgi_param PATH_INFO $path_info;
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_index  index.php;
+        }
+    }
+
+
+}
+</pre>
+<li>php+pathinfo（php.ini）<pre>enable_dl = On
+cgi.force_redirect = 0
+cgi.fix_pathinfo=1
+fastcgi.impersonate = 1
+cgi.rfc2616_headers = 1
+allow_url_fopen = On
+</pre></ol>
+
+<li>配置php-fpm启动脚本
+<ol>
+<li>编写脚本（vi /etc/init.d/php-fpm ）<pre>#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          php-fpm
+# Required-Start:    $remote_fs $network
+# Required-Stop:     $remote_fs $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts php-fpm
+# Description:       starts the PHP FastCGI Process Manager daemon
+### END INIT INFO
+
+prefix=/usr/local/webserver/php
+
+php_fpm_BIN=${prefix}/sbin/php-fpm
+php_fpm_CONF=${prefix}/etc/php-fpm.conf
+php_fpm_PID=${prefix}/var/run/php-fpm.pid
+
+
+php_opts=&quot;--fpm-config $php_fpm_CONF&quot;
+php_pid=&quot;--pid $php_fpm_PID&quot;
+
+wait_for_pid () {
+        try=0
+
+        while test $try -lt 35 ; do
+
+                case &quot;$1&quot; in
+                        'created')
+                        if [ -f &quot;$2&quot; ] ; then
+                                try=''
+                                break
+                        fi
+                        ;;
+
+                        'removed')
+                        if [ ! -f &quot;$2&quot; ] ; then
+                                try=''
+                                break
+                        fi
+                        ;;
+                esac
+
+                echo -n .
+                try=`expr $try + 1`
+                sleep 1
+
+        done
+
+}
+
+case &quot;$1&quot; in
+        start)
+                echo -n &quot;Starting php-fpm &quot;
+
+                $php_fpm_BIN $php_opts $php_pid
+
+                if [ &quot;$?&quot; != 0 ] ; then
+                        echo &quot; failed&quot;
+                        exit 1
+                fi
+
+                wait_for_pid created $php_fpm_PID
+
+                if [ -n &quot;$try&quot; ] ; then
+                        echo &quot; failed&quot;
+                        exit 1
+                else
+                        echo &quot; done&quot;
+                fi
+        ;;
+
+        stop)
+                echo -n &quot;Gracefully shutting down php-fpm &quot;
+
+                if [ ! -r $php_fpm_PID ] ; then
+                        echo &quot;warning, no pid file found - php-fpm is not running ?&quot;
+                        exit 1
+                fi
+
+                kill -QUIT `cat $php_fpm_PID`
+
+                wait_for_pid removed $php_fpm_PID
+
+                if [ -n &quot;$try&quot; ] ; then
+                        echo &quot; failed. Use force-exit&quot;
+                        exit 1
+                else
+                        echo &quot; done&quot;
+                fi
+                      ;;
+
+        force-quit)
+                echo -n &quot;Terminating php-fpm &quot;
+
+                if [ ! -r $php_fpm_PID ] ; then
+                        echo &quot;warning, no pid file found - php-fpm is not running ?&quot;
+                        exit 1
+                fi
+
+                kill -TERM `cat $php_fpm_PID`
+
+                wait_for_pid removed $php_fpm_PID
+
+                if [ -n &quot;$try&quot; ] ; then
+                        echo &quot; failed&quot;
+                        exit 1
+                else
+                        echo &quot; done&quot;
+                fi
+        ;;
+
+        restart)
+                $0 stop
+                $0 start
+        ;;
+
+        reload)
+
+                echo -n &quot;Reload service php-fpm &quot;
+
+                if [ ! -r $php_fpm_PID ] ; then
+                        echo &quot;warning, no pid file found - php-fpm is not running ?&quot;
+                        exit 1
+                fi
+
+                kill -USR2 `cat $php_fpm_PID`
+
+                echo &quot; done&quot;
+        ;;
+
+        *)
+                echo &quot;Usage: $0 {start|stop|force-quit|restart|reload}&quot;
+                exit 1
+        ;;
+
+esac
+</pre>
+<li>赋予脚本执行权限<pre>  cd /usr/local/webserver/php/etc &amp;&amp; cp php-fpm.conf.default php-fpm.conf
+  chmod +x /etc/init.d/php-fpm
+</pre>
+<li>设置开机启动<pre>  /sbin/chkconfig php-fpm on
+</pre>
+<li>使用以下命令对php操作<pre class="mark">  service php-fpm start
+  service php-fpm stop
+  service php-fpm restart
+</pre></ol>
+
+<li>检查php+nginx是否配置成功
+<p>在nginx.conf文件中我配置了我的php工作目录/www,在此目录下建立文件phpinfo.php，然后运行查看内容。文件内容如下:<pre class="mark">&lt;?php
+phpinfo();
+</pre>运行后的内容如下：<br /><img border="0" alt="" align="middle" src="../image/phpinfo.jpg" />
+<li>解密工具
+<ol>
+<li>下载<a href="http://www.zend.com/en/products/guard/downloads">ZendGuardLoader-php-5.3-linux-glibc23-x86_64.tar.gz</a>
+<li>安装<pre class="mark">  tar zxvf ZendGuardLoader-php-5.3-linux-glibc23-x86_64.tar.gz
+  cd ZendGuardLoader-php-5.3-linux-glibc23-x86_64/
+  cp php-5.3.x/ZendGuardLoader.so /usr/local/webserver/php/ext/
+</pre>
+<li>配置<pre class="mark">  打开php.ini，加入以下代码：
+
+[Zend Guard]
+;/usr/local/webserver/php/ext/ZendGuardLoader.so  这个是你当时指定的zend的目录
+zend_extension=/usr/local/webserver/php/ext/ZendGuardLoader.so
+zend_loader.enable=1
+zend_loader.disable_licensing=0
+zend_loader.obfuscation_level_support=3
+zend_loader.license_path=
+</pre>
+<li>重启nginx 和 php-fpm，打开phpinfo查看如下图所示，证明配置成功：<br /><img border="0" alt="" align="middle" src="../image/zend.jpg" /></li>
+</li>
+</li>
+</li>
+</ol>
+</li>
+</p>
+</li>
+</li>
+</li>
+</li>
+</ol>
+</li>
+</li>
+</li>
+</ol>
+</li>
+</ul>
+<pre class="quote">提示：zend Guard 在ecstore非ego版时，可以不用安装
+</pre>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="nginx.html"
+                                  title="上一章">NGINX 安装&配置</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="lnmp.html"
+                                  title="下一章">Ecstore部署安装</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="lnmp.html" title="Ecstore部署安装" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="nginx.html" title="NGINX 安装&配置" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../_refs.html">资料</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

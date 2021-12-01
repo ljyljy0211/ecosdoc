@@ -1,0 +1,333 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      lnmp &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="未归档" href="index.html" />
+
+        <link rel="next" title="lfs" href="LFS.html" />
+        <link rel="prev" title="linuxcommand" href="The Linux Command Line@学习笔记.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="lfs.html" title="LFS" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="linuxcommand.html" title="The Linux Command Line@学习笔记" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> lnmp</h1>
+            <h2><a name="id1">安装nginx</a></h2>
+<p>系统ubuntu11.10<pre>sudo apt-get install nginx
+</pre></p>
+<h2><a name="id2">安装php</a></h2><pre>sudo apt-get install php5 php5-cli php5-cgi php5-mysql php5-fpm
+</pre><h2><a name="id3">配置php-fpm</a></h2><pre>sudo vim /etc/php5/fpm/php.ini
+</pre>
+<p>找到<pre>;cgi.fix_pathinfo=1
+</pre>选项, 修改为：<pre>cgi.fix_pathinfo=1
+</pre></p>
+
+<p>启动 nginx 和 php-fpm<pre>sudo service nginx start
+sudo service php5-fpm start
+</pre></p>
+
+<p>P.S. 除fpm的另一种方法：Nginx和spawn-fcgi配合运行<pre class="mark">在/etc/nginx/fastcgi_params 文件最后, 加入一行, 可以用
+sudo vim /etc/nginx/fastcgi_params
+
+在文件末尾加入此行：
+fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+
+另外需要在PHP-CGI的配置文件（Ubuntu 上此配置文件位于/etc/php5/cgi/php.ini）中,
+sudo vim /etc/php5/cgi/php.ini
+找到
+;cgi.fix_pathinfo=1
+选项, 修改为：
+cgi.fix_pathinfo=1;
+这样php-cgi方能正常使用SCRIPT_FILENAME这个变量。
+
+启动 fast-cgi 命令
+sudo /usr/bin/spawn-fcgi -a 127.0.0.1 -p 9000 -C 5 -u www-data -g www-data -f /usr/bin/php5-cgi -P /var/run/fastcgi-php.pid
+
+设置开机启动fast-cgi进程
+sudo vim /etc/rc.local
+
+把启动 fast-cgi 的命令添加到在 exit 0 上面就完成了
+我们在配置 php.ini 之后需要重启 nginx 和 php-cgi 的命令, 分别是
+
+nginx :
+sudo service nginx restart
+php-cgi:
+# 先杀死进程
+sudo killall -HUP php5-cgi
+# 再启动
+sudo /usr/bin/spawn-fcgi -a 127.0.0.1 -p 9000 -C 5 -u www-data -g www-data -f /usr/bin/php5-cgi -P /var/run/fastcgi-php.pid
+
+参数含义如下
+* -f 指定调用FastCGI的进程的执行程序位置, 根据系统上所装的PHP的情况具体设置
+* -a 绑定到地址addr
+* -p 绑定到端口port
+* -s 绑定到unix socket的路径path
+* -C 指定产生的FastCGI的进程数, 默认为5（仅用于PHP）
+* -P 指定产生的进程的PID文件路径
+* -u和-g FastCGI使用什么身份（-u 用户 -g 用户组）运行, Ubuntu下可以使用www-data, 其他的根据情况配置, 如nobody、apache等
+</pre></p>
+<h2><a name="id4">添加server</a></h2>
+<p>ubuntu系统中放置server的位置在<pre>/etc/nginx/conf.d/
+</pre>我们在里面添加一个default.conf, 内容如下<pre>server {
+    listen 127.0.0.1:80;
+    server_name localhost;
+    root /data/www;
+    location / {
+        index index.php index.html index.htm;
+    }
+
+    location ~ \.php {
+        include /etc/nginx/fastcgi_params;
+        fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;
+
+        set $path_info &quot;&quot;;
+        set $real_script_name $fastcgi_script_name;
+        if ($fastcgi_script_name ~ &quot;^(.+?.php)(/.+)$&quot;) {
+            set $script_name $1;
+            set $path_info $2;
+        }
+        fastcgi_param SCRIPT_NAME $script_name;
+        fastcgi_param PATH_INFO $path_info;
+
+        fastcgi_index  index.php;
+        fastcgi_pass   127.0.0.1:9000;
+
+    }
+}
+
+</pre>重启nginx<pre>sudo service nginx restart
+</pre></p>
+<h3><a name="id5">使Nginx支持ecstore里使用的pathinfo配置</a></h3><pre>location ~ \.php {
+    fastcgi_pass 127.0.0.1:9000;
+    fastcgi_index index.php;
+    include fastcgi_params;
+    set $real_script_name $fastcgi_script_name;
+    if ($fastcgi_script_name ~ &quot;^(.+?\.php)(/.+)$&quot;) {
+        set $real_script_name $1;
+        set $path_info $2;
+    }
+    fastcgi_param SCRIPT_FILENAME $document_root$real_script_name;
+    fastcgi_param SCRIPT_NAME $real_script_name;
+    fastcgi_param PATH_INFO $path_info;
+}
+
+# 伪静态
+if (!-e $request_filename) {
+    rewrite ^/(.*)$ /index.php/$1 last;
+}
+</pre><h3><a name="id6">测试</a></h3><pre>cat &gt; /data/www/index.php &lt;&lt; &quot;EOF&quot;
+&lt;?php
+    phpinfo();
+EOF
+</pre>
+<p>地址栏输入localhost/index.php</p>
+
+<p>有了吗？</p>
+<h2><a name="id7">ubuntu11.04系统登录后只有壁纸和鼠标的解决办法</a></h2>
+<p>Tue Jun 21 11:22:14 CST 2011</p>
+
+<p>今天吴伟遇到这个问题, 我之前用Ubuntu也遇到过这个问题.这个应该是Compiz没有正常启动造成的.</p>
+
+<p>这样解决的, 运行完重启OK.<pre>sudo apt-get install unity-2d
+</pre></p>
+<h2><a name="id8">rtx安装教程</a></h2><pre class="mark">我的系统 ubuntu 10.10
+</pre><pre class="mark">1. 安装wine
+</pre><pre>sudo apt-get install wine
+</pre><pre class="mark">处理中文汉字前二个子为方块的bug
+</pre>
+<p>打开wine配置, 在函数库中的&quot;新增函数库顶替&quot;项中输入 oleaut32.dll<pre class="mark">2. 配置wine
+</pre><pre>sudo add-apt-repository ppa:wine-cn/ppa
+sudo apt-get update
+sudo apt-get install winetricks
+winetricks msxml3 gdiplus riched20 riched30 ie6 vcrun6 vcrun2005sp1 vcrun6sp6 vb6run
+ln -s /usr/share/fonts/truetype/wqy/wqy-microhei.ttc  ~/.wine/drive_c/windows/Fonts/
+cat &gt; ifont.reg &lt;&lt; &quot;EOF&quot;
+REGEDIT4
+[HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\FontSubstitutes]
+&quot;Arial&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Arial CE,238&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Arial CYR,204&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Arial Greek,161&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Arial TUR,162&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Courier New&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Courier New CE,238&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Courier New CYR,204&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Courier New Greek,161&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Courier New TUR,162&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;FixedSys&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Helv&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Helvetica&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;MS Sans Serif&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;MS Shell Dlg&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;MS Shell Dlg 2&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;System&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Tahoma&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Times&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Times New Roman CE,238&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Times New Roman CYR,204&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Times New Roman Greek,161&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Times New Roman TUR,162&quot;=&quot;WenQuanYi Micro Hei&quot;
+&quot;Tms Rmn&quot;=&quot;WenQuanYi Micro Hei&quot;
+EOF
+
+regedit ifont.reg
+</pre><pre class="mark">3. rtx2010
+</pre><pre>wget -c http://dl_dir.qq.com/qqfile/rtx/rtxclient2010formal.exe
+wine rtxclient2010formal
+</pre></p>
+<h2><a name="id9">ubuntu下安装RabbitVCS工具</a></h2>
+<p>你如果习惯了Tortoisesvn, 那么这个软件应该非常适合你-RabbitVCS</p>
+<h3><a name="id10">添加源</a></h3>
+<p>用管理员权限打开文件<pre>sudo vim /etc/apt/sources.list
+</pre></p>
+<h3><a name="id11">在最后一行添加</a></h3><pre>deb http://ppa.launchpad.net/rabbitvcs/ppa/ubuntu karmic main
+</pre><h3><a name="id12">下面是导入key</a></h3><pre>sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 34EF4A35
+</pre><h3><a name="id13">安装</a></h3><pre>sudo apt-get update
+sudo apt-get install rabbitvcs-cli rabbitvcs-core rabbitvcs-gedit rabbitvcs-nautilus rabbitvcs-thunar thunarx-python
+</pre>
+<p>安装完毕后, 注销以下, 重新登录, 在文件夹和文件夹内点击鼠标右键就用RabbitVCS操作工具了。重启 nginx</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">安装nginx</a>
+    <li><a href="#id2" class="reference internal">安装php</a>
+    <li><a href="#id3" class="reference internal">配置php-fpm</a>
+    <li><a href="#id4" class="reference internal">添加server</a>
+        <ul>
+        <li><a href="#id5" class="reference internal">使Nginx支持ecstore里使用的pathinfo配置</a>
+        <li><a href="#id6" class="reference internal">测试</a>
+    </ul>
+    <li><a href="#id7" class="reference internal">ubuntu11.04系统登录后只有壁纸和鼠标的解决办法</a>
+    <li><a href="#id8" class="reference internal">rtx安装教程</a>
+    <li><a href="#id9" class="reference internal">ubuntu下安装RabbitVCS工具</a>
+        <ul>
+        <li><a href="#id10" class="reference internal">添加源</a>
+        <li><a href="#id11" class="reference internal">在最后一行添加</a>
+        <li><a href="#id12" class="reference internal">下面是导入key</a>
+        <li><a href="#id13" class="reference internal">安装</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="linuxcommand.html"
+                                  title="上一章">The Linux Command Line@学习笔记</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="lfs.html"
+                                  title="下一章">LFS</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="lfs.html" title="LFS" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="linuxcommand.html" title="The Linux Command Line@学习笔记" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

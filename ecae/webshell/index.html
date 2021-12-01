@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      webshell &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="ECAE" href="../index.html" />
+
+        <link rel="next" title="../../doczen" href="Doczen用户指南.html" />
+        <link rel="prev" title="../api/rsa" href="加密模块 rsa(需开启Crypto服务).html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../../doczen.html" title="Doczen用户指南" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../api/rsa.html" title="加密模块 rsa(需开启Crypto服务)" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECAE</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> webshell</h1>
+            
+<p>ECAE的相关的前期配置信息请参照文档<a href="http://www.ec-os.net/ecae/index.html">ECAE新手指南</a></p>
+<h2><a name="id1">在ECAE上安装ECOS</a></h2>
+<p>目前在ECAE上安装ECOS我们采用<b>webshell</b>的方式，以下为具体使用方法。</p>
+<h3><a name="id2">前置工作</a></h3>
+<ol>
+<li>确保ECAE中的mysql、mangoDB已经激活。
+<p><br /><img border="0" alt="" align="middle" src="image/webshell03.png" />
+<li>在ECAE Storage 下创建新的存储点 images ，如下图所示：<br /><img border="0" alt="" align="middle" src="image/webshell16.png" /><br /><img border="0" alt="" align="middle" src="image/webshell17.png" />
+<li>确保你的app列表中有<b>webshell</b>这个app。
+<li>配置mapper.php 加入如下代码(红圈标识出)<br /><img border="0" alt="" align="middle" src="image/webshell01.png" />
+<li>配置webshell访问密码。在config/config.php中配置web访问密码：<br /><img border="0" alt="" align="middle" src="image/webshell04.png" />
+<li>将配置好的代码上传到ECAE项目目录。<br /><img border="0" alt="" align="middle" src="image/webshell02.png" /></li>
+</li>
+</li>
+</li>
+</li>
+</p>
+</li>
+</ol>
+<h3><a name="id3">webshell安装ECOS</a></h3>
+<p>一切准备工作就绪，我们开始在ECAE上安装ECOS。(我们以 <a href="http://images.ec-ae.com/">http://images.ec-ae.com/</a> 为例)方法如下:
+<ol>
+<li>方法URL：<a href="http://images.ec-ae.com/index.php/webshell/webcmd，输�">http://images.ec-ae.com/index.php/webshell/webcmd，输�</a><br /><img border="0" alt="" align="middle" src="image/webshell05.png" />
+<li>当提示出现下面画面时，说明webshell开启成功：<br /><img border="0" alt="" align="middle" src="image/webshell06.png" />
+<li>输入：install site，回车：会出现以下提示画面，拷贝红圈处到webshell输入框：<br /><img border="0" alt="" align="middle" src="image/webshell07.png" />
+<li>填写相关参数：<pre>base[db_host]=
+&amp;base[db_user]=                    DB访问用户名（不用填）
+&amp;base[db_password]=                DB访问密码（不用填）
+&amp;base[db_name]=                    数据库名（不用填）
+&amp;base[db_prefix]=sdb_              数据库前缀（默认参数即可）
+&amp;base[default_timezone]=8          时区（默认参数即可）
+&amp;desktop[admin_uname]=admin        后台登陆用户名
+&amp;desktop[admin_password]=admin     后台登陆密码
+&amp;desktop[admin_password_re]=admin  后台登陆密码确认
+</pre>
+<li>提示安装成功画面：<br /><img border="0" alt="" align="middle" src="image/webshell08.png" />
+<li>ls查看已安装的app：<br /><img border="0" alt="" align="middle" src="image/webshell09.png" />
+<li>输入URL： <a href="http://images.ec-ae.com/index.php/shopamin">http://images.ec-ae.com/index.php/shopamin</a>  访问后台查看效果（用户名和密码均为admin）：<br /><img border="0" alt="" align="middle" src="image/webshell10.png" /></li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ol>
+</p>
+<h3><a name="id4">添加前台显示模板</a></h3>
+<p>由于ECAE的themes文件夹（模板文件夹）不可写，所以，ECAE部署的ECOS不能直接通过站点上传本地模板。操作的方式，只能通过在本地生成模板后，svn上传到线上。具体操作方法如下；
+<ol>
+<li>首先将模板文件夹复制到本地目录的themes下：<br /><img border="0" alt="" align="middle" src="image/webshell11.png" />
+<li>模板文件夹目录结构如下：<br /><img border="0" alt="" align="middle" src="image/webshell12.png" />
+<li>代码上传到ECAE：<br /><img border="0" alt="" align="middle" src="image/webshell13.png" />
+<li>上传成功后刷新页面即可在后台显示我们上传的模板：<br /><img border="0" alt="" align="middle" src="image/webshell14.png" />
+<li>访问前台页面效果如下：<br /><img border="0" alt="" align="middle" src="image/webshell15.png" /></li>
+</li>
+</li>
+</li>
+</li>
+</ol>
+</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">在ECAE上安装ECOS</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">前置工作</a>
+        <li><a href="#id3" class="reference internal">webshell安装ECOS</a>
+        <li><a href="#id4" class="reference internal">添加前台显示模板</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../api/rsa.html"
+                                  title="上一章">加密模块 rsa(需开启Crypto服务)</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../../doczen.html"
+                                  title="下一章">Doczen用户指南</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../../doczen.html" title="Doczen用户指南" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../api/rsa.html" title="加密模块 rsa(需开启Crypto服务)" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECAE</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

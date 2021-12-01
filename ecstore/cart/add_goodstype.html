@@ -1,0 +1,413 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      扩展购物车项类型案例 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="购物车" href="index.html" />
+
+        <link rel="next" title="cart/cart_fetch_data" href="购物车数据加载.html" />
+        <link rel="prev" title="index" href="购物车.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="cart/cart_fetch_data.html" title="购物车数据加载" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="购物车" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">购物车</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 扩展购物车项类型案例</h1>
+            <h2><a name="id1">案例说明</a></h2>
+<p>ECStore系统中在加入购物车的时候可以看到<tt class="docutils literal"><span class="pre">商品</span></tt>，<tt class="docutils literal"><span class="pre">赠品</span></tt>，<tt class="docutils literal"><span class="pre">礼包</span></tt>,等类型。</p>
+
+<p>而现在如果有一个购物车项类型为：商品组合促销<pre>商品组合促销：
+    用户可以根据商家给出的选择区域，选择对应的商品。进行搭配购买，从而进行优惠促销。
+</pre></p>
+<h2><a name="id2">案例分析</a></h2>
+<ul>
+<li>以什么形式开发(app形式)<pre>在ECStore中开发可以使用二次开发模式进行改造添加新功能，也可以以app的形式进行添加新功能，
+作为一个相对独立的新功能呢推荐使用以app的形式进行扩展
+</pre>
+<li>如果要扩展一个新的商品类型需要扩展那些？
+<ul>
+<li>后台设置添加商品组合促销商品和规则（新建，编辑，查看,删除等）。
+<li>在前台进行商品的展示，可提用户选择商品，加入购物车。
+<li>在购物车中显示，（新商品类型购物车数据项展示，添加购买数量，数据统计）
+<li>购物车中的新购物车项类型在下单后的库存冻结
+<li>下单后记录购买该商品组合促销信息
+<li>订单中心的订单详情中新购物车类型项的数据显示
+<li>后台订单查看的商品信息中的新购物车项类型的数据显示</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</li>
+</ul>
+<h2><a name="id3">案例实现步骤</a></h2>
+<p>通过上面的分析，那么就可以一步一步的来实现扩展一个新的购物车项类型(商品组合促销)</p>
+<pre>新建app：assorted
+</pre>
+<p>assorted代码<pre>svn co https://app.ec-os.net/svn/assorted/trunk assorted
+</pre></p>
+<h3><a name="id4">后台设置</a></h3>
+<p>在后台设置商品组合促销规则，设置的规则是为以后在商品展示使用，</p>
+
+<p>实现主要是后台finder方法的使用。</p>
+<h3><a name="id5">商品在前台展示</a></h3>
+<p>前台商品展示,主要需要实现的功能是可以，根据商品组合促销显示对应的商品，可以选择商品</p>
+
+<p>进行促销优惠后在加入购物车.</p>
+<pre>assored app 测试 测试加入购物车，前台路径:index.php/assorted-lists.html
+
+因为assorted没有做前台，所以在测试的时候需要找到assorted/controller/site/assorted.php中的add_cart方法
+根据自己的数据修改对应的商品ID和货品ID,这个数据是由前台POST过来的数据，在组织好的数据格式
+$data = array(
+    'assorted_id'=&gt;15,
+    'num'=&gt;1,
+    'buy_price'=&gt;246,//这个表示购买一个组合单价，需前台post过来
+    'discount_amount'=&gt;30,//当前购买单元的优惠价格
+    'pid_478'=&gt;array('name'=&gt;'faw',array('goods_id'=&gt;97,'product_id'=&gt;478,'num'=&gt;1)),
+    'pid_463_454'=&gt;array('name'=&gt;'B区',
+           array('goods_id'=&gt;92,'product_id'=&gt;463,'num'=&gt;1),
+           array('goods_id'=&gt;64,'product_id'=&gt;454,'num'=&gt;1)),
+);
+</pre><h3><a name="id6">加入购物车，购物车显示</a></h3>
+<p>用户在前台将商品选择好以后，需要将信息加入到购物车。</p>
+</ul>
+</ul>
+
+<ol>
+<ol>
+<li>[ 加入购物车]注册加入购物车扩展serivce<pre>&lt;service id=&quot;b2c_cart_object_apps&quot;&gt;
+    &lt;class&gt;assorted_cart_object_assorted&lt;/class&gt;
+&lt;/service&gt;
+</pre>
+<li>[ 加入购物车]在assorted_cart_object_assorted中加入function add方法<pre>add 方法功能是将组织好的数据加入到购物车中
+    1 把前台POST过来的数据，组织成购物车中的数据格式的数据
+    2 获取当前用户的已加入到购物车的数据
+    3 对比当前加入购物车的数据是否在购物车中已经存在，存在则追加
+    4 检查当前加入购物车的数据是否合法
+    5 调用b2c中的cart_objects model中的save方法保存数据;
+</pre><pre class="quote">//$data 由assorted/controller/site/assorted.php中的add_cart方法传过来的值
+//$data 包含的是加入购物车的商品信息
+function add($data){}
+
+/* add 方法中存入到购物车的数据格式
+$aSave = array(
+        'obj_ident'    =&gt; $objIdent,  //存入购物车的唯一标识
+        'member_ident' =&gt; $this-&gt;member_ident, //用户的session ID 用来标识用户
+        'obj_type'     =&gt; 'assorted',
+        'params'       =&gt; $data,
+        'quantity'     =&gt; floatval(($data['num']?$data['num']:1))
+    );
+*/
+</pre>
+<li>[ 加入购物车]在assorted_cart_object_assorted中加入function count()方法<pre>function count(){
+    return true;
+}
+</pre>
+<p>现在即可测试加入购物车,count方法留给购物车显示的时候使用；
+<li>[购物车显示]获取到购物车中的数据
+<ul>
+<li>在assorted_cart_object_assorted类中添加getAll方法<pre>    购物车显示会默认通过注册的service b2c_cart_object_apps 的getAll方法来获取到购物车中的数据
+</pre>
+<li>getAll方法作用<pre>    public function getAll($rich = false) {
+        当getAll参数为false时
+            返回的只是存储到购物车中的基本数据，在加入购物车的add方法中用于
+            判断加入购物车的数据是否在购物车中已存在（已存在,追加即可）
+
+        当getAll参数为true时
+            getAll方法返回的数据是根据新增购物车类型项所需信息
+            1 购物车显示使用（该购物车类型项所购买的商品信息）
+            2 数据统计使用(商品价格，重量，积分等信息)
+</pre></li>
+</li>
+</ul>
+</li>
+</p>
+</li>
+</li>
+</li>
+</ol>
+</ol>
+</ul>
+
+<ol>
+<li>[购物车显示]统计数据
+<p>assorted_cart_object_assorted类中的count方法实现统计</p>
+</li>
+</ol>
+<pre>// 统计购物车中组合商品促销的数据
+public function count(&amp;$aData) {
+// 购物车中不存在goods商品
+    if(empty($aData['object']['assorted'])) return false;
+    $aResult = array(
+          'subtotal_weight'=&gt;0, //统计的assorted购买类型的总重量
+          'subtotal'=&gt;0,
+          'subtotal_price'=&gt;0, //用于前台的总价格
+          'subtotal_consume_score'=&gt;0,
+          'subtotal_gain_score'=&gt;0,
+          'discount_amount_prefilter'=&gt;0, //优惠价格,购物车显示的优惠数据来源
+          'discount_amount_order'=&gt;0, //订单优惠的价格
+          'discount_amount'=&gt;0, //总的优惠价格
+          'items_quantity'=&gt;0,
+          'items_count'=&gt;0,
+   );
+.....
+</pre>
+<ol>
+<li>[购物车显示]显示加入购物车的新增购物车项商品
+<ul>
+<li>注册service<pre>    &lt;service id=&quot;b2c_cart_render_items_apps&quot;&gt;
+        &lt;class&gt;assorted_cart_render_item_assorted&lt;/class&gt;
+    &lt;/service&gt;
+</pre>
+<li>在assorted_cart_render_item_assorted中用$file返回用于显示商品数据的html<pre class="mark">    &lt;?php
+    class assorted_cart_render_item_assorted
+    {
+        public $app = 'assorted';
+        public $file = 'site/cart/item/assorted.html';
+        public $index = 88; // 所处位置(数值越大越排在前面,数值不能和已有的相同)
+
+        /**
+         * 迷你购物车模板配置
+         *
+         * @return array
+         */
+        public function _get_minicart_view() {
+            $arr = array(
+                'file'=&gt;'site/cart/mini/item/assorted.html',
+                'index'=&gt;88,
+            );
+            return $arr;
+        }
+    }
+</pre></ul>
+
+<li>assorted/view/site/cart/item/assorted.html显示商品<pre>    assorted.html可以复制，显示商品的样式基本一样,可以在此基础上自行修改
+</pre>
+<li>[购物车操作]删除,清空购物车
+<p>assorted_cart_object_assorted类中的以下方法<pre>  // 删除购物车中指定商品项
+    public function delete($sIdent = null) {
+        //$sIdeit 是由前台modify_quantity[&lt;{$assorted.obj_ident}&gt;][quantity]post过来的
+        if(empty($sIdent)) return $this-&gt;deleteAll();
+        return $this-&gt;oCartObjects-&gt;delete(array('member_ident'=&gt;$this-&gt;member_ident, 'obj_ident'=&gt;$sIdent, 'obj_type'=&gt;'assorted'));
+    }
+
+    // 清空购物车中商品项数据
+    public function deleteAll() {
+        return $this-&gt;oCartObjects-&gt;delete(array('member_ident'=&gt;$this-&gt;member_ident, 'obj_type'=&gt;'assorted'));
+    }
+</pre>
+<li>[购物车操作]增加，减少购买数量在购物车项显示的/site/cart/item/assorted.html中<pre>&lt;div class=&quot;Numinput &quot;&gt;
+    &lt;input type=&quot;text&quot; class=&quot;_x_ipt textcenter&quot;  name=&quot;modify_quantity[&lt;{$assorted.obj_ident}&gt;][quantity]&quot; size=&quot;3&quot; value=&quot;&lt;{$assorted.quantity}&gt;&quot; onchange=&quot;if(Cart)Cart.ItemNumUpdate(this,this.value,event);&quot;/&gt;
+    &lt;div class=&quot;numadjust-arr&quot;&gt;
+        &lt;span class=&quot;numadjust increase&quot;&gt;&lt;/span&gt;
+        &lt;span class=&quot;numadjust decrease&quot;&gt;&lt;/span&gt;&lt;/div&gt;
+&lt;/div&gt;
+</pre>在这里会默认调用controller/site/b2c/cart.php中的updateCart方法input的值会传入<pre>updateCart方法会通过service 根据不同的购物车类型项调用对应的处理购物车的update方法
+
+那么assorted类型则会通过assorted_cart_object_assorted类中的update方法进行更新
+</pre></li>
+</p>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</ol>
+<h3><a name="id7">下单后的操作</a></h3>
+<ol>
+<li>组织订单数据结构，冻结库存
+<ul>
+<li>注册services<pre>    &lt;service id=&quot;order_goodstype_operation&quot;&gt;
+        &lt;class&gt;assorted_order_assorted&lt;/class&gt;
+    &lt;/service&gt;
+
+</pre>
+<li>在services 注册类中添加如下方法<pre>    /*
+     *作用：组织订单的数据结构,冻结库存，(具体数据结构可以看对应代码)
+     * */
+    function gen_order( $arrObjInfo=array(), &amp;$order_data, &amp;$msg='' ){
+
+        //判断冻结库存点,后台可设置是在下单冻结库存还是在支付后冻结库存
+        $store_mark = app::get('b2c')-&gt;getConf('system.goods.freez.time');
+    }
+</pre></ul>
+
+<li>关联订单
+<ul>
+<li>注册services b2c_order.beforecreate订单完成前操作，事务保护<pre>    &lt;service id=&quot;b2c_order.beforecreate&quot;&gt;
+        &lt;class&gt;assorted_order_beforecreate&lt;/class&gt;
+    &lt;/service&gt;
+</pre>
+<li>assorted_order_beforecreate,方法存储关联订单信息<pre>    public function generate( &amp;$sdf )
+</pre></li>
+</li>
+</ul>
+</li>
+</li>
+</ul>
+</li>
+</ol>
+<h3><a name="id8">订单中心显示</a></h3></ul>
+</ol>
+
+<ul>
+<ul>
+<li>订单提交成功，显示订单详细信息
+<li>会员中心我的订单显示
+<li>会员中心我的订单，查看订单显示
+<li>后台订单信息
+<p>在assorted_order_assorted类中<pre>//订单详情的显示统一调用方法
+public function get_order_object($arr_object=array(), &amp;$order_items, $tml='member_order_detail')
+</pre></p>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">案例说明</a>
+    <li><a href="#id2" class="reference internal">案例分析</a>
+    <li><a href="#id3" class="reference internal">案例实现步骤</a>
+        <ul>
+        <li><a href="#id4" class="reference internal">后台设置</a>
+        <li><a href="#id5" class="reference internal">商品在前台展示</a>
+        <li><a href="#id6" class="reference internal">加入购物车，购物车显示</a>
+        <li><a href="#id7" class="reference internal">下单后的操作</a>
+        <li><a href="#id8" class="reference internal">订单中心显示</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">购物车</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="cart/cart_fetch_data.html"
+                                  title="下一章">购物车数据加载</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="cart/cart_fetch_data.html" title="购物车数据加载" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="购物车" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">购物车</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

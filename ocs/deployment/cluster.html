@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      OCS - 集群部署手册 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="系统部署" href="index.html" />
+
+        <link rel="next" title="../apps/app-list" href="OCS - 应用大全.html" />
+        <link rel="prev" title="single" href="OCS - 安装部署手册.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../apps/app-list.html" title="OCS - 应用大全" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="single.html" title="OCS - 安装部署手册" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">OCS开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">系统部署</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> OCS - 集群部署手册</h1>
+            
+<ul>
+<li>拷贝config文件<pre>cp /web目录/app/base/examples/config.php /web目录/config/config.php 
+</pre>
+<li>修改config.php
+<ul>
+<li>修改KV前缀<pre>    define('KV_PREFIX', 'defalut'); ！* 注意KV_PREFIX一旦设定不可变更*！
+    define('DB_USER', 'dbuser');	修改数据库用户名
+    define('DB_PASSWORD', 'dbpassword');  修改数据库密码
+    define('DB_NAME', 'dbname');  修改数据库名
+    define('DB_HOST', 'localhost');  修改数据库连接地址
+</pre>
+<li>设置不开启缓存（后台操作不需要缓存）<pre>    define('WITHOUT_CACHE',true);
+</pre>
+<li>去除 #define('LOG_TYPE', 0); 前的#注释，表示使用系统日志而非在web机下保存文件日志
+<li>设置kvstore的存储方式<pre>    #define('KVSTORE_STORAGE', 'base_kvstore_tokyotyrant');改成
+    define('KVSTORE_STORAGE', 'base_kvstore_tokyotyrant');
+</pre><pre class="quote">    配置正确的TTserver信息：define('KVSTORE_MEMCACHE_CONFIG', '192.168.2.119:11211');
+    如果需要采用其他持久化存储的方式，配置修改方式同TTServer的方式
+</pre>
+<li>设置系统缓存的存储方式<pre>    #define('CACHE_STORAGE', 'base_cache_memcache');改成
+    define('CACHE_STORAGE', 'base_cache_memcache');
+</pre><pre class="quote">    配置正确的memcache信息：define('CACHE_MEMCACHE_CONFIG', '192.168.2.119:11211');
+</pre>
+<li>尾部追加2个方法，用于定义license的存取<pre>    if(!function_exists(&quot;set_certificate&quot;)){
+        function set_certificate($certificate){
+            base_kvstore::instance('certificate')-&gt;store('cert', $certificate);
+        }
+    }
+    
+    if(!function_exists(&quot;get_certificate&quot;)){
+        function get_certificate(){
+            if(base_kvstore::instance('certificate')-&gt;fetch('cert', $certificate)){
+                return $certificate;
+            }
+        }
+    }
+</pre></li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</li>
+</ul>
+
+<ul>
+<li>将正确的config.php配置在多台web机器上
+<li>访问域名后会自动跳转到安装界面，再次正确填写数据库相关信息并完成安装过程，具体可参考《OCS安装部署手册》
+<li>配置定时脚本
+<p>crontab -e* * * * * sh /data/httpd/ocs/script/cronjob/crontab.sh /usr/local/php/bin/php &gt;/dev/null<pre class="quote">    PS：红色部分是ocs系统的web路径以及php命令执行路径，请配置正确。
+    在任意一台web机上配置即可。
+</pre></p>
+</li>
+</li>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="single.html"
+                                  title="上一章">OCS - 安装部署手册</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../apps/app-list.html"
+                                  title="下一章">OCS - 应用大全</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../apps/app-list.html" title="OCS - 应用大全" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="single.html" title="OCS - 安装部署手册" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">OCS开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">系统部署</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

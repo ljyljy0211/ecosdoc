@@ -1,0 +1,376 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      数据库操作类base_db_connections(强烈不建议直接调用) &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../../doc.html" />
+    <link rel="up" title="模型(model)" href="../m.html" />
+
+        <link rel="next" title="../v" href="视图(view).html" />
+        <link rel="prev" title="base_db_model" href="base_db_model.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../v.html" title="视图(view)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="base_db_model.html" title="base_db_model" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">MVC框架</a> &raquo;
+        </li>
+                <li>
+          <a href="../m.html">模型(model)</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 数据库操作类base_db_connections(强烈不建议直接调用)</h1>
+            
+<p>对于数据库的操作, 建议通过model进行处理,.在model的基类中对于数据库的操作会通过dbschema定义文件对操作的信息进行校验并作相关的转义. 如果有特殊需求无法通过model进行处理, 应用本类时请慎重.</p>
+
+<p>本类不允许直接调用, 调用方式可见<a href="base_db_model.html#id6">base_db_model</a></p>
+<pre class="mark">数据库集群支持
+
+本类支持mysql主从数据库, 一主一从, 主数据库为读写, 从数据库只读.
+
+规则
+1. 通过exec进行处理的通过主数据库服务器
+2. 在一次http请求过程中, 使用用select/selectrow/selectlimit/count函数时, 使用从数据库服务器进行处理. 但一旦使用事务, 系统将通过主数据库服务器处理所有数据, 而不再通过从数据库服务器
+
+如果想支持一主多从, 需要在config.php中做一点小处理, 把每一台的从数据库服务器的信息放到一个数组中(包括 DB_SLAVE_HOST, DB_SLAVE_USER, DB_SLAVE_PASSWORD, DB_SLAVE_NAME), 然后从数组中按照一定算法随机取出一条数据, 然后依次进行define.
+
+</pre>
+<p>支持多库,</p>
+<h2><a name="id1">配置</a></h2>
+<p>本类的配置在config/config.php内完成</p>
+<h3><a name="id2">DB_HOST</a></h3>
+<p>主数据库HOST</p>
+<h3><a name="id3">DB_USER</a></h3>
+<p>主数据库用户名</p>
+<h3><a name="id4">DB_PASSWD</a></h3>
+<p>主数据库密码</p>
+<h3><a name="id5">DB_NAME</a></h3>
+<p>主数据库库名</p>
+<h3><a name="id6">DB_SLAVE_HOST</a></h3>
+<p>从数据库HOST</p>
+<h3><a name="id7">DB_SLAVE_USER</a></h3>
+<p>从数据库用户名</p>
+<h3><a name="id8">DB_SLAVE_PASSWORD</a></h3>
+<p>从数据库密码</p>
+<h3><a name="id9">DB_SLAVE_NAME</a></h3>
+<p>从数据库库名</p>
+<h3><a name="id10">DB_PREFIX</a></h3>
+<p>表前缀, 默认为sdb_</p>
+<h3><a name="id11">DB_CHARSET</a></h3>
+<p>数据库编码, 默认为utf8</p>
+<h2><a name="id12">函数接口</a></h2><h3><a name="id13">exec</a></h3>
+<p>执行sql语句</p>
+<pre class="mark">参数:
+    string $sql 需要执行的sql语句
+    bool $skipModifiedMark 是否跳过对于操作表的缓存更新(不明者请勿修改默认值), 默认为false
+    resource $db_lnk mysql连接标识, 默认为null. 如果设置为null, 系统会根据config.php的配置连接指定服务器的数据库生成
+返回:
+    array|false 如果执行成功返回数组array('$rs', '$sql').
+    $rs表示mysql连接标识, $sql代表经过安全处理的sql语句. 如果失败返回false
+</pre><pre>代码：
+    $item = $this-&gt;app-&gt;model('item');
+    $rs = $item-&gt;db-&gt;exec(&quot;select * from sdb_ecbook_item&quot;);
+
+返回的的$rs
+    Array(
+        [rs] =&gt; Resource id #62
+        [sql] =&gt; select * from sdb_ecbook_item
+    )
+</pre><h3><a name="id14">query</a></h3>
+<p>exec的别名函数</p>
+<h3><a name="id15">select</a></h3>
+<p>对数据库表进行select,执行sql语句（只要是正确的sql语句都能执行）;</p>
+<pre class="mark">参数:
+    string $sql 正确的sql语句
+返回:
+    array   select语句返回数据集, 二维数组.　每行代表一列数据
+    null    insert delete update语句 不管错误还是正确都什么都不返回，如果是正确则会执行
+</pre><pre>代码：
+    $aData = kernel::database()-&gt;select('select * from sdb_ecbook_item');
+返回值：
+    Array(
+        [0] =&gt; Array(
+            [item_id] =&gt; 0
+            [item_name] =&gt; ami
+            [item_subject] =&gt; abcde
+        )
+        [1] =&gt; Array(
+            [item_id] =&gt; 1
+            [item_name] =&gt; 0642
+            [item_subject] =&gt; aaaa
+        )
+
+    )
+</pre><h3><a name="id16">selectrow</a></h3>
+<p>返回单行数据</p>
+<pre class="mark">参数:
+    string $sql sql语句, 不需要包含limit子句
+返回:
+    array 返回表单行数据
+</pre><pre>代码：
+    $item = $this-&gt;app-&gt;model('item');
+    $aData = $item-&gt;db-&gt;selectrow(&quot;select * from sdb_ecbook_item&quot;);
+返回的$aData
+    Array(
+        [item_id] =&gt; 0
+        [item_name] =&gt; ami
+        [item_subject] =&gt; abcde
+    )
+</pre><h3><a name="id17">selectlimit</a></h3>
+<p>与select函数差不多, 区别在于, 用selectlimit不必手拼limit</p>
+<pre class="mark">参数:
+    string $sql select的sql语句 integer $limit 取几条数据, 默认为10. 如果$limit为-1, 则表示所有数据
+    integer $offset 偏移量是多少, 默认为0
+返回:
+    array　数据集, 二维数组.　每行代表一列数据
+</pre><pre>代码：
+    $aData = kernel::database()-&gt;selectlimit('select * from sdb_ecbook_item',1,2);
+返回值：
+    Array(
+        [0] =&gt; Array(
+            [item_id] =&gt; 2
+            [item_name] =&gt; ww
+            [item_subject] =&gt; fsdafasdf
+        )
+    )
+</pre><h3><a name="id18">getRows</a></h3>
+<p>通过mysql结果集连接标识, 获取单/多行数据<pre class="mark">参数:
+    resource $rs mysql结果集连接标识
+    integer $rows 取几行数据
+返回:
+    array 多行数据集
+</pre><pre>代码：
+    $db = kernel::database();
+    $rs = $db-&gt;exec('select * from sdb_ecbook_item');
+    $aData = $db-&gt;getRows($rs,2);
+返回值:
+    Array(
+        [0] =&gt; Array(
+            [item_id] =&gt; 0
+            [item_name] =&gt; ami
+            [item_subject] =&gt; abcde
+        )
+        [1] =&gt; Array(
+            [item_id] =&gt; 1
+            [item_name] =&gt; 0642
+            [item_subject] =&gt; aaaa
+        )
+
+    )
+</pre></p>
+<h3><a name="id19">count</a></h3>
+<p>统计表的数据行数</p>
+<pre class="mark">参数:
+    $sql select sql语句
+返回:
+    integer 行数
+</pre><pre>代码：
+    $num = kernel::database()-&gt;count('select * from sdb_ecbook_item');
+返回值：
+    3
+</pre><h3><a name="id20">quote</a></h3>
+<p>对准备入数据库表字段的数据做安全转义处理</p>
+<pre class="mark">参数:
+    $string 字符串
+返回:
+    $string 转义后的字符串
+</pre><pre>代码：
+    $aData = kernel::database()-&gt;quote('abc&quot;ecos&quot;ab=ab');
+返回值:
+    'abc\&quot;ecos\&quot;ab=ab'
+</pre><h3><a name="id21">lastinsertid</a></h3>
+<p>获取最后插入数据库的条目的id号<pre class="mark">返回:
+    integer 插入数据库的id号
+</pre><pre>kernel::database()-&gt;lastinsertid();
+</pre></p>
+<h3><a name="id22">affect_row</a></h3>
+<p>获取之前mysql语句操作所影响的行数<pre class="mark">返回:
+	integer 如果成功返回影响的行数, 如果失败返回-1
+</pre></p>
+<h3><a name="id23">errorinfo</a></h3>
+<p>返回之前mysql语句操作所产生的错误文本信息</p>
+<pre class="mark">返回:
+	string 如果成功返回相应的错误信息, 否则返回空数组''
+</pre><h3><a name="id24">errorcode</a></h3>
+<p>返回之前mysql语句操作所产生的错误号<pre class="mark">返回:
+	string 如果成功返回相应的错误号, 否则返回空数组0
+</pre></p>
+<h3><a name="id25">beginTransaction</a></h3>
+<p>开始事务<pre class="mark">返回:
+	bool|resource 如果成功返回mysql连接标识, 失败返回false
+</pre></p>
+<h3><a name="id26">commit</a></h3>
+<p>事务提交<pre class="mark">返回:
+	bool 成功为true, 失败为false
+</pre></p>
+<h3><a name="id27">rollBack</a></h3>
+<p>事务回滚</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">配置</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">DB_HOST</a>
+        <li><a href="#id3" class="reference internal">DB_USER</a>
+        <li><a href="#id4" class="reference internal">DB_PASSWD</a>
+        <li><a href="#id5" class="reference internal">DB_NAME</a>
+        <li><a href="#id6" class="reference internal">DB_SLAVE_HOST</a>
+        <li><a href="#id7" class="reference internal">DB_SLAVE_USER</a>
+        <li><a href="#id8" class="reference internal">DB_SLAVE_PASSWORD</a>
+        <li><a href="#id9" class="reference internal">DB_SLAVE_NAME</a>
+        <li><a href="#id10" class="reference internal">DB_PREFIX</a>
+        <li><a href="#id11" class="reference internal">DB_CHARSET</a>
+    </ul>
+    <li><a href="#id12" class="reference internal">函数接口</a>
+        <ul>
+        <li><a href="#id13" class="reference internal">exec</a>
+        <li><a href="#id14" class="reference internal">query</a>
+        <li><a href="#id15" class="reference internal">select</a>
+        <li><a href="#id16" class="reference internal">selectrow</a>
+        <li><a href="#id17" class="reference internal">selectlimit</a>
+        <li><a href="#id18" class="reference internal">getRows</a>
+        <li><a href="#id19" class="reference internal">count</a>
+        <li><a href="#id20" class="reference internal">quote</a>
+        <li><a href="#id21" class="reference internal">lastinsertid</a>
+        <li><a href="#id22" class="reference internal">affect_row</a>
+        <li><a href="#id23" class="reference internal">errorinfo</a>
+        <li><a href="#id24" class="reference internal">errorcode</a>
+        <li><a href="#id25" class="reference internal">beginTransaction</a>
+        <li><a href="#id26" class="reference internal">commit</a>
+        <li><a href="#id27" class="reference internal">rollBack</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="base_db_model.html"
+                                  title="上一章">base_db_model</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../v.html"
+                                  title="下一章">视图(view)</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../v.html" title="视图(view)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="base_db_model.html" title="base_db_model" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">MVC框架</a> &raquo;
+        </li>
+                <li>
+          <a href="../m.html">模型(model)</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

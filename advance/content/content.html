@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      内容管理(CMS) - content &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="内容管理(CMS) - content" href="index.html" />
+
+        <link rel="next" title="../pam/index" href="用户认证 - pam.html" />
+        <link rel="prev" title="index" href="内容管理(CMS) - content.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../pam/index.html" title="用户认证 - pam" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="内容管理(CMS) - content" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">内容管理(CMS) - content</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 内容管理(CMS) - content</h1>
+            
+<p>content管理文章的发布，修改，删除等。</p>
+<h2><a name="id1">content后台控制器调用规则</a></h2><pre class="mark">sh: dot: command not found
+</pre><h2><a name="id2">前台控制器继承规则</a></h2><pre class="mark">sh: dot: command not found
+</pre><h2><a name="id3">content后台文章列表的独特之处</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="image/7.jpg" /></p>
+<pre>     这块有添加文章，添加单独页，添加自定义页
+ 点击添加单独页，看超链为：http://localhost/ecstore/index.php/admin/index.php?app=content&amp;ctl=admin_article_detail&amp;act=add&amp;type=1&amp;_finder[finder_id]=662176&amp;finder_id=662176
+
+ 从超链中看出找到admin_article_detail这个控制器里面的add方法，但是他还会传一个type=1这个值，在add的方法里面接收到type值，根据type值的不同去_editor方法里面寻找不同的模板文件。
+
+ 注意：type有3个值：1，2，3。1代表添加文章。2代表添加单独也。3代表添加自定义页。
+</pre><h2><a name="id4">后台文章栏目的独特之处</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="image/2.jpg" /></p>
+<pre>    这块没有调用finder函数，而是在后台控制器node.php里面的index方法里面调用的index.html模板里面定义的。
+</pre><h2><a name="id5">content的扩展类的介绍</a></h2>
+<ul>
+<li>content_sidepanel_article
+<p>sidepanel 的页面模板 后台文章左侧菜单的模板</p>
+</li>
+</ul>
+
+<ul>
+<li>content_menu_article_index</li>
+</ul>
+
+<p>文章导航类在后台的操作是：<br /><img border="0" alt="" align="middle" src="image/8.jpg" />选择完后按下一步会出现<br /><img border="0" alt="" align="middle" src="image/12.jpg" />最后提交。</p>
+<pre>    这个扩展类是为site服务的，扩展类中的方法在site下面的menu.php
+    控制器里面被调用，择文章页后的生成的HTML表单，并在后台显示。
+    如：$obj = kernel::service('site_menu.' . sprintf('%s_%s_%s', $args['app'], $args['ctl'],       $args['act']));返回注册的service的类名
+
+</pre>
+<ul>
+<li>content_menu_article_i</li>
+</ul>
+
+<p>节点导航类在后台的操作是：<br /><img border="0" alt="" align="middle" src="image/10.jpg" />选择完按下一步会出现<br /><img border="0" alt="" align="middle" src="image/11.jpg" />最后提交。<pre>     这个扩展类是为site服务的，扩展类中的方法在site下面的menu.php
+    控制器里面被调用，择文章页后的生成的HTML表单，并在后台显示。
+    如：$obj = kernel::service('site_menu.' . sprintf('%s_%s_%s', $args['app'], $args['ctl'], $args['act']));返回注册的service的类名
+    节点导航比文章导航多了一个下拉框，下拉框里面的内容为节点的名称。
+
+</pre></p>
+
+<ul>
+<li>content_menu_article_l_</li>
+</ul>
+
+<p>文章列表导航类在后台的操作是：<br /><img border="0" alt="" align="middle" src="image/9.jpg" />选择完按下一步会出现<br /><img border="0" alt="" align="middle" src="image/11.jpg" />最后提交。<pre>     这个扩展类是为site服务的，扩展类中的方法在site下面的menu.php
+    控制器里面被调用，择文章页后的生成的HTML表单，并在后台显示。
+    如：$obj = kernel::service('site_menu.' . sprintf('%s_%s_%s', $args['app'], $args['ctl'], $args['act']));返回注册的service的类名
+    列表导航比文章导航多了一个下拉框，下拉框里面的内容为所有文章的标题的名称。
+
+</pre></p>
+
+<ul>
+<li>content_finder_indexs</li>
+</ul>
+
+<p>indexs的finder区如图中的编辑，预览按钮。<br /><img border="0" alt="" align="middle" src="image/7.jpg" /></p>
+
+<ul>
+<li>content_service_router</li>
+</ul>
+
+<p>content的前台路由规则。<pre>    实现site_interface_router接口。
+    方法：enable()
+          gen_url()
+          分别是获取use_node_path_url值
+          获取前台控制器对应的地址
+          gen_url()参数设置：
+           1： param array $params 控制器，方法，参数 等
+           2：return string  返回访问地址
+</pre></p>
+
+<ul>
+<li>content_service_tplsource   content_service_nodetplsource</li>
+</ul>
+
+<p>自定义模板类<pre>    自定义模板文件，如邮件模板，短信模板
+
+    一般是我们定义好一个邮件模板文件，先是将规则定义好，根据规则把模板文件存储到数据库
+
+    在要使用这个模板文件的时候则到数据库中把模板文件获取到，在根据规则把数据填充到模板文件中
+
+    再用base_render中的fetch方法进行编译返回
+</pre></p>
+
+<p>使用方法<pre>    注册service tpl_source.$name
+
+    &lt;service id=&quot;tpl_source.tplsource&quot;&gt;
+        &lt;class&gt;content_service_tplsource&lt;/class&gt;
+    &lt;/service&gt;
+</pre></p>
+
+<p>service类的写法<pre>    last_modified       返回模板文件最后修改的时间
+    get_file_contents   返回自定义模板文件
+    以上俩个方法在base_render类中被display方法调用
+    display 是对html模板文件进行编译后输出
+</pre></p>
+
+<ul>
+<li>content_site_view_helper</li>
+</ul>
+
+<p>这个扩展类里面主要实现了2个方法，即头部方法function_header，尾部方法function_footer这个类在 site_view_helper中被调用。使用方法：<pre>    function_header($params,&amp;$smarty)
+    function_footer($params,&amp;$smarty)
+    @param array 参数
+    @param object $smarty smarty实例
+    @return string  返回HTML内容
+</pre></p>
+
+<ul>
+<li>content_site_sitemaps</li>
+</ul>
+
+<p>后台地图生成类。在site_sitemaps中被调用</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">content后台控制器调用规则</a>
+    <li><a href="#id2" class="reference internal">前台控制器继承规则</a>
+    <li><a href="#id3" class="reference internal">content后台文章列表的独特之处</a>
+    <li><a href="#id4" class="reference internal">后台文章栏目的独特之处</a>
+    <li><a href="#id5" class="reference internal">content的扩展类的介绍</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">内容管理(CMS) - content</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../pam/index.html"
+                                  title="下一章">用户认证 - pam</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../pam/index.html" title="用户认证 - pam" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="内容管理(CMS) - content" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">内容管理(CMS) - content</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

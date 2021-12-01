@@ -1,0 +1,444 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      三机方案 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="其他方案" href="index.html" />
+
+        <link rel="next" title="../mongodbrepl" href="mongodb 集群方案.html" />
+        <link rel="prev" title="double" href="双机方案.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../mongodbrepl.html" title="mongodb 集群方案" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="double.html" title="双机方案" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECstore部署文档</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">其他方案</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 三机方案</h1>
+            <h2><a name="id1">架构图</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="../image/three-server.jpg" /></p>
+<h2><a name="id2">LVS/NAT</a></h2>
+<table class="docutils">
+<tr>
+<td>-</td>
+
+<td><b>server1</b></td>
+
+<td><b>server2</b></td>
+
+<td><b>server3</b></td>
+</tr>
+
+<tr>
+<td><b>vip</b></td>
+
+<td>192.168.51.12</td>
+
+<td>-</td>
+
+<td>-</td>
+</tr>
+
+<tr>
+<td><b>RIP</b></td>
+
+<td>10.0.0.10</td>
+
+<td>10.0.0.8</td>
+
+<td>10.0.0.9</td>
+</tr>
+
+<tr>
+<td><b>db</b></td>
+
+<td>-</td>
+
+<td>mysql-master</td>
+
+<td>mysql-slave</td>
+</tr>
+
+<tr>
+<td><b>cache</b></td>
+
+<td>-</td>
+
+<td>memcache</td>
+
+<td>memcache</td>
+</tr>
+
+<tr>
+<td><b>kv</b></td>
+
+<td>-</td>
+
+<td>mongo-master</td>
+
+<td>mongo-slave</td>
+</tr>
+
+<tr>
+<td><b>webserver</b></td>
+
+<td>-</td>
+
+<td>nginx</td>
+
+<td>nginx</td>
+</tr>
+
+<tr>
+<td><b>sync</b></td>
+
+<td>-</td>
+
+<td>inotify&amp;rsync</td>
+
+<td>inotify&amp;rsync</td>
+</tr>
+</table>
+</table>
+
+<p><b>注： 基中mysql,cache,kv,webserver方案与双机方案类同，请参考双机方案。</b></p>
+
+<p>1. 在server1,server2上设置默认路由<pre>       #vim /etc/sysconfig/network
+       
+       GATEWAY=10.0.0.10
+</pre></p>
+<pre>       #重启路由
+       
+       /sbin/route add default gw 10.0.0.10
+
+       #或
+   
+       # 需重启服务器, 使配置文件生效
+       reboot
+
+</pre>
+<p>2. 在server1上安装ipvsadm<pre>       yum install ipvsadm
+</pre></p>
+<pre>       # vim /etc/init.d/lvs
+
+       #!/bin/bash
+#
+# LVS script
+#
+# chkconfig: 2345 99 90
+# description: LVS sample script
+#
+case &quot;$1&quot; in
+start)
+  # Bring up the VIP (Normally this should be under Heartbeat'scontrol.)
+  /sbin/ifconfig eth1:1 192.168.51.12 netmask 255.255.255.0 up
+
+# Since this is the Director we must be
+# able to forward packets.[10]
+           echo 1 &gt; /proc/sys/net/ipv4/ip_forward
+
+# Clear all iptables rules.
+           /sbin/iptables -F
+
+# Reset iptables counters.
+           /sbin/iptables -Z
+
+# Clear all ipvsadm rules/services.
+           /sbin/ipvsadm -C
+
+# Add an IP virtual service for VIP 209.100.100.3 port 80
+           /sbin/ipvsadm -A -t 192.168.51.12:80 -s rr
+
+# Now direct packets for this VIP to
+# to the real server IP (RIP) inside the cluster
+           /sbin/ipvsadm -a -t 192.168.51.12:80 -r 10.1.1.2 -m
+           ;;
+
+stop)
+        # Stop forwarding packets
+        echo 0 &gt; /proc/sys/net/ipv4/ip_forward
+
+        # Reset ipvsadm
+        /sbin/ipvsadm -C
+
+        # Bring down the VIP interface
+        ifconfig eth0:1 down
+        ;;
+*)
+        echo &quot;Usage: $0 {start|stop}&quot;
+    ;;
+esac
+       
+</pre><pre>
+       chmod u+x /etc/init.d/lvs
+
+       # 起动lvs director
+       /etc/initd/lvs start
+
+</pre><h2><a name="id3">inotify-tools</a></h2>
+<p>在server1, server2上安装inotify, 监听文件变动（增删改移动等）事件。</p>
+<pre>     yum -y install gcc autoconf automake make libtool unzip
+     wget https://github.com/rvoicilas/inotify-tools/archive/master.zip 
+     mv master inotify-tools.zip
+     unzip inotify-tools.zip
+     cd inotify-tools-master/
+     ./autogen.sh
+     ./configure --prefix=/usr/local/inotify-tools
+     make &amp;&amp; make install
+</pre><h2><a name="id4">rsync</a></h2>
+<p>在server2, server3上安装rsync, 当inotify事件触发时，与另一台机子做文件同步。在此我们直接监听ecstore整个目录。</p>
+
+<p><br /><img border="0" alt="" align="middle" src="../image/rsync.jpg" /></p>
+<pre>     yum -y install rsync
+     cd /usr/local/sbin 
+</pre><pre>     #vim /usr/local/sbin/inotify-rsync 
+
+     #!/bin/sh
+     src=/var/www
+     des=/var/
+     ip=10.0.0.8
+
+     /usr/local/inotify-tools/bin/inotifywait -mrq --timefmt '%d/%m/%y %H:%M' --format  '%T %w%f' -e modify,delete,create,attrib ${src} \
+                | while read  file
+                do
+                rsync -qavz --delete --progress ${src} root@${ip}:${des}
+                done &amp;
+</pre><h2><a name="id5">日志</a></h2>
+<p>ecstore中日志默认是存文件的，位置在path/to/ecstore/data/log下，我们这里也使用rsync做同步即可。</p>
+<h2><a name="id6">ecstore config</a></h2>
+<p>server2与server3配置一至：</p>
+<pre>  &lt;?php
+
+// ** 数据库配置 ** //
+define('DB_USER', 'root');  # 数据库用户名
+define('DB_PASSWORD', '12356'); # 数据库密码
+define('DB_NAME', 'ecstore');    # 数据库名
+
+# 数据库服务器 -- 99% 的情况下您不需要修改此参数
+define('DB_HOST', '10.0.0.8');
+
+define('WITH_REWRITE',false);
+define('STORE_KEY', ''); #密钥
+define('DB_PREFIX', 'sdb_');
+define('DEFAULT_TIMEZONE', '8');
+define('WITHOUT_CACHE',false);
+#define('PAGE_CACHE_LOG', false);
+define('WITHOUT_KVSTORE_PERSISTENT', false);
+
+
+/* 以下为调优参数 */
+define('DB_CHARSET', 'utf8');
+define('DB_COLLATE', '');
+define('DEBUG_JS',false); //是否开启javascript无压缩模式
+define('DEBUG_CSS',false);//是否开启css无压缩模式
+define('EDITOR_ALL_SOUCECODE',false);//是否使后台可视化编辑器变为源码编辑模式
+define('DONOTUSE_CSSFRAMEWORK',false);//是否禁用前台系统css框架
+define('WITHOUT_AUTOPADDINGIMAGE',false);//图片处理时不需要自动补白
+
+define('ROOT_DIR', realpath(dirname(__FILE__).'/../'));
+
+
+#您可以更改这个目录的位置来获得更高的安全性
+define('DATA_DIR', ROOT_DIR.'/data'); 
+define('THEME_DIR', ROOT_DIR.'/themes');
+define('PUBLIC_DIR', ROOT_DIR.'/public');  #同一主机共享文件
+define('MEDIA_DIR', PUBLIC_DIR.'/images');
+define('SECACHE_SIZE','15M'); #缓存大小,最大不能超过1G
+define(&quot;MAIL_LOG&quot;,false);
+define('DEFAULT_INDEX','');
+define('SERVER_TIMEZONE',8); #服务器时区
+@ini_set('memory_limit','32M');
+define('WITHOUT_GZIP',false);
+define('WITHOUT_STRIP_HTML', true);
+
+#数据库集群.
+define('DB_SLAVE_NAME',DB_NAME);
+define('DB_SLAVE_USER',DB_USER);
+define('DB_SLAVE_PASSWORD',DB_PASSWORD);
+define('DB_SLAVE_HOST', '10.0.0.9');
+
+#按日期分目录，每个ip一个日志文件。扩展名是php防止下载。
+define('LOG_FILE', DATA_DIR.'/logs/{date}/{ip}.php');
+
+#log文件头部放上exit()保证无法下载。
+define('LOG_HEAD_TEXT', '&lt;'.'?php exit()?'.&quot;&gt;\n&quot;);  
+
+#使用数据库存放改动过的模板
+//define('THEME_STORAGE','db');
+
+# kvstroe后台存储类
+define('KVSTORE_STORAGE', 'base_kvstore_mongodb');
+
+# cache后端存储类
+define('CACHE_STORAGE', 'base_cache_memcache');
+
+# cache memcache服务器配置
+define('CACHE_MEMCACHE_CONFIG', '10.0.0.8:11211,10.0.0.9:11211');
+
+#mongodb 服务器配置
+define('MONGODB_OPTION_CONFIG','mongodb://10.0.0.8:27017');
+
+</pre><h2><a name="id7">zabbix</a></h2><pre>     # server
+     groupadd zabbix
+     useradd -g zabbix zabbix
+     wget http://nchc.dl.sourceforge.net/project/zabbix/ZABBIX%20Latest%20Stable/2.0.4/zabbix-2.0.4.tar.gz
+     tar zxvf zabbix-2.0.4.tar.gz
+     cd zabbix-2.0.4
+     yum install curl curl-devel net-snmp httpd mysql mysql-server mysql-devel php php-devel php-mysql
+     ./configure --enable-server --enable-proxy --enable-agent --with-mysql=/usr/bin/mysql_config --with-net-snmp --with-libcurl
+     make &amp;&amp; make install 
+     /etc/init.d/httpd start
+     service mysqld start
+     /etc/init.d/iptables stop
+     chkconfig --level 35 iptables off
+
+     cd frontends/php
+     cp -a . &lt;htdocs&gt;/zabbix
+
+     #此时应能访问zabbix的web界面
+     #按界面上的setup一步步进行下去就行了。
+     #默认用户名、密码为： Admin zabbix
+</pre><pre>     mysql -u root -p
+     mysql&gt; CREATE DATABASE zabbix character set utf8;
+     mysql&gt; grant all on zabbix.* to zabbix@localhost identified by 'zabbix';
+     mysql -u&lt;username&gt; -p&lt;password&gt; zabbix &lt; database/mysql/schema.sql
+     mysql -u&lt;username&gt; -p&lt;password&gt; zabbix &lt; database/mysql/images.sql
+     mysql -u&lt;username&gt; -p&lt;password&gt; zabbix &lt; database/mysql/data.sql
+</pre>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">架构图</a>
+    <li><a href="#id2" class="reference internal">LVS/NAT</a>
+    <li><a href="#id3" class="reference internal">inotify-tools</a>
+    <li><a href="#id4" class="reference internal">rsync</a>
+    <li><a href="#id5" class="reference internal">日志</a>
+    <li><a href="#id6" class="reference internal">ecstore config</a>
+    <li><a href="#id7" class="reference internal">zabbix</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="double.html"
+                                  title="上一章">双机方案</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../mongodbrepl.html"
+                                  title="下一章">mongodb 集群方案</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../mongodbrepl.html" title="mongodb 集群方案" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="double.html" title="双机方案" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECstore部署文档</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">其他方案</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

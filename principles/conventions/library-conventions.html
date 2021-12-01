@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      业务逻辑库(library) &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="Ecos命名规则" href="index.html" />
+
+        <link rel="next" title="model-conventions" href="数据库表,数据库表定义文件及模型命名规则.html" />
+        <link rel="prev" title="index" href="Ecos命名规则.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="model-conventions.html" title="数据库表,数据库表定义文件及模型命名规则" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="Ecos命名规则" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos的基本原则</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">Ecos命名规则</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 业务逻辑库(library)</h1>
+            
+<p>业务逻辑库的类名采用下划线命名法, 并且只允许小写字母</p>
+
+<p>library有两种命名规则, 一个是系统内置的核心libary库的命名规则(数量有限), 一个是通用的library的命名规则</p>
+<h2><a name="id1">核心library命名规则</a></h2>
+<p>这一类是系统内置的核心的library, 都放置在base app的lib/static目录下</p>
+
+<ul>
+<li>业务逻辑库类名: {$filename}
+<li>业务逻辑库存放目录: app/base/lib/static
+<li>业务逻辑库文件名: {$filename}.php
+<li>业务逻辑库完整文件名: app/base/lib/static/{$filename}.php
+<li>控制器所在app: base</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+
+<p>内置的核心library并不多, 罗列一下:</p>
+
+<ul>
+<li>app
+<li>cachemgr
+<li>lang
+<li>modifiers
+<li>service
+<li>utils</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+
+<p>因此可以看到如下用法:<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$app&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #0000BB">$app</span><span style="color: #007700">);<br /></span>
+</span>
+</code></div></p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$md5&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">utils</span><span style="color: #007700">::</span><span style="color: #0000BB">array_md5</span><span style="color: #007700">(</span><span style="color: #0000BB">$arr</span><span style="color: #007700">);<br /></span>
+</span>
+</code></div><h2><a name="id2">通用library命名规则</a></h2>
+<ul>
+<li>业务逻辑库类名: {$app_name}_{$dir_1}/{$dir_n}_{$filename}
+<li>业务逻辑库存放目录: app/{$app_name}/lib/{$dir_1}/{$dir_2}
+<li>业务逻辑库文件名: {$filename}.php
+<li>业务逻辑库完整文件名: app/{$app_name}/lib/{$dir_1}/{$dir_2}/{$filename}.php
+<li>控制器所在app: {$app_name}</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+
+<p>看起来很晕吧, 来几个例子解脱一下</p>
+
+<p>例1:<pre class="mark">- 业务逻辑库类名: base_application_dbtable
+- 业务逻辑库存放目录: app/base/lib/application
+- 业务逻辑库文件名: dbtable.php
+- 业务逻辑库完整文件名: app/base/lib/application/dbtable.php
+- 控制器所在app: base
+</pre></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">核心library命名规则</a>
+    <li><a href="#id2" class="reference internal">通用library命名规则</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">Ecos命名规则</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="model-conventions.html"
+                                  title="下一章">数据库表,数据库表定义文件及模型命名规则</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="model-conventions.html" title="数据库表,数据库表定义文件及模型命名规则" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="Ecos命名规则" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos的基本原则</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">Ecos命名规则</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      多文件上传 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="ECOS开发指南" href="../index.html" />
+
+        <link rel="next" title="../append" href="附录.html" />
+        <link rel="prev" title="../db/multi-table" href="多表连接.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../append.html" title="附录" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../db/multi-table.html" title="多表连接" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECOS开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 多文件上传</h1>
+            <h3><a name="id1">说明</a></h3>
+<p>多文件上传功能是用js实现的flash效果，在我们的ecstore系统中，有两处用到了这种方法（1、商品图片上传；2、模板包上传），实现此功能的主要部分就是调用flash文件（uploader.swf）和 数据保存，接下来就是一起学习怎样去完成“多文件上传”的功能（此处主要是以b2c中多图片上传作为示例）。</p>
+<h3><a name="id2">调用flash</a></h3>
+<p>为了方便多次调用上传的功能，我们可以写一个包含了调用flash的文件（domfile.html），最后通过</p>
+
+<p>&lt;{include file=&quot;domfile.html&quot;}&gt;直接引用到你想要完成多文件上传的html页面中。（文件代码展示如下）</p>
+
+<p>domfile.html<pre>&lt;div class=&quot;division&quot; style=&quot;margin:0;position:relative&quot;&gt;
+	&lt;!--flash按钮展示层--&gt;
+     &lt;div class=&quot;clearfix&quot;&gt;
+         &lt;span id=&quot;pic-uploader&quot;&gt;
+              &lt;{button app=&quot;desktop&quot; class=&quot;btn-upload&quot; label=$___b2c=&quot;添加商品图片&quot;|t:'b2c' icon=&quot;image_new.gif&quot;}&gt;
+         &lt;/span&gt;
+     &lt;/div&gt;
+	&lt;!--上传的图片展示层--&gt;
+     &lt;div class=&quot;pic-area&quot; id=&quot;pic-area&quot;&gt;
+         &lt;input type=&quot;hidden&quot; name=&quot;image_default&quot; value=&quot;&lt;{$goods.image_default_id}&gt;&quot; /&gt;
+		 &lt;div id='all-pics' style=&quot;width:100%&quot;&gt;
+		 &lt;div class=&quot;gpic-box&quot;&gt;
+			&lt;{include file=&quot;gimage.html&quot; app='image'}&gt;
+		 &lt;/div&gt;
+	 &lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+//function setPos(){
+ /*此处是加载文件上传表单&lt;input type=&quot;file&quot;&gt;
+  *$$('.std-upload-txt')[0].setStyle('top',$('pic-uploader').getPosition().y+$('main').getScroll().y);
+  */     
+//}
+//window.addEvent('domready',function(){
+//  setPos.periodical(200);
+//});
+//var goodsEditor = null;
+
+var goodsEditFrame = (function(){
+//  setPos();
+ /**
+   *此处是删除调用的事件+路径
+   *goodsEditor = new ShopExGoodsEditor('gEditor',{imgtype:'&lt;{$uploader}&gt;',url:'&lt;{$url}&gt;',goods_id:'&lt;{$goods.id}&gt;'}); 
+   */ 
+
+  Ex_Loader('uploader',function(){
+  /**
+    *此处是弹出的浮动窗口中整个页面的最外层“&lt;div id='add' &gt;”
+    *var main =$('add').getParent('.dialog-content-body').setStyle('position','relative');
+    *console.info($('add').getParent('.dialog-content-body'));
+    */
+        new Swiff.Uploader( {
+            allowDuplicates: true,
+            verbose: true,
+	    //container:main,
+	    //flash上传保存路径
+            url:'index.php?app=image&amp;ctl=admin_manage&amp;act=gimage_swf_remote&amp;sess_id='+sess_id,
+	    //flash路径   
+            path: '&lt;{$file_dir}&gt;/uploader.swf',   
+	    //允许上传的图片(文件)类型（若果想修改为上传多文件的，在这里加载你要上传的文件的后缀）            
+            typeFilter: {
+                'Images (*.jpg, *.jpeg, *.gif, *.png)': '*.jpg; *.jpeg; *.gif; *.png'           
+            },
+	    //图片大小的限制
+            fileSizeMax:&lt;{$IMAGE_MAX_SIZE}&gt;,                                                     
+            target:'pic-uploader',
+            onSelect:function(rs){
+                if(rs)
+                rs.each(function(v){
+                    if(v.size&gt;this.fileSizeMax){
+                        alert(v.name+'&lt;{t}&gt;\n\n文件超出大小&lt;{/t}&gt;');
+                    };
+                },this);
+            },
+            onSelectFail:function(rs){
+                rs.each(function(v){
+                    if(v.validationError=='sizeLimitMax'){
+                        alert(v.name+'&lt;{t}&gt;\n\n文件超出大小&lt;{/t}&gt;');
+                    };
+                });
+            },
+            onSelectSuccess:function(rs){
+                var PID='up_';
+                var _this=this;
+                rs.each(function(v,i){
+                     new Element('div',{'class':'gpic-box','id':PID+v.id}).inject($('all-pics'));
+                });
+                this.start();
+            },
+            onFileOpen:function(e){
+                $('up_'+e.id).setHTML('&lt;em style=&quot;font-size:13px;font-family:Georgia;&quot;&gt;0%&lt;/em&gt;');
+            },
+            onFileProgress:function(e){
+                $('up_'+e.id).getElement('em').set('text',e.progress.percentLoaded+'%');
+            },
+            onFileComplete: function(res){
+                if(res.response.error){
+                    return  new MessageBox.error('&lt;{t}&gt;文件&lt;{/t}&gt;'+res.name+'&lt;{t}&gt;上传失败&lt;{/t}&gt;');
+                }
+                $('up_'+res.id).setHTML(res.response.text);
+                if(!$E('#pic-area .current')&amp;&amp;$E('#pic-area .gpic')){
+                  $E('#pic-area .gpic').onclick();
+                }
+            }
+        });
+
+    });
+
+
+})();
+&lt;/script&gt;
+</pre>接下来我们从控制器中来调用此文件。</p>
+
+<p>index.php<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">useremail_ctl_admin_file&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">desktop_controller</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">index</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">finder</span><span style="color: #007700">(</span><span style="color: #DD0000">'useremail_mdl_user'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'title'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'会员详细信息录入'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'actions'</span><span style="color: #007700">=&gt;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'useremail'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'添加信息'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'icon'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'add.gif'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'href'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'index.php?app=useremail&amp;ctl=admin_file&amp;act=add'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">/**<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;此处是弹出浮动小窗口<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*'target'=&gt;'dialog::{title:\''.app::get('useremail')-&gt;_('信息录入').'\',width:700,height:400}'<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;/<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/**此处是在新窗口打开(两种不同的窗口，会有不同的flash调用方法；这里用新窗口)*/<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'target'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'_blank'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">add</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">/**此处sess_id的使用场景是：在弹出子窗口中调用domfile.html文件时传给siss_id的参数*/<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//$this-&gt;pagedata['ssid']&nbsp;=&nbsp;kernel::single('base_session')-&gt;sess_id();&nbsp;&nbsp;&nbsp;&nbsp;//可有可无<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//此处必须有，他是flash的具体地址<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">pagedata</span><span style="color: #007700">[</span><span style="color: #DD0000">'file_dir'</span><span style="color: #007700">]&nbsp;=&nbsp;&amp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'image'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">res_url</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//此处必须有，他是图片大小的限制<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">pagedata</span><span style="color: #007700">[</span><span style="color: #DD0000">'IMAGE_MAX_SIZE'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">1024</span><span style="color: #007700">*</span><span style="color: #0000BB">1024</span><span style="color: #007700">*</span><span style="color: #0000BB">5</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">page</span><span style="color: #007700">(</span><span style="color: #DD0000">'upfile.html'</span><span style="color: #007700">);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />}<br /><br /></span>
+</span>
+</code></div>upfile.html<pre>&lt;!--  以下是引入flash页面--&gt;
+会员照片：&lt;{include file=&quot;domfile.html&quot;}&gt;
+
+</pre>根据以上的步骤，可以先测试一下效果，看看是不是想要的那种感觉。效果图如下：</p>
+
+<p>在页面调用flash页面效果图：<br /><img border="0" alt="" align="middle" src="image/effect.jpg" /></p>
+
+<p>在弹出子窗口调用flash页面效果<br /><img border="0" alt="" align="middle" src="image/effect1.jpg" /></p>
+<h3><a name="id3">数据保存</a></h3>
+<p>ecstore系统上传图片的保存方法都很完善，我们只需要去看看他们的保存方法，不需要我们在重新去写方法。方法路径是：<pre class="mark">“app=image&amp;ctl=admin_manage&amp;act=gimage_swf_remote”
+</pre></p>
+
+<p>以上的方法只是单独的保存图片相关的信息，返回了图片存储id，还没有与商品关联在一起，以下是保存商品时关联图片的方法。在商品保存方法中，对于图片关联表的保存处理方式如下（只是作为参考）：<pre> $arr_remove_image = array();
+  if( $_POST['goods']['images'] ){
+     $oImage_attach = app::get('image')-&gt;model('image_attach');
+      /*
+       *根据相关商品id和goods类型查询当前商品已经关联的图片（此操作适合修改商品信息），删除原有的信息，从新做插入操作
+       */
+     $arr_image_attach = $oImage_attach-&gt;getList('*',array('target_id'=&gt;$goods['goods_id'],'target_type'=&gt;'goods'));
+     foreach ((array)$arr_image_attach as $_arr_image_attach){
+         if (!in_array($_arr_image_attach['image_id'],$_POST['goods']['images'])){
+                 $arr_remove_image[] = $_arr_image_attach['image_id'];
+             }
+          }
+    }
+
+        if ( !$oGoods-&gt;save($goods) ){
+            //保存商品数据
+            $this-&gt;end(false,app::get('b2c')-&gt;_('您所填写的货号重复，请检查！'));
+        }else{
+	/*图片的处理*/
+          if( $goods['images'] ){
+                $oImage = &amp;app::get('image')-&gt;model('image');
+                if ($arr_remove_image){
+                    foreach($arr_remove_image as $_arr_remove_image)
+                        $test = $oImage-&gt;delete_image($_arr_remove_image,'goods');
+                }
+                //保存图片信息
+                foreach($goods['images'] as $k=&gt;$v){
+                    $test = $oImage-&gt;rebuild($v['image_id'],array('S','M','L'),true);
+                }
+            }
+          /**商品相关的其他内容处理及存储*/
+        }
+</pre>到这里，我们多图片上传处理完成，接下去的操作就是显示等其他的一些方式，就要靠自己去完成了。</p>
+<h3><a name="id4">多文件上传重点总结</a></h3>
+<p>多文件上传和多图片上传可以说是一样的原理，只需注意以下几个问题
+<ol>
+<li>调用flash时文件类型的罗列（把想要上传的文件类型用以下方式列出）<pre class="mark">typeFilter: {
+                'Images (*.jpg, *.psd,*.gif, *.png,*.bmp,*.zip,*.pdf,*.rar,*.xls,*.xlsx,*.doc,*.docx,*.ppt,*.pptx,*.csv,*.txt,)': '*.jpg; *.jpeg; *.gif; *.png; *.bmp; *.zip; *.pdf; *.rar; *.xls; *.xlsx; *.doc; *.docx; *.ppt; *.pptx; *.csv; *.txt; '           
+            },
+</pre>
+<li>文件保存时需要扩展图片保存model中的store()方法(以下方法是多文件保存的一个示例，只能作为参考，具体的要以自己所需来处理)<pre class="mark">function store(){
+        $file = $this-&gt;app-&gt;model('file');
+        $file_name = $_FILES['Filedata']['name']; 
+		$hou=explode('.',$file_name);  //上传文件名
+		$hou='.'.end($hou);
+		$extname = array(
+				1 =&gt; '.txt',
+				2 =&gt; '.doc',
+				3 =&gt; '.zip',
+				4 =&gt; '.pdf',
+				5 =&gt; '.rar',
+				6 =&gt; '.xls',
+				7 =&gt; '.xlsx',
+				8 =&gt; '.docx',
+				9 =&gt; '.ppt',
+				10 =&gt; '.pptx',
+				11 =&gt; '.csv',
+                12=&gt; '.gif',
+                13=&gt; '.jpg',
+                14=&gt; '.png',
+                15=&gt; '.bmp',
+				16 =&gt; '.psd',
+            );
+		
+        if(!@is_dir(ROOT_DIR.&quot;/public/tmp/&quot;)){
+			@mkdir(ROOT_DIR.&quot;/public/tmp/&quot;,0777,true);
+		}
+        $filepath = ROOT_DIR.&quot;/public/tmp/&quot;;     //存放的临时路径
+        $upname =md5(time().'|'.$file_name);  //存放的文件名
+		$pathname=$filepath.$upname;        //  临时路径名
+        $uppath=$_FILES['Filedata']['tmp_name'];
+        if($_FILES['Filedata']['error'] == UPLOAD_ERR_NO_FILE) continue;
+		if(!is_uploaded_file($uppath)) return false;
+        if(!move_uploaded_file($uppath,$pathname)){
+			return false;
+		}
+		$docname=time().'|'.$file_name;
+		if(in_array($hou,$extname)){
+               $upfile=array(
+                    'file_id'=&gt;md5(rand(0,9999).microtime()),
+					'file_name'=&gt;$docname,
+					'path'=&gt;$pathname,
+					'addtime'=&gt;time(),
+				);
+                if(!$file-&gt;save($upfile)) return false;        
+			  $file_id = $upfile['file_id'];
+		}
+        $this-&gt;pagedata['gimage']['file_id'] = $file_id;
+		$this-&gt;pagedata['gimage']['file_name'] = $file_name;
+        $this-&gt;display('gimage.html');
+        
+        
+    }
+</pre></li>
+</li>
+</ol>
+</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+        <ul>
+        <li><a href="#id1" class="reference internal">说明</a>
+        <li><a href="#id2" class="reference internal">调用flash</a>
+        <li><a href="#id3" class="reference internal">数据保存</a>
+        <li><a href="#id4" class="reference internal">多文件上传重点总结</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../db/multi-table.html"
+                                  title="上一章">多表连接</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../append.html"
+                                  title="下一章">附录</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../append.html" title="附录" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../db/multi-table.html" title="多表连接" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECOS开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      概述 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="doc.html" />
+    <link rel="up" title="ECOS百科全书" href="doc.html" />
+
+        <link rel="next" title="quickstart/index" href="快速入门.html" />
+        <link rel="prev" title="doc" href="ECOS百科全书.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="quickstart/index.html" title="快速入门" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="doc.html" title="ECOS百科全书" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="doc.html">ECOS百科全书</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 概述</h1>
+            <h2><a name="id1">阶段1 茫然无序</a></h2>
+<p>作为新手通过<a href="./../quickstart/index.html">入门(quickstart)</a>, 快速应用ecos框架,分步骤的搭建实用的项目, 通过图画和充足信息给予频繁迅速的成就感. 了解系统的基本知识和技巧.</p>
+
+<ul>
+<li>学习并使用ecos shell.
+<li>知道如何创建新的app
+<li>对service, 有基本感官上的概念
+<li>了解site app,并对模板有认识
+<li>了解desktop app</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+<h2><a name="id2">阶段2 初窥门径(进阶)</a></h2>
+<p>之前对框架已经有一个基本的概念, 并有了小型项目的开发经验, 虽然对很多细节都不太明朗 但无需沮丧,接下来将关注更多使用的组件和功能上来, 进入<a href="./advance/index.html">进阶部分</a>的学习阶段.</p>
+<h2><a name="id3">阶段2.5 观其大略, 不求甚解</a></h2>
+<p>第一次阅读本手册时不必渴求每一部分都能学得面面俱到. 但求能够了解手册中所讲解的每一个组件或app的作用和能达到的效果. 将所学尽可能的武装到实验性项目中, 而不需要关注是否过度设计.</p>
+<h2><a name="id4">阶段3 运用自如</a></h2>
+<p>当完成以上阶段, 知识体系基本建立. 能够运用框架开发项目, 可以组合一系列任务以达成某个目标, 也许任务的组合顺序不是最佳的，但是通常都可以发挥作用.</p>
+
+<p>在本阶段我们将通过两方面来解决学习者的困扰</p>
+
+<ul>
+<li>应用最佳实践库(案例库)      (2011.3.21的版本暂无此内容)
+<li>ecos apis:框架的类,函数手册   (2011.3.21的版本暂无此内容)</li>
+</li>
+</ul>
+
+<p>应用最佳实践(引自<a href="http://www.infoq.com/cn/articles/better-best-practices">infoQ|更好的最佳实践</a>)的好处:</p>
+<pre class="mark">* 应用最佳实践可以确保一致性。我们正在引入［此处插入最佳实践名称］，而且希望确保每个人都能与我们保持方向一致。我们要给人们提供方向指引，以避免他们被落下；否则只能造成混乱。
+
+* 应用最佳实践可以支持学习过程。我们要让大家在尽量不产生焦躁情绪的状况下，彼此保持步调一致；而且我们拥有一个标准化的、结构齐备的运作材料，这就是说人们可以明确了解自己该做什么，以及在理想化状况下他们能够做到多么好的程度。
+
+* 应用最佳实践可以限制（潜在的）冲击或破坏。（现在让我们看看它们到底是怎么一回事吧。）在任何组织中，人们能力总是会构成一条钟形曲线［注1］，我们知道有少数非常杰出的人会被错误对待，导致他们处于钟形曲线错误的一端。错误地推进变革计划，会让我们面临重大的财政或法律风险；为了保护我们自己，要将实践的流程和方式定义得非常清晰。它们之所以被成为最佳实践，是因为人们曾经尝试过它们并且证明它们是有效的，所以我可以明确保证它们一定能够起到成效。
+
+* 应用最佳实践可以帮助建立更加便捷、灵活的劳动力环境。在目前高速发展的时代中，项目的实现或是取消都是一夜之间的事情。人们在项目团队之间转换，项目在不同办公室、国家或时区之间变动。让所有的成员都能接受针对同样最佳实践的训练，我们——和他们——就能在工作的灵活性上拥有更多选择。我们称之为“资源商品化”。
+
+* 应用最佳实践可以帮助我们加强控制。在一个大型的、等级森严的组织中，“加强控制”是问题的关键。一个部门经理或者副总可能要负责几千人的管理。在这种规模下，拥有一个清晰定义并能得到强有力实施的最佳实践是进行有效管理的唯一途径。
+</pre>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">阶段1 茫然无序</a>
+    <li><a href="#id2" class="reference internal">阶段2 初窥门径(进阶)</a>
+    <li><a href="#id3" class="reference internal">阶段2.5 观其大略, 不求甚解</a>
+    <li><a href="#id4" class="reference internal">阶段3 运用自如</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="doc.html"
+                                  title="上一章">ECOS百科全书</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="quickstart/index.html"
+                                  title="下一章">快速入门</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="quickstart/index.html" title="快速入门" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="doc.html" title="ECOS百科全书" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="doc.html">ECOS百科全书</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

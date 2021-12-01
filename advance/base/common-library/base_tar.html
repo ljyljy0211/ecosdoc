@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      压缩工具类 - base_tar &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../doc.html" />
+    <link rel="up" title="常用类库" href="index.html" />
+
+        <link rel="next" title="base_xml" href="xml工具类 - base_xml.html" />
+        <link rel="prev" title="index" href="常用类库.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="base_xml.html" title="xml工具类 - base_xml" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="常用类库" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">常用类库</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 压缩工具类 - base_tar</h1>
+            <h2><a name="id1">功能描述</a></h2>
+<p>这个类用来处理tar包, 目前不支持gzip压缩</p>
+
+<p>这个类的原作者: Josh Barger &lt;joshb@npt.com&gt;.原类存在两个问题, 因此做了一定程度的改善
+<ul>
+<li>在生成tar包时需要将所有文件内容加载至内存,然后一起写入磁盘, 容易造成内存溢出
+<li>
+<li>必须实际文件才可以打tar包. 满足不了业务需求</li>
+</li>
+</li>
+</ul>
+</p>
+<h2><a name="id2">应用场景</a></h2>
+<ul>
+<li>数据备份
+<li>模板包</li>
+</li>
+</ul>
+<h2><a name="id3">属性</a></h2><h3><a name="id4">解包时专用属性</a></h3><h4><a name="id5">filename</a></h4>
+<p>待解包文件名<h4><a name="id6">tar_file</a></h4>待解包文件的文件句柄<h3><a name="id7">公用属性</a></h3><h4><a name="id8">files</a></h4>二维数组, 表示tar包内所有文件的信息.</p>
+
+<p>每一行的格式为{$infomation}, 格式为:<pre>    array(
+	'name' =&gt; $file_name,
+	'mode' =&gt; $file_mode,
+	'size' =&gt; $file_size,
+	'time' =&gt; $file_time,
+	'member_id' =&gt; $file_uid,
+	'group_id' =&gt; $file_gid,
+	'user_name' =&gt; $file_uname,
+	'group_name' =&gt; $file_gname,
+	'checksum' =&gt; $file_chksum,
+	'offset' =&gt; $file_offset
+	)
+</pre><h3><a name="id9">directories</a></h3>所有目录信息, 二维数组, 格式为{$information}见上文</p>
+<h3><a name="id10">numFiles</a></h3>
+<p>文件数量</p>
+<h3><a name="id11">numDirectories</a></h3>
+<p>目录数量</p>
+<h2><a name="id12">函数接口</a></h2><h3><a name="id13">openTAR</a></h3>
+<p>打开一个tar包文件</p>
+<pre class="mark">参数:
+    string $filename tar包文件名
+返回:
+    bool 如果成功为true, 反之为false
+</pre><h3><a name="id14">closeTAR</a></h3>
+<p>关闭tar包(关闭文件指针)</p>
+<pre class="mark">参数:
+    无
+返回:
+    bool 如果成功为true, 反之为false
+</pre><h3><a name="id15">appendTar</a></h3>
+<p>同时再打开一个tar包</p>
+<pre class="mark">参数:
+    string $filename tar包文件名
+返回:
+    bool 如果成功为true, 反之为false
+</pre><h3><a name="id16">getFile</a></h3>
+<p>获取tar包内文件的详细信息</p>
+<pre class="mark">参数:
+    string $filename tar包文件名
+返回:
+    array 成功的话返回文件信息一维数组, 格式为{$information}见上文, 失败返回false. 
+</pre><h3><a name="id17">getContents</a></h3>
+<p>从tar包中取出文件内容</p>
+<pre class="mark">参数:
+    string $information 格式为{$information}, 见上文
+返回:
+    string 如果成功则返回文件内容, 反之为false
+</pre><h3><a name="id18">getDirectory</a></h3>
+<p>获取tar包内的目录信息<pre class="mark">参数:
+    string $dirname 目录名
+返回:
+    array 如果成功为目录的{$information}, 反之为false
+</pre></p>
+<h3><a name="id19">containsFile</a></h3>
+<p>判断tar包内是否存在某一文件</p>
+<pre class="mark">参数:
+    string $filename 文件名
+返回:
+    bool 如果成功为目录的{$information}, 反之为false
+</pre><h3><a name="id20">containsDirectory</a></h3>
+<p>判断tar包内是否存在某一目录</p>
+<pre class="mark">参数:
+    string $filename 文件名
+返回:
+    bool 如果成功为true, 反之为false
+</pre><h3><a name="id21">addDirectory</a></h3>
+<p>为tar包增加一个目录</p>
+<pre class="mark">参数:
+    string $dirname 目录名
+返回:
+    bool 如果成功为true, 反之为false
+</pre><h3><a name="id22">addFile</a></h3>
+<p>为tar包增加一个文件</p>
+<pre class="mark">参数:
+    string $filename 文件名
+    string $file_contents 文件内容. 默认值为false, 如果值为false, 则会到$filename路径取得文件内容
+返回:
+    bool 如果成功为true, 反之为false
+</pre><h3><a name="id23">removeFile</a></h3>
+<p>从tar包中删除文件<pre class="mark">参数:
+    string $filename 文件名
+返回:
+    bool 如果成功为true, 反之为false
+</pre></p>
+<h3><a name="id24">removeDirectory</a></h3>
+<p>从tar包中删除目录</p>
+<pre class="mark">参数:
+    string $filename 文件名
+返回:
+    bool 如果成功为true, 反之为false
+</pre><h3><a name="id25">saveTar</a></h3>
+<p>将tar包保存至实际文件</p>
+<pre class="mark">参数:
+    无
+返回:
+    bool 如果成功为true, 反之为false
+</pre><h3><a name="id26">getTar</a></h3>
+<p>返回tar文件内容</p>
+<pre class="mark">参数:
+    string $type 返回类型, 如果$type为output则直接输出. 默认为output
+返回:
+    string tar文件内容
+</pre><h3><a name="id27">toTar</a></h3>
+<p>将当前文档保存到另外的tar包文件中</p>
+<pre class="mark">参数:
+    string $filename 文件名路径
+返回:
+    bool 如果成功为true, 反之为false
+</pre><h3><a name="id28">gzcompressfile</a></h3>
+<p>将已有tar包压缩成tar.gz包放在和tar包同级目录下</p>
+<pre class="mark">参数:
+    string $source 需要压缩的tar包路径
+返回:
+    bool 如果成功为true, 反之为false
+</pre><h2><a name="id29">几个例子</a></h2><h3><a name="id30">解包 - 安装模板</a></h3><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /><br />$t_dir&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'模板需要放置的绝对路径'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$tar&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'base_tar'</span><span style="color: #007700">);<br /></span><span style="color: #0000BB">$tar</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">openTAR</span><span style="color: #007700">(</span><span style="color: #0000BB">$theme_tar_filename</span><span style="color: #007700">)&nbsp;{&nbsp;</span><span style="color: #FF8000">//打开模板tar包文件<br /></span><span style="color: #007700">if(</span><span style="color: #0000BB">$tar</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">containsFile</span><span style="color: #007700">(</span><span style="color: #DD0000">'theme.xml'</span><span style="color: #007700">))&nbsp;{&nbsp;</span><span style="color: #FF8000">//判断tar包内是否有模板描述文件theme.xml<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">foreach(</span><span style="color: #0000BB">$tar</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">files&nbsp;</span><span style="color: #007700">as&nbsp;</span><span style="color: #0000BB">$id&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">$file</span><span style="color: #007700">)&nbsp;{&nbsp;</span><span style="color: #FF8000">//循环模板包内的所有文件<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">if(!</span><span style="color: #0000BB">preg_match</span><span style="color: #007700">(</span><span style="color: #DD0000">'/\.php/'</span><span style="color: #007700">,</span><span style="color: #0000BB">$file</span><span style="color: #007700">[</span><span style="color: #DD0000">'name'</span><span style="color: #007700">])&nbsp;||&nbsp;</span><span style="color: #0000BB">preg_match</span><span style="color: #007700">(</span><span style="color: #DD0000">'/^widgets\/(.*)\.php$/'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$file</span><span style="color: #007700">[</span><span style="color: #DD0000">'name'</span><span style="color: #007700">])){&nbsp;</span><span style="color: #FF8000">//只有widges目录下的php会解包并放在相关目录下<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$fpath&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$t_dir</span><span style="color: #007700">.</span><span style="color: #0000BB">$file</span><span style="color: #007700">[</span><span style="color: #DD0000">'name'</span><span style="color: #007700">];&nbsp;</span><span style="color: #FF8000">//拼接出文件的全路径<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">if(!</span><span style="color: #0000BB">is_dir</span><span style="color: #007700">(</span><span style="color: #0000BB">dirname</span><span style="color: #007700">(</span><span style="color: #0000BB">$fpath</span><span style="color: #007700">))){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">mkdir</span><span style="color: #007700">(</span><span style="color: #0000BB">dirname</span><span style="color: #007700">(</span><span style="color: #0000BB">$fpath</span><span style="color: #007700">),&nbsp;</span><span style="color: #0000BB">0755</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">)){&nbsp;</span><span style="color: #FF8000">//递归建立目录<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">file_put_contents</span><span style="color: #007700">(</span><span style="color: #0000BB">$fpath</span><span style="color: #007700">,</span><span style="color: #0000BB">$tar</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getContents</span><span style="color: #007700">(</span><span style="color: #0000BB">$file</span><span style="color: #007700">));&nbsp;</span><span style="color: #FF8000">//从tar包中取文件数据<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">}else{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}else{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">file_put_contents</span><span style="color: #007700">(</span><span style="color: #0000BB">$fpath</span><span style="color: #007700">,</span><span style="color: #0000BB">$tar</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getContents</span><span style="color: #007700">(</span><span style="color: #0000BB">$file</span><span style="color: #007700">));&nbsp;</span><span style="color: #FF8000">//将tar包中的文件解包到实际的目录中.<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$tar</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">closeTAR</span><span style="color: #007700">();&nbsp;</span><span style="color: #FF8000">//关闭tar包<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">...<br />}<br /><br /></span>
+</span>
+</code></div><h3><a name="id31">打包 -</a></h3><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;$tar&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'base_tar'</span><span style="color: #007700">);<br />&nbsp;</span><span style="color: #0000BB">$workdir&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">getcwd</span><span style="color: #007700">();&nbsp;&nbsp;</span><span style="color: #FF8000">//记录当前工作目录<br /><br />&nbsp;</span><span style="color: #007700">if(</span><span style="color: #0000BB">chdir</span><span style="color: #007700">(</span><span style="color: #0000BB">THEME_DIR</span><span style="color: #007700">.</span><span style="color: #DD0000">'/'</span><span style="color: #007700">.</span><span style="color: #0000BB">$theme</span><span style="color: #007700">)){&nbsp;</span><span style="color: #FF8000">//将工作目录切到实际要压缩的位置<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">__get_all_files</span><span style="color: #007700">(</span><span style="color: #DD0000">'.'</span><span style="color: #007700">,</span><span style="color: #0000BB">$aFile</span><span style="color: #007700">);&nbsp;&nbsp;</span><span style="color: #FF8000">//取到所有要打包的文件列表,&nbsp;$aFile为引用返回<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">for(</span><span style="color: #0000BB">$i</span><span style="color: #007700">=</span><span style="color: #0000BB">0</span><span style="color: #007700">;</span><span style="color: #0000BB">$i</span><span style="color: #007700">&lt;</span><span style="color: #0000BB">count</span><span style="color: #007700">(</span><span style="color: #0000BB">$aFile</span><span style="color: #007700">);</span><span style="color: #0000BB">$i</span><span style="color: #007700">++){&nbsp;&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">$f&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">substr</span><span style="color: #007700">(</span><span style="color: #0000BB">$aFile</span><span style="color: #007700">[</span><span style="color: #0000BB">$i</span><span style="color: #007700">],</span><span style="color: #0000BB">2</span><span style="color: #007700">)){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">$f</span><span style="color: #007700">!=</span><span style="color: #DD0000">'theme.xml'</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$tar</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">addFile</span><span style="color: #007700">(</span><span style="color: #0000BB">$f</span><span style="color: #007700">);&nbsp;</span><span style="color: #FF8000">//向tar包中加文件<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">is_file</span><span style="color: #007700">(</span><span style="color: #DD0000">'info.xml'</span><span style="color: #007700">)){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$tar</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">addFile</span><span style="color: #007700">(</span><span style="color: #DD0000">'info.xml'</span><span style="color: #007700">,</span><span style="color: #0000BB">file_get_contents</span><span style="color: #007700">(</span><span style="color: #DD0000">'info.xml'</span><span style="color: #007700">));<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$tar</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">addFile</span><span style="color: #007700">(</span><span style="color: #DD0000">'theme.xml'</span><span style="color: #007700">,</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">make_configfile</span><span style="color: #007700">(</span><span style="color: #0000BB">$theme</span><span style="color: #007700">));<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//取到tar包的实际内容然后通过http输出<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">header</span><span style="color: #007700">(</span><span style="color: #DD0000">"Cache-Control:&nbsp;no-cache,&nbsp;must-revalidate"</span><span style="color: #007700">);&nbsp;</span><span style="color: #FF8000">//&nbsp;HTTP/1.1<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">header</span><span style="color: #007700">(</span><span style="color: #DD0000">"Expires:&nbsp;Mon,&nbsp;26&nbsp;Jul&nbsp;1997&nbsp;05:00:00&nbsp;GMT"</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">header</span><span style="color: #007700">(</span><span style="color: #DD0000">'Content-type:&nbsp;application/octet-stream'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">header</span><span style="color: #007700">(</span><span style="color: #DD0000">'Content-type:&nbsp;application/force-download'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">header</span><span style="color: #007700">(</span><span style="color: #DD0000">'Content-Disposition:&nbsp;attachment;&nbsp;filename="'</span><span style="color: #007700">.</span><span style="color: #0000BB">$name</span><span style="color: #007700">.</span><span style="color: #DD0000">'.tgz"'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$tar</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getTar</span><span style="color: #007700">(</span><span style="color: #DD0000">'output'</span><span style="color: #007700">);&nbsp;</span><span style="color: #FF8000">//生成实际的tar包文件,&nbsp;并且输出&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">chdir</span><span style="color: #007700">(</span><span style="color: #0000BB">$workdir</span><span style="color: #007700">);&nbsp;</span><span style="color: #FF8000">//打包完成后切到打包前的工作目录<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">...<br /><br />}<br /><br /></span>
+</span>
+</code></div>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">功能描述</a>
+    <li><a href="#id2" class="reference internal">应用场景</a>
+    <li><a href="#id3" class="reference internal">属性</a>
+        <ul>
+        <li><a href="#id4" class="reference internal">解包时专用属性</a>
+            <ul>
+            <li><a href="#id5" class="reference internal">filename</a>
+            <li><a href="#id6" class="reference internal">tar_file</a>
+        </ul>
+        <li><a href="#id7" class="reference internal">公用属性</a>
+            <ul>
+            <li><a href="#id8" class="reference internal">files</a>
+        </ul>
+        <li><a href="#id9" class="reference internal">directories</a>
+        <li><a href="#id10" class="reference internal">numFiles</a>
+        <li><a href="#id11" class="reference internal">numDirectories</a>
+    </ul>
+    <li><a href="#id12" class="reference internal">函数接口</a>
+        <ul>
+        <li><a href="#id13" class="reference internal">openTAR</a>
+        <li><a href="#id14" class="reference internal">closeTAR</a>
+        <li><a href="#id15" class="reference internal">appendTar</a>
+        <li><a href="#id16" class="reference internal">getFile</a>
+        <li><a href="#id17" class="reference internal">getContents</a>
+        <li><a href="#id18" class="reference internal">getDirectory</a>
+        <li><a href="#id19" class="reference internal">containsFile</a>
+        <li><a href="#id20" class="reference internal">containsDirectory</a>
+        <li><a href="#id21" class="reference internal">addDirectory</a>
+        <li><a href="#id22" class="reference internal">addFile</a>
+        <li><a href="#id23" class="reference internal">removeFile</a>
+        <li><a href="#id24" class="reference internal">removeDirectory</a>
+        <li><a href="#id25" class="reference internal">saveTar</a>
+        <li><a href="#id26" class="reference internal">getTar</a>
+        <li><a href="#id27" class="reference internal">toTar</a>
+        <li><a href="#id28" class="reference internal">gzcompressfile</a>
+    </ul>
+    <li><a href="#id29" class="reference internal">几个例子</a>
+        <ul>
+        <li><a href="#id30" class="reference internal">解包 - 安装模板</a>
+        <li><a href="#id31" class="reference internal">打包 -</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">常用类库</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="base_xml.html"
+                                  title="下一章">xml工具类 - base_xml</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="base_xml.html" title="xml工具类 - base_xml" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="常用类库" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">常用类库</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

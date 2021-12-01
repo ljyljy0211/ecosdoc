@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      site路由处理类 - site_router &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="优雅的前端- site" href="index.html" />
+
+        <link rel="next" title="template" href="模板机制.html" />
+        <link rel="prev" title="site_controller" href="site_controller控制器基类.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="template.html" title="模板机制" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="site_controller.html" title="site_controller控制器基类" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">优雅的前端- site</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> site路由处理类 - site_router</h1>
+            
+<p><a href="http://www.ec-os.net/advance/base/mvc/c/base.html#id1">前置学习路由调用流程和base_router</a></p>
+
+<p>以b2c为例</p>
+<h2><a name="id1">调用流程</a></h2>
+<p>此url为PHPINFO解析后的url</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/site_router.jpg" /></p>
+<h2><a name="id2">sitemap</a></h2>
+<p>在sdb_site_modules数据库保存所有在site.xml中定义的controller,在site_router的构造函数中会获取到所有的记录</p>
+
+<p>用以判断URL传过来的控制器是否真是存在</p>
+<h2><a name="id3">site路由规则</a></h2>
+<p>index.php/控制器-方法-参数1-...-参数N.html</p>
+<pre>index.php/passport-error.html
+
+调用的是：passport这个控制器的error方法
+</pre><h2><a name="id4">site静态路由</a></h2>
+<p>在后台站点中可以设置静态路由，可以自定路由规则</p>
+<h2><a name="id5">重新构造路由规则</a></h2>
+<p>这个重新构造路由规则是在继承site的情况下的一个重新构造，(index.php/控制器-自定义.html)这个控制器位置不能变。</p>
+
+<ul>
+<li>首先注册service</li>
+</ul>
+
+<p>service id是 site_router.$app。$app表示所要重新构造的app_id<pre>&lt;service id=&quot;site_router.content&quot;&gt;
+    &lt;class&gt;content_service_router&lt;/class&gt;
+&lt;/service&gt;
+</pre></p>
+
+<ul>
+<li>写router类</li>
+</ul>
+
+<p>根据注册的service写好router类</p>
+
+<p>一般需要重构的是gen_url和dispatch两个方法<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">/**<br />&nbsp;*&nbsp;ShopEx&nbsp;licence<br />&nbsp;*<br />&nbsp;*&nbsp;@copyright&nbsp;&nbsp;Copyright&nbsp;(c)&nbsp;2005-2010&nbsp;ShopEx&nbsp;Technologies&nbsp;Inc.&nbsp;(http://www.shopex.cn)<br />&nbsp;*&nbsp;@license&nbsp;&nbsp;http://ecos.shopex.cn/&nbsp;ShopEx&nbsp;License<br />&nbsp;*/<br /><br /><br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">content_service_router<br /></span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;private&nbsp;</span><span style="color: #0000BB">$_enable&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">__construct</span><span style="color: #007700">()<br />&nbsp;&nbsp;&nbsp;&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">_enable&nbsp;</span><span style="color: #007700">=&nbsp;(</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'content'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">getConf</span><span style="color: #007700">(</span><span style="color: #DD0000">'base.use_node_path_url'</span><span style="color: #007700">)&nbsp;==&nbsp;</span><span style="color: #DD0000">'true'</span><span style="color: #007700">)&nbsp;?&nbsp;</span><span style="color: #0000BB">true&nbsp;</span><span style="color: #007700">:&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}</span><span style="color: #FF8000">//End&nbsp;Function<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">function&nbsp;</span><span style="color: #0000BB">enable</span><span style="color: #007700">()<br />&nbsp;&nbsp;&nbsp;&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">_enable</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}</span><span style="color: #FF8000">//End&nbsp;Function<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">public&nbsp;function&nbsp;</span><span style="color: #0000BB">gen_url</span><span style="color: #007700">(</span><span style="color: #0000BB">$params&nbsp;</span><span style="color: #007700">=&nbsp;array())<br />&nbsp;&nbsp;&nbsp;&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$base_url&nbsp;</span><span style="color: #007700">.&nbsp;((</span><span style="color: #0000BB">$params</span><span style="color: #007700">[</span><span style="color: #DD0000">'real'</span><span style="color: #007700">]==</span><span style="color: #DD0000">'true'</span><span style="color: #007700">)&nbsp;?&nbsp;</span><span style="color: #0000BB">$url&nbsp;</span><span style="color: #007700">:&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'site_router'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">parse_route_static_genurl</span><span style="color: #007700">(</span><span style="color: #0000BB">$url</span><span style="color: #007700">));<br />&nbsp;&nbsp;&nbsp;&nbsp;}</span><span style="color: #FF8000">//End&nbsp;Function<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">public&nbsp;function&nbsp;</span><span style="color: #0000BB">dispatch</span><span style="color: #007700">(</span><span style="color: #0000BB">$query</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$allow_name</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$separator</span><span style="color: #007700">)<br />&nbsp;&nbsp;&nbsp;&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//$query：去除静态路由后的url,$allow_name：控制器的名字,$separator：连接符号<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//可以自己直接参照default_dispatch进行解析<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//如果不复杂可以把参数做解析成default_dispatch的参数在调用site_router<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">...<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'site_router'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">default_dispatch</span><span style="color: #007700">(</span><span style="color: #0000BB">$query</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$allow_name</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$separator</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}</span><span style="color: #FF8000">//End&nbsp;Function<br /><br /></span><span style="color: #007700">}/<br /></span>
+</span>
+</code></div></p>
+<h2><a name="id6">site_router方法</a></h2><h3><a name="id7">dispatch</a></h3>
+<p>根据传入的PHPINFO调用对应的控制器并且控制页面的输出</p>
+<h3><a name="id8">gen_url</a></h3>
+<p>拼接使用本路由的URL地址</p>
+<pre>$this-&gt;gen_url(array('app'=&gt;'b2c','ctl'=&gt;'members','act'=&gt;'index'));
+</pre>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">调用流程</a>
+    <li><a href="#id2" class="reference internal">sitemap</a>
+    <li><a href="#id3" class="reference internal">site路由规则</a>
+    <li><a href="#id4" class="reference internal">site静态路由</a>
+    <li><a href="#id5" class="reference internal">重新构造路由规则</a>
+    <li><a href="#id6" class="reference internal">site_router方法</a>
+        <ul>
+        <li><a href="#id7" class="reference internal">dispatch</a>
+        <li><a href="#id8" class="reference internal">gen_url</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="site_controller.html"
+                                  title="上一章">site_controller控制器基类</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="template.html"
+                                  title="下一章">模板机制</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="template.html" title="模板机制" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="site_controller.html" title="site_controller控制器基类" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">优雅的前端- site</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

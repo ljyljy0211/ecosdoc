@@ -1,0 +1,711 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      性能调优(lnmp) &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="ecstore2.0部署文档" href="index.html" />
+
+        <link rel="next" title="crontab" href="ecstore2.0 服务器crontab配置.html" />
+        <link rel="prev" title="lnmp/index" href="linux单机部署.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="crontab.html" title="ecstore2.0 服务器crontab配置" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="lnmp/index.html" title="linux单机部署" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore2.0部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 性能调优(lnmp)</h1>
+            
+<p>注:以下命令不要照搬</p>
+<h2><a name="id1">linux调优</a></h2><h3><a name="id2">cpu调优</a></h3>
+<ul>
+<li>停止打印服务<pre>  $ /etc/rc.d/init.d/cups stop
+  $ chkconfig --list cups 确认是否关闭
+</pre></li>
+</ul>
+
+<ul>
+<li>关闭不需要的tty (这里默认留下2个tty)
+<ul>
+<li>centos 5<pre class="mark">    修改 /etc/inittab
+    注释掉 tty3,tty4,tty5,tty6对应行
+</pre><pre>    $ initq
+</pre>
+<li>centos 6<pre class="mark">    修改 /etc/init/start-ttys.conf 和 /etc/sysconfig/init
+
+    找到 tty[1-6] 改为 tty[1-2],即只启动2个TTY
+</pre><pre>    #关闭指定终端：
+    $ initctl stop tty TTY=/dev/ttyn
+    #这里n为3，4，5，6
+</pre><pre>    #踢出指定终端用户：
+    $ pkill -kill -t ttyn
+    #这里n为3，4，5，6,
+</pre></li>
+</li>
+</ul>
+</li>
+</ul>
+<h3><a name="id3">内存调优</a></h3></ul>
+
+<ul>
+<li>调整linux 文件描述符大小
+<p>使用ulimit -a 可以查看当前系统的所有限制值，使用ulimit -n 可以查看当前的最大打开文件数,新装的linux 默认只有1024<pre>  $ vim /etc/rc.local
+  ulimit -SHn 65535
+</pre><pre>  #修改对应文件，看是否存在以下行数据，或者对应的数量不对的则对照修改
+
+  $ vim /etc/security/limits.conf
+  *                soft    nproc          65535
+  *                hard    nproc          65535
+  *                soft    nofile         65535
+  *                hard    nofile         65535
+</pre><pre>  $ vim /etc/security/limits.d/90-nproc.conf
+  *          soft    nproc     65535
+</pre></p>
+</li>
+</ul>
+<h3><a name="id4">磁盘调优</a></h3>
+<ul>
+<li>修改shell命令的history 记录个数<pre>  $ vim /etc/profile
+
+  HISTSIZE=100
+</pre></li>
+</ul>
+
+<ul>
+<li>优化写磁盘操作。禁止写入atime时间.优化IO性能,一般设置你的php代码区,如/data/httpd/为数据分区,<pre>  $ vim /etc/fstab
+  /dev/sda5 /data/httpd ext3 noatime,nodiratime 0 0
+  #磁盘和目录对应你自己的机器分区
+</pre></li>
+</ul>
+<h3><a name="id5">网络调优</a></h3>
+<ul>
+<li>优化内核TCP参数<pre>  $ vim /etc/sysctl.conf
+
+  net.ipv4.tcp_fin_timeout = 30
+  net.ipv4.tcp_keepalive_time = 1200
+  net.ipv4.tcp_syncookies = 1
+  net.ipv4.tcp_tw_reuse = 1
+  net.ipv4.tcp_tw_recycle = 1
+  net.ipv4.ip_local_port_range = 1024 65000
+  net.ipv4.tcp_max_syn_backlog = 262144
+  net.ipv4.tcp_max_tw_buckets = 6000
+  net.core.somaxconn = 262144
+  net.core.netdev_max_backlog = 262144
+  net.ipv4_tcp_max_orphans = 262144
+  net.ipv4.tcp_timestamps = 0
+  net.ipv4.tcp_synack_retries = 1
+  net.ipv4.tcp_syn_retries = 1
+
+   $ sysctl -p
+</pre></li>
+</ul>
+
+<ul>
+<li>对TCP/IP网络参数进行调整<pre>    $ echo 'net.ipv4.tcp_syncookies = 1' &gt;&gt; /etc/sysctl.conf
+    $ sysctl -p
+</pre></li>
+</ul>
+
+<ul>
+<li>定时校正服务器时间<pre>  $ yum install ntp
+  $ crontab -e
+  */5 * * * * ntpdate ntp.api.bz
+</pre></li>
+</ul>
+
+<ul>
+<li>停止ipv6<pre>  $ ifconfig -a
+  $ vim /etc/modprobe.conf
+  alias net -pf -10 off
+  alias ipv6 off
+  $ echo &quot;IPV6INIT = no &quot; &gt;&gt; /etc/sysconfig/network-scripts/ifconfig-eth0
+  $ shutdown -r now 
+</pre></li>
+</ul>
+<h2><a name="id6">nginx 调优</a></h2><h3><a name="id7">关闭访问日志</a></h3>
+<p>关闭Nginx的访问日志，如果确实需要记录日志，那么可以根据实际需要有选择的记录部分日志，Nginx的访问日志可以具体到“区段”级别。</p>
+
+<p>在Nginx中区段有：http\server\location等，可以在这些区段中适当地配置日志记录</p>
+<h3><a name="id8">nginx配置项说明</a></h3>
+<p># 定义了nginx对外提供web服务时的worder进程数。</p>
+
+<p># 最优值取决于许多因素，包括（但不限于）CPU核的数量、存储数据的硬盘数量及负载模式。</p>
+
+<p># 不能确定的时候，将其设置为可用的CPU内核数将是一个好的开始（设置为“auto”将尝试自动检测它）。</p>
+
+<p># 一般建议按照cpu 数目来指定，一般为它的倍数。<pre class="mark">  worker_processes  8;
+</pre></p>
+
+<p># 为每个进程分配cpu，上例中将8 个进程分配到8 个cpu，当然可以写多个，或者将一个进程分配到多个cpu。<pre class="mark">  worker_cpu_affinity 00000001 00000010 00000100 00001000 00010000 00100000 01000000 10000000;
+</pre></p>
+
+<p># 这个指令是指当一个nginx 进程打开的最多文件描述符数目，理论值应该是最多打开文件数（ulimit -n）与nginx 进程数相除，</p>
+
+<p># 但是nginx 分配请求并不是那么均匀，所以最好与ulimit-n 的值保持一致</p>
+
+<p># 设置可由一个worker进程同时打开的最大连接数。</p>
+
+<p># 如果设置了上面提到的worker_rlimit_nofile，我们可以将这个值设得很高。</p>
+
+<p># 记住，最大客户数也由系统的可用socket连接数限制（~ 64K），所以设置不切实际的高没什么好处<pre class="mark">  worker_connections 65535;
+</pre></p>
+
+<p># 这是在Linux下必选的模型，但是epoll只能使用于linux内核2.6版本及以后的系统，对于我们现在使用的linux系统，这不是问题。</p>
+
+<p># (epoll是Linux内核为处理大批量句柄而作了改进的poll，是Linux下多路复用IO接口select/poll的增强版本，</p>
+
+<p># 它能显著减少程序在大量并发连接中只有少量活跃的情况下的系统CPU利用率。）<pre class="mark">  use epoll;
+</pre></p>
+
+<p># multi_accept 告诉nginx收到一个新连接通知后接受尽可能多的连接。<pre class="mark">  multi_accept on;
+</pre></p>
+
+<p># server_tokens  并不会让nginx执行的速度更快，但它可以关闭在错误页面中的nginx版本数字，这样对于安全性是有好处的。server_tokens on;</p>
+
+<p># keepalive_timeout  给客户端分配keep-alive链接超时时间。</p>
+
+<p># 服务器将在这个超时时间过后关闭链接。我们将它设置低些可以让ngnix持续工作的时间更长。<pre class="mark">  keepalive_timeout 60;
+</pre></p>
+
+<p>#client_header_timeout 和client_body_timeout 设置请求头和请求体(各自)的超时时间。</p>
+
+<p>#我们也可以把这个设置低些。<pre class="mark">  client_header_timeout 10; 
+  client_body_timeout 10; 
+</pre></p>
+
+<p># reset_timeout_connection 告诉nginx关闭不响应的客户端连接。</p>
+
+<p># 这将会释放那个客户端所占有的内存空间。<pre class="mark">  reset_timedout_connection on;
+</pre></p>
+
+<p># send_timeout 指定客户端的响应超时时间。</p>
+
+<p># 这个设置不会用于整个转发器，而是在两次客户端读取操作之间。</p>
+
+<p># 如果在这段时间内，客户端没有读取任何数据，nginx就会关闭连接。send_timeout 10;</p>
+
+<p># limit_conn_zone 设置用于保存各种key（比如当前连接数）的共享内存的参数。</p>
+
+<p># 5m就是5兆字节，这个值应该被设置的足够大以存储（32K*5）32byte状态或者（16K*5）64byte状态。<pre class="mark">  limit_conn_zone $binary_remote_addr zone=addr:5m;
+</pre></p>
+
+<p># limit_conn 为给定的key设置最大连接数。</p>
+
+<p># 这里key是addr，我们设置的值是100，也就是说我们允许每一个IP地址最多同时打开有100个连接。<pre class="mark">  limit_conn addr 100;
+</pre></p>
+
+<p># include 只是一个在当前文件中包含另一个文件内容的指令。这里我们使用它来加载稍后会用到的一系列的MIME类型。<pre class="mark">  include /etc/nginx/mime.types;
+</pre></p>
+
+<p># default_type 设置文件使用的默认的MIME-type。<pre class="mark">  default_type text/html;
+</pre></p>
+
+<p># charset 设置我们的头文件中的默认的字符集<pre class="mark">  charset UTF-8;
+</pre></p>
+
+<p># 可以让sendfile()发挥作用。sendfile()可以在磁盘和TCP socket之间互相拷贝数据(或任意两个文件描述符)。</p>
+
+<p># Pre-sendfile是传送数据之前在用户空间申请数据缓冲区。</p>
+
+<p># 之后用read()将数据从文件拷贝到这个缓冲区，write()将缓冲区数据写入网络。</p>
+
+<p># sendfile()是立即将数据从磁盘读到OS缓存。</p>
+
+<p># 因为这种拷贝是在内核完成的，sendfile()要比组合read()和write()以及打开关闭丢弃缓冲更加有效(更多有关于sendfile)。<pre class="mark">  sendfile on;
+</pre></p>
+
+<p># tcp_nopush 告诉nginx在一个数据包里发送所有头文件，而不一个接一个的发送。<pre class="mark">  tcp_nopush on;
+</pre></p>
+
+<p># tcp_nodelay 告诉nginx不要缓存数据，而是一段一段的发送--</p>
+
+<p># 当需要及时发送数据时，就应该给应用设置这个属性，这样发送一小块数据信息时就不能立即得到返回值。<pre class="mark">  tcp_nodelay on;
+</pre></p>
+
+<p>#access_log 设置nginx是否将存储访问日志。关闭这个选项可以让读取磁盘IO操作更快(aka,YOLO)</p>
+
+<p>#error_log 告诉nginx只能记录严重的错误：<pre class="mark">  access_log off;
+</pre></p>
+
+<p># 客户端请求头部的缓冲区大小，这个可以根据你的系统分页大小来设置，</p>
+
+<p># 一般一个请求头的大小不会超过1k，不过由于一般系统分页都要大于1k，所以这里设置为分页大小。</p>
+
+<p># 分页大小可以用命令getconf PAGESIZE 取得。该值必须设置为“系统分页大小”的整倍数<pre class="mark">  client_header_buffer_size 8k;
+</pre></p>
+
+<p># 与ulimit -n的值保持一致。</p>
+
+<p># 更改worker进程的最大打开文件数限制。如果没设置的话，这个值为操作系统的限制。</p>
+
+<p># 设置后你的操作系统和Nginx可以处理比“ulimit -a”更多的文件，所以把这个值设高，这样nginx就不会有“too many open files”问题了。<pre class="mark">  worker_rlimit_nofile 65535;
+</pre></p>
+
+<p># gzip 是告诉nginx采用gzip压缩的形式发送数据。这将会减少我们发送的数据量。</p>
+
+<p># gzip_disable 为指定的客户端禁用gzip功能。我们设置成IE6或者更低版本以使我们的方案能够广泛兼容。</p>
+
+<p># gzip_static 告诉nginx在压缩资源之前，先查找是否有预先gzip处理过的资源。这要求你预先压缩你的文件（在这个例子中被注释掉了），从而允许你使用最高压缩比，这样nginx就不用再压缩这些文件了（想要更详尽的gzip_static的信息，请点击这里）。</p>
+
+<p># gzip_proxied 允许或者禁止压缩基于请求和响应的响应流。我们设置为any，意味着将会压缩所有的请求。</p>
+
+<p># gzip_min_length 设置对数据启用压缩的最少字节数。如果一个请求小于1000字节，我们最好不要压缩它，因为压缩这些小的数据会降低处理此请求的所有进程的速度。</p>
+
+<p># gzip_comp_level 设置数据的压缩等级。这个等级可以是1-9之间的任意数值，9是最慢但是压缩比最大的。我们设置为4，这是一个比较折中的设置。</p>
+
+<p># gzip_type 设置需要压缩的数据格式。上面例子中已经有一些了，你也可以再添加更多的格式。<pre class="mark">  gzip on;
+  gzip_disable &quot;msie6&quot;;
+  # gzip_static on;
+  gzip_proxied any;
+  gzip_min_length 1000;
+  gzip_comp_level 4;
+  gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+</pre></p>
+
+<p># open_file_cache 打开缓存的同时也指定了缓存最大数目，以及缓存的时间。</p>
+
+<p># 我们可以设置一个相对高的最大时间，这样我们可以在它们不活动超过20秒后清除掉。</p>
+
+<p># open_file_cache_valid 在open_file_cache中指定检测正确信息的间隔时间。</p>
+
+<p># open_file_cache_min_uses 定义了open_file_cache中指令参数不活动时间期间里最小的文件数。</p>
+
+<p># open_file_cache_errors 指定了当搜索一个文件时是否缓存错误信息，也包括再次给配置中添加文件。</p>
+
+<p># 我们也包括了服务器模块，这些是在不同文件中定义的。</p>
+
+<p># 如果你的服务器模块不在这些位置，你就得修改这一行来指定正确的位置。<pre class="mark">  cache informations about file descriptors, frequently accessed files 
+  # can boost performance, but you need to test those values 
+  open_file_cache max=100000 inactive=20s; 
+  open_file_cache_valid 30s; 
+  open_file_cache_min_uses 2; 
+  open_file_cache_errors on; 
+  ## 
+  # Virtual Host Configs 
+  # aka our settings for specific servers 
+  ## 
+  include /etc/nginx/conf.d/*.conf; 
+  include /etc/nginx/sites-enabled/*; 
+</pre></p>
+<h3><a name="id9">一个参考配置</a></h3><pre class="mark">user www www;
+pid /var/run/nginx.pid;
+worker_processes 8;
+worker_cpu_affinity 00000001 00000010 00000100 00001000 00010000 00100000 01000000 10000000;
+worker_rlimit_nofile 65535;
+ 
+events {
+    worker_connections 65535;
+    multi_accept on;
+    use epoll;
+}
+ 
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    server_tokens off;
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+ 
+    access_log off;
+    error_log /var/log/nginx/error.log crit;
+ 
+    keepalive_timeout 10;
+    client_header_timeout 10;
+    client_body_timeout 10;
+    reset_timedout_connection on;
+    send_timeout 10;
+ 
+    limit_conn_zone $binary_remote_addr zone=addr:5m;
+    limit_conn addr 100;
+ 
+ 
+    gzip on;
+    gzip_disable&quot;msie6&quot;;
+    gzip_http_version  1.1;
+    gzip_proxied any;
+    gzip_min_length 1k;
+    gzip_comp_level 4;
+    gzip_buffers   4 8k;
+    gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml text/javascript;
+
+
+    open_file_cache max=65535 inactive=20s;
+    open_file_cache_valid 30s;
+    open_file_cache_min_uses 2;
+
+    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/sites-enabled/*;
+}
+</pre><h2><a name="id10">php 调优 (php 5.3)</a></h2><h3><a name="id11">基本原则</a></h3>
+<ul>
+<li>尽量少安装PHP模块，最简单是最好（快）的
+<li>安装php opcode加速器，如apc，xcache等
+<li>socket连接FastCGI，/dev/shm是内存文件系统，socket放在内存中肯定会快些
+<p>修改 php-fpm.conflisten = 127.0.0.1:9000改为:listen = /var/run/php.socket修改nginx 的php-fpm 转发配置中的fastcgi_pass   127.0.0.1:9000;改为:fastcgi_pass unix:/var/run/php.socket;
+<li>/usr/localphp/etc/php-fpm.conf重要优化参数详解：</li>
+</p>
+</li>
+</li>
+</li>
+</ul>
+
+<p># pm参数指定了进程管理方式，有两种可供选择：static或dynamic，从字面意思不难理解，为静态或动态方式。# 如果是静态方式，那么在php-fpm启动的时候就创建了指定数目的进程，在运行过程中不会再有变化(并不是真的就永远不变)；# 而动态的则在运行过程中动态调整，当然并不是无限制的创建新进程，受pm.max_spare_servers参数影响；# 动态适合小内存机器，灵活分配进程，省内存。静态适用于大内存机器，动态创建回收进程对服务器资源也是一种消耗<pre class="mark">pm = dynamic
+</pre># static模式下创建的子进程数或dynamic模式下同一时刻允许最大的php-fpm子进程数量# 一般php-fpm进程占用20~30m左右的内存就按30m算。# 如果单独跑php-fpm，动态方式起始值可设置物理内存Mem/30M，由于大家一般Nginx、MySQL或者memcached等都在一台机器上，即php-fpm进程数为 剩余内存$Mem/30。<pre class="mark">pm.max_children = 30
+</pre># Default Value: min_spare_servers + (max_spare_servers - min_spare_servers) / 2# 动态方式下的起始php-fpm进程数量<pre class="mark">pm.start_servers = 20
+</pre># 动态方式下服务器空闲时最小php-fpm进程数量<pre class="mark">pm.min_spare_servers = 5
+</pre># 动态方式下服务器空闲时最大php-fpm进程数量# 一般php-fpm进程占用20~30m左右的内存就按30m算。# 如果单独跑php-fpm，动态方式起始值可设置物理内存Mem/30M，由于大家一般Nginx、MySQL都在一台机器上，# 于是预留一半给它们，即php-fpm进程数为$Mem/2/30。<pre class="mark">pm.max_spare_servers = 35
+</pre></p>
+<h2><a name="id12">mysql 调优(mysql 5.6)</a></h2>
+<ul>
+<li>不要开启ecstore的 mysql永久连接</li>
+</ul>
+
+<ul>
+<li>my.cnf 配置解析
+<p>[client]port = 3306socket = /tmp/mysql.sock</p>
+</li>
+</ul>
+
+<p>[mysqld]port = 3306socket = /tmp/mysql.sock</p>
+
+<p>basedir = /usr/local/mysqldatadir = /data/mysqlpid-file = /data/mysql/mysql.piduser = mysqlbind-address = 0.0.0.0server-id = 1 #表示是本机的序号为1,一般来讲就是master的意思</p>
+
+<p># 禁止MySQL对外部连接进行DNS解析，使用这一选项可以消除MySQL进行DNS解析的时间。但需要注意，如果开启该选项，# 则所有远程主机连接授权都要使用IP地址方式，否则MySQL将无法正常处理连接请求<pre class="mark">#skip-name-resolve
+#skip-networking
+</pre></p>
+
+<p># MySQL能有的连接数量。当主要MySQL线程在一个很短时间内得到非常多的连接请求，这就起作用，# 然后主线程花些时间(尽管很短)检查连接并且启动一个新线程。back_log值指出在MySQL暂时停止回答新请求之前的短时间内多少个请求可以被存在堆栈中。# 如果期望在一个短时间内有很多连接，你需要增加它。也就是说，如果MySQL的连接数据达到max_connections时，新来的请求将会被存在堆栈中，# 以等待某一连接释放资源，该堆栈的数量即back_log，如果等待连接的数量超过back_log，将不被授予连接资源。# 另外，这值（back_log）限于您的操作系统对到来的TCP/IP连接的侦听队列的大小。# 你的操作系统在这个队列大小上有它自己的限制（可以检查你的OS文档找出这个变量的最大值），试图设定back_log高于你的操作系统的限制将是无效的。<pre class="mark">back_log = 600
+</pre></p>
+
+<p># MySQL的最大连接数，如果服务器的并发连接请求量比较大，建议调高此值，以增加并行连接数量，当然这建立在机器能支撑的情况下，因为如果连接数越多，介于MySQL会为每个连接提供连接缓冲区，就会开销越多的内存，所以要适当调整该值，不能盲目提高设值。可以过'conn%'通配符查看当前状态的连接数量，以定夺该值的大小。<pre class="mark">max_connections = 1000
+</pre></p>
+
+<p># 对于同一主机，如果有超出该参数值个数的中断错误连接，则该主机将被禁止连接。如需对该主机进行解禁，执行：FLUSH HOST。<pre class="mark">max_connect_errors = 6000
+</pre></p>
+
+<p># MySQL打开的文件描述符限制，默认最小1024;当open_files_limit没有被配置的时候，比较max_connections*5和ulimit -n的值，哪个大用哪个，# 当open_file_limit被配置的时候，比较open_files_limit和max_connections*5的值，哪个大用哪个。<pre class="mark">open_files_limit = 65535
+</pre></p>
+
+<p># MySQL每打开一个表，都会读入一些数据到table_open_cache缓存中，当MySQL在这个缓存中找不到相应信息时，才会去磁盘上读取。默认值64# 假定系统有200个并发连接，则需将此参数设置为200*N(N为每个连接所需的文件描述符数目)；# 当把table_open_cache设置为很大时，如果系统处理不了那么多文件描述符，那么就会出现客户端失效，连接不上当某一连接访问一个表时，MySQL会检查当前已缓存表的数量。如果该表已经在缓存中打开，则会直接访问缓存中的表，以加快查询速度；如果该表未被缓存，则会将当前的表添加进缓存并进行查询。（5.1.3之前这个值叫做table_cache），通过检查峰值时间的状态值 Open_tables 和 Opened_tables ，可以决定是否需要增加 table_open_cache 的值。如果发现open_tables等于 table_open_cache table_open_cache 的值。设置为512即可满足需求。<pre class="mark">table_open_cache = 128
+</pre></p>
+
+<p># 接受的数据包大小；增加该变量的值十分安全，这是因为仅当需要时才会分配额外内存。例如，仅当你发出长查询或MySQLd必须返回大的结果行时MySQLd才会分配更多内存。# 该变量之所以取较小默认值是一种预防措施，以捕获客户端和服务器之间的错误信息包，并确保不会因偶然使用大的信息包而导致内存溢出。<pre class="mark">max_allowed_packet = 4M
+</pre></p>
+
+<p># 一个事务，在没有提交的时候，产生的日志，记录到Cache中；等到事务提交需要提交的时候，则把日志持久化到磁盘。默认binlog_cache_size大小32K<pre class="mark">binlog_cache_size = 1M
+</pre></p>
+
+<p># 定义了用户可以创建的内存表(memory table)的大小。这个值用来计算内存表的最大行数值。这个变量支持动态改变<pre class="mark">max_heap_table_size = 8M
+</pre></p>
+
+<p># MySQL的heap（堆积）表缓冲大小。所有联合在一个DML指令内完成，并且大多数联合甚至可以不用临时表即可以完成。# 大多数临时表是基于内存的(HEAP)表。具有大的记录长度的临时表 (所有列的长度的和)或包含BLOB列的表存储在硬盘上。# 如果某个内部heap（堆积）表大小超过tmp_table_size，MySQL可以根据需要自动将内存中的heap表改为基于硬盘的MyISAM表。还可以通过设置tmp_table_size选项来增加临时表的大小。也就是说，如果调高该值，MySQL同时将增加heap表的大小，可达到提高联接查询速度的效果<pre class="mark">tmp_table_size = 16M
+</pre></p>
+
+<p># MySQL读入缓冲区大小。对表进行顺序扫描的请求将分配一个读入缓冲区，MySQL会为它分配一段内存缓冲区。read_buffer_size变量控制这一缓冲区的大小。# 如果对表的顺序扫描请求非常频繁，并且你认为频繁扫描进行得太慢，可以通过增加该变量值以及内存缓冲区大小提高其性能<pre class="mark">read_buffer_size = 2M
+</pre></p>
+
+<p># MySQL的随机读缓冲区大小。当按任意顺序读取行时(例如，按照排序顺序)，将分配一个随机读缓存区。进行排序查询时，# MySQL会首先扫描一遍该缓冲，以避免磁盘搜索，提高查询速度，如果需要排序大量数据，可适当调高该值。但MySQL会为每个客户连接发放该缓冲空间，所以应尽量适当设置该值，以避免内存开销过大<pre class="mark">read_rnd_buffer_size = 8M
+</pre></p>
+
+<p># MySQL执行排序使用的缓冲大小。如果想要增加ORDER BY的速度，首先看是否可以让MySQL使用索引而不是额外的排序阶段。# 如果不能，可以尝试增加sort_buffer_size变量的大小<pre class="mark">sort_buffer_size = 8M
+</pre></p>
+
+<p># 联合查询操作所能使用的缓冲区大小，和sort_buffer_size一样，该参数对应的分配内存也是每连接独享<pre class="mark">join_buffer_size = 8M
+</pre></p>
+
+<p># 这个值（默认8）表示可以重新利用保存在缓存中线程的数量，当断开连接时如果缓存中还有空间，那么客户端的线程将被放到缓存中，# 如果线程重新被请求，那么请求将从缓存中读取,如果缓存中是空的或者是新的请求，那么这个线程将被重新创建,如果有很多新的线程，# 增加这个值可以改善系统性能.通过比较Connections和Threads_created状态的变量，可以看到这个变量的作用。(–&gt;表示要调整的值)# 根据物理内存设置规则如下：# 1G  —&gt; 8# 2G  —&gt; 16# 3G  —&gt; 32# 大于3G  —&gt; 64<pre class="mark">thread_cache_size = 8
+</pre></p>
+
+<p>#MySQL的查询缓冲大小（从4.0.1开始，MySQL提供了查询缓冲机制）使用查询缓冲，MySQL将SELECT语句和查询结果存放在缓冲区中，# 今后对于同样的SELECT语句（区分大小写），将直接从缓冲区中读取结果。根据MySQL用户手册，使用查询缓冲最多可以达到238%的效率。# 通过检查状态值'Qcache_%'，可以知道query_cache_size设置是否合理：如果Qcache_lowmem_prunes的值非常大，则表明经常出现缓冲不够的情况，# 如果Qcache_hits的值也非常大，则表明查询缓冲使用非常频繁，此时需要增加缓冲大小；如果Qcache_hits的值不大，则表明你的查询重复率很低，# 这种情况下使用查询缓冲反而会影响效率，那么可以考虑不用查询缓冲。此外，在SELECT语句中加入SQL_NO_CACHE可以明确表示不使用查询缓冲<pre class="mark">query_cache_size = 8M
+</pre></p>
+
+<p>#指定单个查询能够使用的缓冲区大小，默认1M<pre class="mark">query_cache_limit = 2M
+</pre></p>
+
+<p>#指定用于索引的缓冲区大小，增加它可得到更好处理的索引(对所有读和多重写)，到你能负担得起那样多。如果你使它太大，# 系统将开始换页并且真的变慢了。对于内存在4GB左右的服务器该参数可设置为384M或512M。通过检查状态值Key_read_requests和Key_reads，# 可以知道key_buffer_size设置是否合理。比例key_reads/key_read_requests应该尽可能的低，# 至少是1:100，1:1000更好(上述状态值可以使用SHOW STATUS LIKE 'key_read%'获得)。注意：该参数值设置的过大反而会是服务器整体效率降低<pre class="mark">key_buffer_size = 4M
+</pre></p>
+
+<p># 分词词汇最小长度，默认4<pre class="mark">ft_min_word_len = 4
+</pre></p>
+
+<p># MySQL支持4种事务隔离级别，他们分别是：# READ-UNCOMMITTED, READ-COMMITTED, REPEATABLE-READ, SERIALIZABLE.# 如没有指定，MySQL默认采用的是REPEATABLE-READ，ORACLE默认的是READ-COMMITTED<pre class="mark">transaction_isolation = REPEATABLE-READ
+</pre></p>
+<pre class="mark">log_bin = mysql-bin
+binlog_format = mixed
+expire_logs_days = 30 #超过30天的binlog删除
+
+log_error = /data/mysql/mysql-error.log #错误日志路径
+slow_query_log = 1
+long_query_time = 1 #慢查询时间 超过1秒则为慢查询
+slow_query_log_file = /data/mysql/mysql-slow.log
+
+performance_schema = 0
+explicit_defaults_for_timestamp
+
+#lower_case_table_names = 1 #不区分大小写
+
+skip-external-locking #MySQL选项以避免外部锁定。该选项默认开启
+
+default-storage-engine = InnoDB #默认存储引擎
+</pre>
+<p># InnoDB为独立表空间模式，每个数据库的每个表都会生成一个数据空间# 独立表空间优点：# 1．每个表都有自已独立的表空间。# 2．每个表的数据和索引都会存在自已的表空间中。# 3．可以实现单表在不同的数据库中移动。# 4．空间可以回收（除drop table操作处，表空不能自已回收）# 缺点：# 单表增加过大，如超过100G# 结论：# 共享表空间在Insert操作上少有优势。其它都没独立表空间表现好。当启用独立表空间时，请合理调整：innodb_open_files<pre class="mark">innodb_file_per_table = 1
+</pre></p>
+
+<p># 限制Innodb能打开的表的数据，如果库里的表特别多的情况，请增加这个。这个值默认是300<pre class="mark">innodb_open_files = 500
+</pre></p>
+
+<p># InnoDB使用一个缓冲池来保存索引和原始数据, 不像MyISAM.# 这里你设置越大,你在存取表里面数据时所需要的磁盘I/O越少.# 在一个独立使用的数据库服务器上,你可以设置这个变量到服务器物理内存大小的80%# 不要设置过大,否则,由于物理内存的竞争可能导致操作系统的换页颠簸.# 注意在32位系统上你每个进程可能被限制在 2-3.5G 用户层面内存限制,# 所以不要设置的太高.<pre class="mark">innodb_buffer_pool_size = 64M
+</pre></p>
+
+<p># innodb使用后台线程处理数据页上的读写 I/O(输入输出)请求,根据你的 CPU 核数来更改,默认是4# 注:这两个参数不支持动态改变,需要把该参数加入到my.cnf里，修改完后重启MySQL服务,允许值的范围从 1-64<pre class="mark">innodb_write_io_threads = 4
+innodb_read_io_threads = 4
+</pre></p>
+
+<p># 默认设置为 0,表示不限制并发数，这里推荐设置为0，更好去发挥CPU多核处理能力，提高并发量<pre class="mark">innodb_thread_concurrency = 0
+</pre></p>
+
+<p># InnoDB中的清除操作是一类定期回收无用数据的操作。在之前的几个版本中，清除操作是主线程的一部分，这意味着运行时它可能会堵塞其它的数据库操作。# 从MySQL5.5.X版本开始，该操作运行于独立的线程中,并支持更多的并发数。用户可通过设置innodb_purge_threads配置参数来选择清除操作是否使用单# 独线程,默认情况下参数设置为0(不使用单独线程),设置为 1 时表示使用单独的清除线程。建议为1<pre class="mark">innodb_purge_threads = 1
+</pre></p>
+
+<p># 0：如果innodb_flush_log_at_trx_commit的值为0,log buffer每秒就会被刷写日志文件到磁盘，提交事务的时候不做任何操作（执行是由mysql的master thread线程来执行的。# 主线程中每秒会将重做日志缓冲写入磁盘的重做日志文件(REDO LOG)中。不论事务是否已经提交）默认的日志文件是ib_logfile0,ib_logfile1# 1：当设为默认值1的时候，每次提交事务的时候，都会将log buffer刷写到日志。# 2：如果设为2,每次提交事务都会写日志，但并不会执行刷的操作。每秒定时会刷到日志文件。要注意的是，并不能保证100%每秒一定都会刷到磁盘，这要取决于进程的调度。# 每次事务提交的时候将数据写入事务日志，而这里的写入仅是调用了文件系统的写入操作，而文件系统是有 缓存的，所以这个写入并不能保证数据已经写入到物理磁盘# 默认值1是为了保证完整的ACID。当然，你可以将这个配置项设为1以外的值来换取更高的性能，但是在系统崩溃的时候，你将会丢失1秒的数据。# 设为0的话，mysqld进程崩溃的时候，就会丢失最后1秒的事务。设为2,只有在操作系统崩溃或者断电的时候才会丢失最后1秒的数据。InnoDB在做恢复的时候会忽略这个值。# 总结# 设为1当然是最安全的，但性能页是最差的（相对其他两个参数而言，但不是不能接受）。如果对数据一致性和完整性要求不高，完全可以设为2，如果只最求性能，例如高并发写的日志服务器，设为0来获得更高性能<pre class="mark">innodb_flush_log_at_trx_commit = 2
+</pre></p>
+
+<p># 此参数确定些日志文件所用的内存大小，以M为单位。缓冲区更大能提高性能，但意外的故障将会丢失数据。MySQL开发人员建议设置为1－8M之间<pre class="mark">innodb_log_buffer_size = 2M
+</pre></p>
+
+<p># 此参数确定数据日志文件的大小，更大的设置可以提高性能，但也会增加恢复故障数据库所需的时间<pre class="mark">innodb_log_file_size = 32M
+</pre></p>
+
+<p># 为提高性能，MySQL可以以循环方式将日志文件写到多个文件。推荐设置为3<pre class="mark">innodb_log_files_in_group = 3
+</pre></p>
+
+<p># innodb主线程刷新缓存池中的数据，使脏数据比例小于90%<pre class="mark">innodb_max_dirty_pages_pct = 90
+</pre></p>
+
+<p># InnoDB事务在被回滚之前可以等待一个锁定的超时秒数。InnoDB在它自己的锁定表中自动检测事务死锁并且回滚事务。InnoDB用LOCK TABLES语句注意到锁定设置。默认值是50秒<pre class="mark">innodb_lock_wait_timeout = 120 
+</pre></p>
+
+<p># 批量插入缓存大小， 这个参数是针对MyISAM存储引擎来说的。适用于在一次性插入100-1000+条记录时， 提高效率。默认值是8M。可以针对数据量的大小，翻倍增加。<pre class="mark">bulk_insert_buffer_size = 8M
+</pre></p>
+
+<p>myisam_sort_buffer_size = 8M# MyISAM设置恢复表之时使用的缓冲区的尺寸，当在REPAIR TABLE或用CREATE INDEX创建索引或ALTER TABLE过程中排序 MyISAM索引分配的缓冲区</p>
+
+<p># 如果临时文件会变得超过索引，不要使用快速排序索引方法来创建一个索引。注释：这个参数以字节的形式给出<pre class="mark">myisam_max_sort_file_size = 10G
+</pre></p>
+
+<p># 如果该值大于1，在Repair by sorting过程中并行创建MyISAM表索引(每个索引在自己的线程内)<pre class="mark">myisam_repair_threads = 1
+</pre></p>
+
+<p># 服务器关闭交互式连接前等待活动的秒数。交互式客户端定义为在mysql_real_connect()中使用CLIENT_INTERACTIVE选项的客户端。默认值：28800秒（8小时）<pre class="mark">interactive_timeout = 28800
+</pre></p>
+
+<p># 服务器关闭非交互连接之前等待活动的秒数。在线程启动时，根据全局wait_timeout值或全局interactive_timeout值初始化会话wait_timeout值，# 取决于客户端类型(由mysql_real_connect()的连接选项CLIENT_INTERACTIVE定义)。参数默认值：28800秒（8小时）# MySQL服务器所支持的最大连接数是有上限的，因为每个连接的建立都会消耗内存，因此我们希望客户端在连接到MySQL Server处理完相应的操作后，# 应该断开连接并释放占用的内存。如果你的MySQL Server有大量的闲置连接，他们不仅会白白消耗内存，而且如果连接一直在累加而不断开，# 最终肯定会达到MySQL Server的连接上限数，这会报'too many connections'的错误。对于wait_timeout的值设定，应该根据系统的运行情况来判断。# 在系统运行一段时间后，可以通过show processlist命令查看当前系统的连接状态，如果发现有大量的sleep状态的连接进程，则说明该参数设置的过大，# 可以进行适当的调整小些。要同时设置interactive_timeout和wait_timeout才会生效。<pre class="mark">wait_timeout = 28800
+</pre></p>
+<pre class="mark">[mysqldump]
+quick
+max_allowed_packet = 16M #服务器发送和接受的最大包长度
+
+[myisamchk]
+key_buffer_size = 8M
+sort_buffer_size = 8M
+read_buffer = 4M
+write_buffer = 4M
+</pre>
+<ul>
+<li>根据mysql运行状态调配参数
+<p><b> 查看MySQL服务器配置信息：</b><pre>show variables;
+</pre>查看MySQL服务器运行的各种状态值：<pre>show global status;
+</pre><b> 慢查询</b><pre>show variables like '%slow%';
+show global status like '%slow%';
+mysqldumpslow -s c -t 20 host -slow.log
+</pre>分析慢查询日志，找出有问题的SQL语句，慢查询时间不宜设置过长，否则意义不大，数据量不大的时候可以直接设为2s。</ul>
+
+<ol>
+<li>连接数</li>
+</ol>
+</li>
+</ul>
+
+<p>经常会遇见”MySQL: ERROR 1040: Too manyconnections” 的情况：一种是访问量确实很高，MySQL服务器抗不住，这个时候就要考虑增加从服务器分散读压力。一种情况是MySQL配置文件中max_connections值过小。查看最大连接数：<pre>show variables like 'max_connections';
+</pre>查看mysql服务器过去的最大连接数：<pre>show global status like 'max_used_connections';
+</pre>理想值：max_used_connections / max_connections * 100% ≈ 85%最大连接数占上限连接数的85%左右，如果发现比例在10%以下，MySQL服务器连接数上限设置的过高了。
+<ol>
+<li>key_buffer_sizekey_buffer_size是对MyISAM表性能影响最大的一个参数，不过数据库中多为Innodb查看key_buffer_size设置大小：<pre>show variables like 'key_buffer_size';
+</pre>查看key_buffer_size使用情况：<pre>show global status like 'key_read%';
+</pre>计算索引未命中缓存的概率：key_cache_miss_rate = Key_reads / Key_read_requests * 100%key_cache_miss_rate在0.1%以下都很好(每1000个请求有一个直接读硬盘)，如果key_cache_miss_rate在0.01%以下的话，key_buffer_size分配的过多，可以适当减少。
+<li>key_blocks_*参数<pre>show global status like 'key_blocks_u%';
+</pre>Key_blocks_unused：表示未使用的缓存簇(blocks)数Key_blocks_used：表示曾经用到的最大的blocks数理想值：Key_blocks_used / (Key_blocks_unused + Key_blocks_used) * 100% ≈ 80%
+<li>临时表当执行语句时，关于已经被创造了的隐含临时表的数量，查看命令：<pre>show global status like 'created_tmp%';
+</pre>每次创建表时Created_tmp_tables 都会增加，如果在磁盘上创建，Created_tmp_disk_tables也会增加，Created_tmp_files表示服务器创建的临时文件数理想值：Created_tmp_disk_tables / Created_tmp_tables * 100% ≤25%查看服务器对临时表的配置：<pre>show variables where variable_name in('tmp_table_size','max_heap_table_size');
+</pre>
+<li>打开表的情况<pre>show global status like 'open%tables%';
+</pre>open_tables 表示打开表的数量，opened_tables表示打开过的表数量，如果opened_tables数量过大，说明配置中 table_cache(5.1.3之后这个值叫做table_open_cache)值可能太小查询服务器table_cache值：<pre>show variables like 'table_open_cache';
+</pre>理想值：open_tables / opened_tables * 100% ≥ 85%理想值：open_tables / table_cache * 100% ≤95%
+<li>进程使用情况如果我们在MySQL服务器配置文件中设置了thread_cache_size，当客户端断开之后，服务器处理此客户的线程将会缓存起来以响应下一个客户而不是销毁（前提是缓存数未达上限）。Threads_created表示创建过的线程数：<pre>show global status like 'thread%';
+</pre>如果发现Threads_created值过大的话，表明 MySQL服务器一直在创建线程，这也是比较耗资源，可以适当增加配置文件中thread_cache_size值，查询服务器 thread_cache_size配置：<pre>show variables like 'thread_cache_size';
+</pre>
+<li>查询缓存(query cache)查看服务器query_cache配置情况：<pre>show variables like 'query_cache%';
+</pre>参数解释：query_cache_limit：超过此大小的查询将不缓存。query_cache_min_res_unit：缓存块的最小值。query_cache_size：查询缓存大小。query_cache_type：缓存类型，决定缓存什么样的查询。query_cache_wlock_invalidate：表示当前客户端，正在对MyISAM表进行写操作时，读请求是要等SRITE LOCK释放资源后再查询，还是允许直接从Query Cache中读取结果，默认为OFF（可以直接从Query Cache 中读取结果）。查看服务器query_cache使用情况：<pre>show global status like 'qcache%';
+</pre>参数解释：Qcache_free_blocks：缓存中相邻内存块的个数。数目大说明可能有碎片。FLUSH QUERY CACHE会对缓存中的碎片进行整理，从而得到一个空闲块。Qcache_free_memory：缓存中的空闲内存。Qcache_hits：每次查询在缓存中命中时就增大Qcache_inserts：每次插入一个查询时就增大。命中次数除以插入次数就是不中比率。Qcache_lowmem_prunes：缓存出现内存不足并且必须要进行清理以便为更多查询提供空间的次数。这个数字最好长时间来看；如果这个数字不断增长，表示可能碎片非常严重，或内存很少。Qcache_not_cached：不适合进行缓存的查询的数量，通常是由于这些查询不是 SELECT 语句或者用了now()之类的函数。Qcache_queries_in_cache：当前缓存的查询（和响应）的数量。Qcache_total_blocks：缓存中块的数量。
+<li>排序使用情况它表示系统中对数据进行排序时所使用Buffer，查看命令：<pre>show global status like 'sort%';
+</pre>增大sort_buffer_size 会减少Sort_merge_passes和创建临时文件的次数，但盲目增加并不一定能提高速度。
+<li>文件打开数当open_files大于open_files_limit值时，mysql数据库就会发生卡住的现象，导致web服务器打开不响应的页面。查看open_files命令：<pre>show global status like 'open_files';
+</pre>查看open_files_limit命令：<pre>show variables like 'open_files_limit';
+</pre>理想值：open_files / open_files_limit *100% ≤ 75%
+<li>Innodb_buffer_pool_size 的合理设置<pre>show status like 'Innodb_bufferpool_%';
+</pre>根据实际运行场景进行调整read 命中率:(Innodb_buffer_pool_read_requests - Innodb_buffer_pool_reads) /  Innodb_buffer_pool_read_requests = ?write 命中率:Innodb_buffer_pool_pages_data / Innodb_buffer_pool_pages_total</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ol>
+</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">linux调优</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">cpu调优</a>
+        <li><a href="#id3" class="reference internal">内存调优</a>
+        <li><a href="#id4" class="reference internal">磁盘调优</a>
+        <li><a href="#id5" class="reference internal">网络调优</a>
+    </ul>
+    <li><a href="#id6" class="reference internal">nginx 调优</a>
+        <ul>
+        <li><a href="#id7" class="reference internal">关闭访问日志</a>
+        <li><a href="#id8" class="reference internal">nginx配置项说明</a>
+        <li><a href="#id9" class="reference internal">一个参考配置</a>
+    </ul>
+    <li><a href="#id10" class="reference internal">php 调优 (php 5.3)</a>
+        <ul>
+        <li><a href="#id11" class="reference internal">基本原则</a>
+    </ul>
+    <li><a href="#id12" class="reference internal">mysql 调优(mysql 5.6)</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="lnmp/index.html"
+                                  title="上一章">linux单机部署</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="crontab.html"
+                                  title="下一章">ecstore2.0 服务器crontab配置</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="crontab.html" title="ecstore2.0 服务器crontab配置" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="lnmp/index.html" title="linux单机部署" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore2.0部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

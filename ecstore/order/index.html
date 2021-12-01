@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      订单 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="ECStore 开发指南" href="../index.html" />
+
+        <link rel="next" title="../cart/index" href="购物车.html" />
+        <link rel="prev" title="../index" href="ECStore 开发指南.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../cart/index.html" title="购物车" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../index.html" title="ECStore 开发指南" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 订单</h1>
+            <h2><a name="id1">订单提交</a></h2>
+<p><b>业务流程图</b><br /><img border="0" alt="" align="middle" src="images/order1.jpg" /></p>
+
+<p><b>设计流程图</b><br /><img border="0" alt="" align="middle" src="images/order2.jpg" /></p>
+<h2><a name="id2">订单支付</a></h2>
+<p><b>设计流程图</b><br /><img border="0" alt="" align="middle" src="images/order3.jpg" /></p>
+<h2><a name="id3">订单状态</a></h2>
+<p><b>uml状态图</b><br /><img border="0" alt="" align="middle" src="images/order4.jpg" /></p>
+<h2><a name="id4">订单相关表</a></h2>
+<p><b>E-R图</b><br /><img border="0" alt="" align="middle" src="images/order5.jpg" /></p>
+<h2><a name="id5">单据归档</a></h2><h3><a name="id6">归档所用技术</a></h3>
+<ul>
+<li>mysql的分区功能(partition)
+<li>参考链接:<a href="https://dev.mysql.com/doc/refman/5.1/zh/partitioning.html">https://dev.mysql.com/doc/refman/5.1/zh/partitioning.html</a></li>
+</li>
+</ul>
+<h3><a name="id7">归档注意事项</a></h3>
+<ul>
+<li>归档方式目前只支持 range 和 hash 两种</li>
+</ul>
+
+<ul>
+<li>归档的定义文件app/app_id/partition.xml</li>
+</ul>
+<pre>&lt;partitions&gt;
+
+    &lt;partition table=&quot;archive_return_product&quot;&gt; &lt;!-- 分区的表名 --&gt;
+        &lt;method&gt;range&lt;/method&gt; &lt;!-- 对应mysql分区的方法,目前系统只实现range和hash两种方式的简单应用 --&gt;
+        &lt;expr&gt;add_time&lt;/expr&gt; &lt;!-- 分区表中的分区字段 --&gt;
+    &lt;/partition&gt;
+
+    &lt;partition table=&quot;archive_order_items&quot;&gt; &lt;!-- 分区的表名 --&gt;
+        &lt;method&gt;hash&lt;/method&gt; &lt;!-- 对应mysql分区的方法,目前系统只实现range和hash两种方式的简单应用 --&gt;
+        &lt;expr&gt;order_id&lt;/expr&gt; &lt;!-- 分区表中的分区字段 --&gt;
+        &lt;nums&gt;4&lt;/nums&gt; &lt;!-- hash分区的数目(只有hash分区拥有) --&gt;
+    &lt;/partition&gt;
+
+&lt;/partitions&gt;
+
+</pre>
+<ul>
+<li>归档表原样复制被归档表的dbschema文件，去除了后台搜索的一些配置</li>
+</ul>
+
+<ul>
+<li>归档表的命名一般是依照原表在前面增加`archive_`,如b2c/dbschema/orders.php对应的归档表文件为b2c/dbschema/archive_orders.php</li>
+</ul>
+
+<ul>
+<li>归档的dbschema描述文件中原来的定义主键的pkey字段需要改为virtual_pkey,定义后此字段不会更新数据库的对应字段为主键(原因时分区的字段如果是主键则必须要包含这个字段,具体参考mysql分区文档)</li>
+</ul>
+
+<ul>
+<li>针对range分区是根据季度进行分区，通过crontab定期维护新建的分区，每个季度会创建下个季度分区。hash分区不做维护,hash分区只能通过修改partition.xml文件内对应的nums修改</li>
+</ul>
+
+<ul>
+<li>**b2c依赖于archive，并且归档会删除原来的单据表的对应条目，所以一旦安装归档表则不要删除，否则导致数据丢失</li>
+</ul>
+
+<ul>
+<li>如果安装有带有归档的ecstore版本,<b>升级时请注意:如果原有的订单表增加了字段，则需要在归档对应表也要增加此字段，否则会导致归档后此字段的信息丢失</b></li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">订单提交</a>
+    <li><a href="#id2" class="reference internal">订单支付</a>
+    <li><a href="#id3" class="reference internal">订单状态</a>
+    <li><a href="#id4" class="reference internal">订单相关表</a>
+    <li><a href="#id5" class="reference internal">单据归档</a>
+        <ul>
+        <li><a href="#id6" class="reference internal">归档所用技术</a>
+        <li><a href="#id7" class="reference internal">归档注意事项</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../index.html"
+                                  title="上一章">ECStore 开发指南</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../cart/index.html"
+                                  title="下一章">购物车</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../cart/index.html" title="购物车" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../index.html" title="ECStore 开发指南" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

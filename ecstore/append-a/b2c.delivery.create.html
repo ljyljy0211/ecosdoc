@@ -1,0 +1,532 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      b2c.delivery.create 添加发货单 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="ecstore  被外部系统请求的api接口" href="index.html" />
+
+        <link rel="next" title="b2c.delivery.update" href="b2c.delivery.update 修改发货单.html" />
+        <link rel="prev" title="b2c.refund.create" href="b2c.refund.create 添加订单退款单.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="b2c.delivery.update.html" title="b2c.delivery.update 修改发货单" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="b2c.refund.create.html" title="b2c.refund.create 添加订单退款单" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../api.html">API</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore  被外部系统请求的api接口</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> b2c.delivery.create 添加发货单</h1>
+            
+<p>外部系统向ECSTORE中添加发货单</p>
+<h2><a name="id1">API应用级输入参数</a></h2>
+<table class="docutils">
+<tr>
+<th>参数</th>
+
+<th>类型</th>
+
+<th>长度</th>
+
+<th>是否必须</th>
+
+<th>说明 及 示例</th>
+</tr>
+
+<tr>
+<td>order_bn</td>
+
+<td>string</td>
+
+<td>100</td>
+
+<td>Y</td>
+
+<td>订单号 (140219114630707)</td>
+</tr>
+
+<tr>
+<td>delivery_bn</td>
+
+<td>string</td>
+
+<td>32</td>
+
+<td>Y</td>
+
+<td>发货单号(1201402192020150867)</td>
+</tr>
+
+<tr>
+<td>delivery</td>
+
+<td>string</td>
+
+<td>50</td>
+
+<td>N</td>
+
+<td>配送方式名称 (快递 或者 货到付款)</td>
+</tr>
+
+<tr>
+<td>ship_distinct</td>
+
+<td>string</td>
+
+<td>50</td>
+
+<td>Y</td>
+
+<td>收货人的所在地区(通州区)</td>
+</tr>
+
+<tr>
+<td>money</td>
+
+<td>double</td>
+
+<td>decimal(20,3)</td>
+
+<td>N</td>
+
+<td>配送费用(如果不传默认为0)</td>
+</tr>
+
+<tr>
+<td>is_protect</td>
+
+<td>bool</td>
+
+<td></td>
+
+<td>N</td>
+
+<td>是否保价（true或false,默认false）</td>
+</tr>
+
+<tr>
+<td>logi_no</td>
+
+<td>string</td>
+
+<td>50</td>
+
+<td>N</td>
+
+<td>物流单号 (12345)</td>
+</tr>
+
+<tr>
+<td>logi_name</td>
+
+<td>string</td>
+
+<td>200</td>
+
+<td>Y</td>
+
+<td>物流公司 (顺丰)</td>
+</tr>
+
+<tr>
+<td>ship_name</td>
+
+<td>string</td>
+
+<td>50</td>
+
+<td>Y</td>
+
+<td>收货人 (张三)</td>
+</tr>
+
+<tr>
+<td>ship_states</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>Y</td>
+
+<td>收货人的所在省份（江苏）</td>
+</tr>
+
+<tr>
+<td>ship_city</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>Y</td>
+
+<td>收货人的所在城市（南通市)</td>
+</tr>
+
+<tr>
+<td>ship_addr</td>
+
+<td>string(text)</td>
+
+<td></td>
+
+<td>Y</td>
+
+<td>收货地址 （桂林路396号2号楼）</td>
+</tr>
+
+<tr>
+<td>ship_zip</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>Y</td>
+
+<td>邮政编码 （200233）</td>
+</tr>
+
+<tr>
+<td>ship_tel</td>
+
+<td>string</td>
+
+<td>50</td>
+
+<td>Y</td>
+
+<td>收货人电话（此处和手机号码任选一必填 如：021-66666666）</td>
+</tr>
+
+<tr>
+<td>ship_mobile</td>
+
+<td>string</td>
+
+<td>50</td>
+
+<td>Y</td>
+
+<td>收货人电话 （此处和电话号码任选一必填 如：13812344321）</td>
+</tr>
+
+<tr>
+<td>ship_email</td>
+
+<td>string</td>
+
+<td>200</td>
+
+<td>N</td>
+
+<td>收货人邮箱 (uuu@163.com)</td>
+</tr>
+
+<tr>
+<td>memo</td>
+
+<td>string(longtext)</td>
+
+<td></td>
+
+<td>Y</td>
+
+<td>订单备注 (周末收货)</td>
+</tr>
+
+<tr>
+<td>member_id</td>
+
+<td>string</td>
+
+<td>8</td>
+
+<td>N</td>
+
+<td>用户ID(如果不传默认为0)</td>
+</tr>
+
+<tr>
+<td>t_begin</td>
+
+<td>string</td>
+
+<td>10</td>
+
+<td>Y</td>
+
+<td>发货单生成时间(时间戳) 如：1234567890</td>
+</tr>
+
+<tr>
+<td>buyer_uname</td>
+
+<td>string</td>
+
+<td>50</td>
+
+<td>N</td>
+
+<td>购买人(如果不传默认为空)</td>
+</tr>
+
+<tr>
+<td>status</td>
+
+<td>string</td>
+
+<td>20</td>
+
+<td>Y</td>
+
+<td>发货状态 (SUCC:发货成功, FAILED:发货失败, CANCEL:取消发货, LOST:丢失, PROGRESS:配货中, TIMEOUT:超时, READY:准备中) 如：succ</td>
+</tr>
+
+<tr>
+<td>items</td>
+
+<td><a href="#Items">json</a></td>
+
+<td></td>
+
+<td>Y</td>
+
+<td>订单发货明细</td>
+</tr>
+</table>
+</table>
+<h4><a name="id2">Items</a></h4>
+<table class="docutils">
+<tr>
+<th>参数</th>
+
+<th>类型</th>
+
+<th>长度</th>
+
+<th>是否必须</th>
+
+<th>说明 及 示例</th>
+</tr>
+
+<tr>
+<td>product_bn</td>
+
+<td>string</td>
+
+<td>30</td>
+
+<td>Y</td>
+
+<td>货号 (P4CB28BF757BFD)</td>
+</tr>
+
+<tr>
+<td>product_name</td>
+
+<td>string</td>
+
+<td>200</td>
+
+<td>Y</td>
+
+<td>商品名称 (AVENE 雅漾 舒活保湿面膜 50ml)</td>
+</tr>
+
+<tr>
+<td>number</td>
+
+<td>string</td>
+
+<td></td>
+
+<td>Y</td>
+
+<td>货品需要发货数量 (20)</td>
+</tr>
+</table>
+</table>
+<h2><a name="id3">API应用级返回结果</a></h2>
+<p>订单支付单创建成功后，返回结果</p>
+<pre class="mark">Array
+(
+    [rsp] =&gt; succ
+    [res] =&gt; 
+    [data] =&gt; Array
+        (
+            [delivery_id] =&gt; P123456
+            [tid] =&gt; 20101011189112
+        )
+
+)
+
+
+</pre>
+<p>失败返回<pre class="mark">Array
+(
+    [rsp] =&gt; fail
+    [res] =&gt; 发货单已经存在了！
+    [data] =&gt; Array
+        (
+            [delivery_id] =&gt; P123456
+            [tid] =&gt; 20101011189112
+        )
+
+)
+
+
+</pre></p>
+<pre class="mark">Array
+(
+    [rsp] =&gt; fail
+    [res] =&gt; 发货单tid没有收到！
+    [data] =&gt; Array
+        (
+        )
+
+)
+</pre>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">API应用级输入参数</a>
+        <ul>
+            <ul>
+            <li><a href="#id2" class="reference internal">Items</a>
+        </ul>
+    </ul>
+    <li><a href="#id3" class="reference internal">API应用级返回结果</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="b2c.refund.create.html"
+                                  title="上一章">b2c.refund.create 添加订单退款单</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="b2c.delivery.update.html"
+                                  title="下一章">b2c.delivery.update 修改发货单</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="b2c.delivery.update.html" title="b2c.delivery.update 修改发货单" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="b2c.refund.create.html" title="b2c.refund.create 添加订单退款单" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../api.html">API</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore  被外部系统请求的api接口</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

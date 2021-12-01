@@ -1,0 +1,637 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      电商工具集 - ectools &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="Ecos手册" href="../index.html" />
+
+        <link rel="next" title="../desktop/index" href="强大的后端 - desktop.html" />
+        <link rel="prev" title="../dbeav/dbeav" href="dbeav 使用手册.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../desktop/index.html" title="强大的后端 - desktop" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../dbeav/dbeav.html" title="dbeav 使用手册" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 电商工具集 - ectools</h1>
+            <h2><a name="id1">ectools简介</a></h2>
+<p>ectools是集支付，货币，数据精度和地区包为一体的电子商务通用功能。可以灵活配置支付功能和数据精度管理，方便其他应用使用。ectools作为ecos的一个基础app一般不单独存在，是其他app操作流程的载体。ecstore是基于ecos的开源商城系统，亦依赖ectools。</p>
+<h2><a name="id2">此手册目标人群</a></h2>
+<p>开发者：开发基于ecos的新应用或扩展已有支付方式的扩展都会用到此应用。</p>
+<h2><a name="id3">ectools提供了下列功能：</a></h2>
+<ul>
+<li>支付方式管理
+<li>支付和退款单管理
+<li>货币管理
+<li>数据精度配置
+<li>地区包管理</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+<h3><a name="id4">支付方式管理与配置</a></h3>
+<p>ecstore是基于ecos的开源商城系统需要用到默认支付方式就是由此应用来管理，我们可以管理已有的支付方式，也可以新建支付方式。</p>
+
+<p>现以支付宝支付方式为例：</p>
+
+<ul>
+<li>支付方式接口ectools_interface_payment_app
+<li>支付方式父类ectools_payment_app</li>
+</li>
+</ul>
+
+<p>1. 接口方法介绍：</p>
+
+<p><tt class="docutils literal"><span class="pre">admin_intro:</span></tt>显示支付接口后台的信息</p>
+
+<p><tt class="docutils literal"><span class="pre">setting:</span></tt>设置后台的显示项目（表单项目）</p>
+
+<p><tt class="docutils literal"><span class="pre">intro:</span></tt>前台在线支付列表相应项目的说明</p>
+
+<p><tt class="docutils literal"><span class="pre">dopay:</span></tt>支付表单的提交方式</p>
+
+<p><tt class="docutils literal"><span class="pre">is_fields_valiad:</span></tt>验证提交表单数据的正确性</p>
+
+<p><tt class="docutils literal"><span class="pre">callback:</span></tt>支付后返回后处理的事件的动作</p>
+
+<p><tt class="docutils literal"><span class="pre">gen_form:</span></tt>生成支付表单 - 自动提交(点击链接提交的那种方式，通常用于支付方式列表)</p>
+
+<p>2. 具体介绍下setting里面的数据结构（以aplipay的参数配置为准）<pre>'pay_name'=&gt;array(
+	'title'=&gt;app::get('ectools')-&gt;_('支付方式名称'),
+	'type'=&gt;'string',
+	'validate_type' =&gt; 'required',
+),
+'mer_id'=&gt;array(
+	'title'=&gt;app::get('ectools')-&gt;_('合作者身份(parterID)'),
+	'type'=&gt;'string',
+	'validate_type' =&gt; 'required',
+),
+'mer_key'=&gt;array(
+	'title'=&gt;app::get('ectools')-&gt;_('交易安全校验码(key)'),
+	'type'=&gt;'string',
+	'validate_type' =&gt; 'required',
+),
+'support_cur'=&gt;array(
+	'title'=&gt;app::get('ectools')-&gt;_('支持币种'),
+	'type'=&gt;'text hidden',
+	'options'=&gt;array('1'=&gt;app::get('ectools')-&gt;_('人民币'),'2'=&gt;app::get('ectools')-&gt;_('其他'),'3'=&gt;app::get('ectools')-&gt;_('商店默认货币'))
+),
+'real_method'=&gt;array(
+	'title'=&gt;app::get('ectools')-&gt;_('选择接口类型'),
+	'type'=&gt;'select',
+	'options'=&gt;array('0'=&gt;app::get('ectools')-&gt;_('使用标准双接口'),'2'=&gt;app::get('ectools')-&gt;_('使用担保交易接口'),'1'=&gt;app::get('ectools')-&gt;_('使用即时到帐交易接口'))
+),
+'pay_fee'=&gt;array(
+	'title'=&gt;app::get('ectools')-&gt;_('交易费率'),
+	'type'=&gt;'pecentage',
+	'validate_type' =&gt; 'number',
+),
+'pay_desc'=&gt;array(
+	'title'=&gt;app::get('ectools')-&gt;_('描述'),
+	'type'=&gt;'html',
+	'includeBase' =&gt; true,
+),
+'pay_type'=&gt;array(
+	 'title'=&gt;app::get('ectools')-&gt;_('支付类型(是否在线支付)'),
+	 'type'=&gt;'hidden',
+	 'name' =&gt; 'pay_type',
+),
+'status'=&gt;array(
+	'title'=&gt;app::get('ectools')-&gt;_('是否开启此支付方式'),
+	'type'=&gt;'radio',
+	'options'=&gt;array('false'=&gt;app::get('ectools')-&gt;_('否'),'true'=&gt;app::get('ectools')-&gt;_('是')),
+	'name' =&gt; 'status',
+),
+</pre></p>
+
+<p><tt class="docutils literal"><span class="pre">title:</span></tt>参数的标题</p>
+
+<p><tt class="docutils literal"><span class="pre">type:</span></tt>参数的标题（string，text hidden，select，pecentage，html和radio）</p>
+
+<p><tt class="docutils literal"><span class="pre">options:</span></tt>只有type=radio，type=checkbox和type=select才需要填写</p>
+
+<p><tt class="docutils literal"><span class="pre">validate_type:</span></tt>需要验证的方式（类型可以参考desktop下面的validate.js）</p>
+
+<p>3. 支付方式父类方法介绍：</p>
+
+<p><tt class="docutils literal"><span class="pre">add_field:</span></tt>设置提交表单的元素属性</p>
+
+<p><tt class="docutils literal"><span class="pre">getConf:</span></tt>得到支付方式配置参数</p>
+
+<p><tt class="docutils literal"><span class="pre">get_html:</span></tt>支付方式提交表单的html内容</p>
+
+<p>4. 本类的属性说明<pre>public $name = '支付宝支付';
+public $app_name = '支付宝支付接口';
+public $app_key = 'alipay';
+public $display_name = '支付宝';
+public $curname = 'CNY';
+public $ver = '1.0';
+</pre></p>
+
+<p><tt class="docutils literal"><span class="pre">name:</span></tt>支付接口名称，一般不被前台或者后台显示使用，仅仅只是说明（目前）</p>
+
+<p><tt class="docutils literal"><span class="pre">app_name:</span></tt>支付接口应用名称，一般不被前台或者后台显示使用，仅仅只是说明（目前）</p>
+
+<p><tt class="docutils literal"><span class="pre">app_key:</span></tt>支付接口的唯一标示，用于数据对应取值，一般用英文表示</p>
+
+<p><tt class="docutils literal"><span class="pre">display_name:</span></tt>用于前后台显示在页面上的名称</p>
+
+<p>5. 下面我来实现一个例子（新建一个支付方式）：</p>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">首先拷贝一个支付方式的文件ectools/lib/payment/plugin/yunchoubao.php</span></tt></li>
+</ul>
+
+<p>(1). 首先配置service.xml，因为支付方式本来就是一种服务</p>
+<pre>	&lt;service id=&quot;ectools_payment.ectools_mdl_payment_cfgs&quot; optname=&quot;支付插件列表&quot;&gt;
+		&lt;class&gt;ectools_payment_plugin_alipay&lt;/class&gt;
+		&lt;class&gt;ectools_payment_plugin_99bill&lt;/class&gt;
+		&lt;class&gt;ectools_payment_plugin_paypal&lt;/class&gt;
+		&lt;class&gt;ectools_payment_plugin_tenpay&lt;/class&gt;
+		&lt;class&gt;ectools_payment_plugin_offline&lt;/class&gt;
+		&lt;class&gt;ectools_payment_plugin_deposit&lt;/class&gt;
+		&lt;class&gt;ectools_payment_plugin_yunchoubao&lt;/class&gt;
+	&lt;/service&gt;
+</pre>
+<p>增加了一行&lt;class&gt;ectools_payment_plugin_yunchoubao&lt;/class&gt;</p>
+
+<p>然后安装开发者中心，然后在“应用中心”维护下即可，如果不安装开发者中心的话，也可以选择重新安装。</p>
+
+<p>(2). 首先打开这个文件</p>
+
+<p>(2). 修改类名，将原来的类名修改为ectools_payment_plugin_yunchoubao</p>
+
+<p>(3). 修改构造方法中的“$this-&gt;callback_url”变量的值，将ectools_payment_plugin_alipay=&gt;ectools_payment_plugin_yunchoubao</p>
+
+<p>(4). 修改setting方法中的表单元素，修改成你自己支付网关中需要用户配置的参数，具体配置的方法详见第二节（setting里面的数据结构）</p>
+
+<p>(5). 然后修改支付网关中的dopay()和callback()，按照网关规定的接口来修改。</p>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">这样一个网关支付方式也就修改完毕了。</span></tt></li>
+</ul>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">然后进行相应的配置</span></tt></li>
+</ul>
+
+<p>如图：<br /><img border="0" alt="" align="middle" src="images/alipayConf.png" /></p>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">对相应的内容进行配置即可。</span></tt></li>
+</ul>
+<h3><a name="id5">ectools的其他功能简介</a></h3>
+<p>1. 支付与退款单管理</p>
+
+<p>如图：</p>
+
+<p>支付单<br /><img border="0" alt="" align="middle" src="images/payments.png" /></p>
+
+<p>退款单<br /><img border="0" alt="" align="middle" src="images/refunds.png" /></p>
+
+<p>支付与退款单据的finder上面与其他的有所不同，需要顶一个关联搜索的字段（rel_id - 对象外键），下面已支付单为例：</p>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">先打开代码文件app/ectools/model/payments.php，增加此外键在搜索下拉框中的显示。</span></tt></li>
+</ul>
+<pre>/**
+ * 重写搜索的下拉选项方法
+ * @param null
+ * @return null
+ */
+public function searchOptions(){
+	$columns = array();
+	foreach($this-&gt;_columns() as $k=&gt;$v){
+		if(isset($v['searchtype']) &amp;&amp; $v['searchtype']){
+			$columns[$k] = $v['label'];
+		}
+	}
+
+	// 添加额外的
+	$ext_columns = array('rel_id'=&gt;$this-&gt;app-&gt;_('对象ID'));
+
+	return array_merge($columns, $ext_columns);
+}
+</pre>
+<ul>
+<li><tt class="docutils literal"><span class="pre">修改finder搜索相关数据支持的方法的重写</span></tt></li>
+</ul>
+<pre>/**
+ * 重写去除所要查询的列表的数据数量
+ * @param null
+ * @return null
+ */
+public function count($filter=null)
+{
+	if (!array_key_exists('rel_id', $filter))
+		$row = $this-&gt;db-&gt;select('SELECT count(*) as _count FROM '.$this-&gt;table_name(1).' WHERE '.$this-&gt;_filter($filter));
+	else
+	{
+		$row = $this-&gt;db-&gt;select('SELECT count(payments.payment_id) as _count
+					FROM '.$this-&gt;table_name(1).' AS payments
+					INNER JOIN ' . kernel::database()-&gt;prefix.$this-&gt;app-&gt;app_id . '_order_bills AS bills ON bills.bill_id=payments.payment_id
+					WHERE bills.rel_id=' . $filter['rel_id']);
+	}
+
+	return intval($row[0]['_count']);
+}
+
+/**
+ * 重载getList方法
+ * @params string - 特殊的列名
+ * @params array - 限制条件
+ * @params 偏移量起始值
+ * @params 偏移位移值
+ * @params 排序条件
+ */
+public function getList($cols='*', $filter=array('disabled' =&gt; 'false'), $offset=0, $limit=-1, $orderby=null)
+{
+	if ($filter)
+	{
+		if (!array_key_exists('rel_id', $filter))
+			return parent::getList($cols, $filter, $offset, $limit, $orderby);
+		else
+		{
+			$arr_cols = explode(',', $cols);
+			if ($arr_cols)
+			{
+				foreach ($arr_cols as $key=&gt;&amp;$str_cols)
+				{
+					if ($key == 0) continue;
+
+					$str_cols = $this-&gt;table_name(1) . '.' . $str_cols;
+				}
+
+				$cols = implode(',', $arr_cols);
+			}
+
+			$rows = $this-&gt;db-&gt;selectLimit('SELECT '.$cols.'
+							FROM '. $this-&gt;table_name(1) .'
+							INNER JOIN ' . kernel::database()-&gt;prefix.$this-&gt;app-&gt;app_id . '_order_bills ON ' . kernel::database()-&gt;prefix.$this-&gt;app-&gt;app_id . '_order_bills.bill_id=' . $this-&gt;table_name(1) . '.payment_id
+							WHERE ' . kernel::database()-&gt;prefix.$this-&gt;app-&gt;app_id . '_order_bills.rel_id=' . $filter['rel_id'],$limit,$offset);
+			$this-&gt;tidy_data($rows, $cols);
+			return $rows;
+		}
+	}
+	else
+		return parent::getList($cols, array('disabled' =&gt; 'false'), $offset, $limit, $orderby);
+}
+</pre>
+<p>2. 货币管理</p>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">列表页面：</span></tt></li>
+</ul>
+
+<p><br /><img border="0" alt="" align="middle" src="images/currency.png" /></p>
+
+<ul>
+<li><tt class="docutils literal"><span class="pre">新建：</span></tt></li>
+</ul>
+
+<p><br /><img border="0" alt="" align="middle" src="images/currency_create.png" /></p>
+
+<p>3. 数据精度配置</p>
+
+<p>系统数据计算和显示设定，可用系统应用其他数据的计算和现实。</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/accuracy.png" /></p>
+
+<p>3. 地区包管理</p>
+
+<p>可以自由管理地区，可以导入，或者自己定义与新建</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/regions.png" /></p>
+<h3><a name="id6">ectools 报表,统计图调用</a></h3>
+<p>因为在finder中有top_extra_view这个属性,所以在finder的头部可以自定义添加,而下面的报表样式则根据</p>
+
+<p>finder提供的属性写的。<pre>$finder['params']['top_extra_view'] = $this-&gt;_extra_view;
+</pre></p>
+
+<p>在ectools中提供了报表，统计图的接口，只要按照规定重写几个方法就出现如下的一个报表</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/ectools.png" /><br /><img border="0" alt="" align="middle" src="images/ectools1.png" /></p>
+<h4><a name="id7">调用流程</a></h4>
+<p>首先需要在调用方法中根据需要选择其中的一个写法去调用一个继承ectools方法的一个类<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #FF8000">//写法1<br /></span><span style="color: #007700">public&nbsp;function&nbsp;</span><span style="color: #0000BB">index</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$html&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c_analysis_index'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">set_service</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c_analysis_shopsale'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">set_extra_view</span><span style="color: #007700">(array(</span><span style="color: #DD0000">'ectools'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'analysis/index_view.html'</span><span style="color: #007700">))-&gt;</span><span style="color: #0000BB">set_params</span><span style="color: #007700">(</span><span style="color: #0000BB">$_POST</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">pagedata</span><span style="color: #007700">[</span><span style="color: #DD0000">'_PAGE_CONTENT'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">$html</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">page</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br /></span><span style="color: #FF8000">//写法2<br /></span><span style="color: #007700">public&nbsp;function&nbsp;</span><span style="color: #0000BB">index</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$html&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c_analysis_index'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">set_extra_view</span><span style="color: #007700">(array(</span><span style="color: #DD0000">'ectools'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'analysis/index_view.html'</span><span style="color: #007700">))-&gt;</span><span style="color: #0000BB">set_params</span><span style="color: #007700">(</span><span style="color: #0000BB">$_POST</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">fetch</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">pagedata</span><span style="color: #007700">[</span><span style="color: #DD0000">'_PAGE_CONTENT'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">$html</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">page</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;}<br /><br /></span><span style="color: #FF8000">//写法3<br /></span><span style="color: #007700">public&nbsp;function&nbsp;</span><span style="color: #0000BB">sale</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c_analysis_index'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">set_params</span><span style="color: #007700">(</span><span style="color: #0000BB">$_POST</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">display</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /></span>
+</span>
+</code></div></p>
+
+<p>在lib下创建 b2c_analysis_index</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">b2c_analysis_index&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">ectools_analysis_abstract&nbsp;</span><span style="color: #007700">implements&nbsp;</span><span style="color: #0000BB">ectools_analysis_interface</span><span style="color: #007700">{<br /><br />}<br /></span>
+</span>
+</code></div><pre class="mark">所有要实现的功能就是在这个类中实现
+</pre><h4><a name="id8">1区 标题</a></h4>
+<ul>
+<li>如果没定义过finder 则定义标题需要在添加<pre>protected $_title = '经营概况';
+</pre>
+<li>如果定义finder则标题为finder的标题名</li>
+</li>
+</ul>
+<h4><a name="id9">2区</a></h4>
+<p>这个在ectools中实现了，在ectools提供的报表统计图样式都依赖了这个数据，在一般情况下只要调用ectools的</p>
+
+<p>报表并不需要改变，</p>
+
+<p>如果需要替换掉需劫持ectools/view/analysis/time_header.html进行修改</p>
+<h4><a name="id10">3区</a></h4>
+<p>此区域的数据都是存放在$detail变量中的</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">b2c_analysis_index&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">ectools_analysis_abstract&nbsp;</span><span style="color: #007700">implements&nbsp;</span><span style="color: #0000BB">ectools_analysis_interface</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//可以配置显示的项，值默认是0<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">public&nbsp;</span><span style="color: #0000BB">$logs_options&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'1'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'name'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'订单量'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'flag'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'2'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'name'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'订单额'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'flag'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">/*<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$logs_options&nbsp;完整的写法<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;$logs_options&nbsp;=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'1'&nbsp;=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'name'&nbsp;=&gt;&nbsp;'订单成交量',<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'flag'&nbsp;=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'0'&nbsp;=&gt;&nbsp;'全部',<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'1'&nbsp;=&gt;&nbsp;'已发货',<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'2'&nbsp;=&gt;&nbsp;'已付款',<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'memo'&nbsp;=&gt;&nbsp;'已发货订单数量',//鼠标移上去显示的说明<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'icon'&nbsp;=&gt;&nbsp;'application_add.gif',<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;//定义3区的项,和显示的数据<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">public&nbsp;function&nbsp;</span><span style="color: #0000BB">ext_detail</span><span style="color: #007700">(&amp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail&nbsp;</span><span style="color: #007700">=&nbsp;array();&nbsp;</span><span style="color: #FF8000">//把前面定义的清空，不再这个区域显示,使上面定义的只作为4区域的提供配置<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//中间的数据来源代码省掉了<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'收入'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'value'</span><span style="color: #007700">]=&nbsp;</span><span style="color: #0000BB">$earn</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'收入'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'memo'</span><span style="color: #007700">]=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'“收款额”减去“退款额”'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'收入'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'icon'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #DD0000">'coins.gif'</span><span style="color: #007700">;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'新增订单'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'value'</span><span style="color: #007700">]=&nbsp;</span><span style="color: #0000BB">$orderAll</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'新增订单'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'memo'</span><span style="color: #007700">]=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'新增加的订单数量'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'新增订单'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'icon'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #DD0000">'application_add.gif'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'付款订单'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'value'</span><span style="color: #007700">]=&nbsp;</span><span style="color: #0000BB">$orderPay</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'付款订单'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'memo'</span><span style="color: #007700">]=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'付款的订单数量'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'付款订单'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'icon'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #DD0000">'application_key.gif'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'发货订单'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'value'</span><span style="color: #007700">]=&nbsp;</span><span style="color: #0000BB">$orderShip</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'发货订单'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'memo'</span><span style="color: #007700">]=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'发货的订单数量'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'发货订单'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'icon'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #DD0000">'application_go.gif'</span><span style="color: #007700">;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'新增会员'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'value'</span><span style="color: #007700">]=&nbsp;</span><span style="color: #0000BB">$memberNewadd</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'新增会员'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'memo'</span><span style="color: #007700">]=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'新增加的会员数量'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'新增会员'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'icon'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #DD0000">'folder_user.gif'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'会员总数'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'value'</span><span style="color: #007700">]=&nbsp;</span><span style="color: #0000BB">$memberNum</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'会员总数'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'memo'</span><span style="color: #007700">]=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'网店会员总数'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$detail</span><span style="color: #007700">[</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'会员总数'</span><span style="color: #007700">)][</span><span style="color: #DD0000">'icon'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #DD0000">'group_add.gif'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />}<br /></span>
+</span>
+</code></div>
+<p>如果不要显示这个区域,则可以进行如下配置</p>
+<pre>public $detail_options = array(
+        'hidden'=&gt;true,
+        );
+
+</pre>
+<p>配置统计图的高度<pre>public $graph_options = array(
+        'iframe_height' =&gt; 300,
+    );
+
+</pre></p>
+<h4><a name="id11">4区</a></h4>
+<p>这个统计图是ectools内置的，销售统计这个标题也是固定的，不可改变。</p>
+
+<ul>
+<li>如果不需要显示此区域则进行如下配置<pre>public $graph_options = array(
+        'hidden' =&gt; true,
+    );
+
+</pre>
+<p>值得注意的是如果是在调用的时候使用如下的调用方法则不能对这个区域进行隐藏<pre>set_extra_view(array('ectools'=&gt;'analysis/index_view.html'))
+</pre></p>
+</li>
+</ul>
+
+<ul>
+<li>统计表数据来源配置<pre>public function get_logs($time){
+       $ilter = array(
+            'time_from' =&gt; $time,
+            'time_to' =&gt; $time+86400,
+        );
+        $filterShip = array(
+            'time_from' =&gt; $time,
+            'time_to' =&gt; $time+86400,
+            'ship_status' =&gt; 1,
+        );
+        $filterPay = array(
+            'time_from' =&gt; $time,
+            'time_to' =&gt; $time+86400,
+            'pay_status' =&gt; 1,
+        );
+        $shopsaleObj = $this-&gt;app-&gt;model('analysis_shopsale');
+        $order = $shopsaleObj-&gt;get_order($filter); //全部
+        $saleTimes = $order['saleTimes']; //订单量
+        $salePrice = $order['salePrice']; //订单额
+
+        $orderShip = $shopsaleObj-&gt;get_order($filterShip); //已发货
+        $shipTimes = $orderShip['saleTimes']; //订单量
+        $shipPrice = $orderShip['salePrice']; //订单额
+
+        $orderPay = $shopsaleObj-&gt;get_order($filterPay); //已支付
+        $payTimes = $orderPay['saleTimes']; //订单量
+        $payPrice = $orderPay['salePrice']; //订单额
+
+        $reship_num = $shopsaleObj-&gt;get_reship_num($filter); //商品退换量
+        $sale_num = $shopsaleObj-&gt;get_sale_num($filter); //商品销售量
+        $refund_ratio = isset($sale_num)?number_format($reship_num/$sale_num,2):0; //商品退换率
+
+        $result[] = array('type'=&gt;0, 'target'=&gt;1, 'flag'=&gt;0, 'value'=&gt;$saleTimes); //target是$logs_options中的键,
+        $result[] = array('type'=&gt;0, 'target'=&gt;1, 'flag'=&gt;1, 'value'=&gt;$shipTimes); //flag是$logs_options中的flag的键
+        $result[] = array('type'=&gt;0, 'target'=&gt;1, 'flag'=&gt;2, 'value'=&gt;$payTimes);
+        $result[] = array('type'=&gt;0, 'target'=&gt;2, 'flag'=&gt;0, 'value'=&gt;$salePrice);
+        $result[] = array('type'=&gt;0, 'target'=&gt;2, 'flag'=&gt;1, 'value'=&gt;$shipPrice);
+        $result[] = array('type'=&gt;0, 'target'=&gt;2, 'flag'=&gt;2, 'value'=&gt;$payPrice);
+        $result[] = array('type'=&gt;0, 'target'=&gt;3, 'flag'=&gt;0, 'value'=&gt;$reship_num);
+        $result[] = array('type'=&gt;0, 'target'=&gt;4, 'flag'=&gt;0, 'value'=&gt;$refund_ratio);
+
+        return $result;
+    }
+</pre>
+<p>注意：<pre class="mark">如果用function get_logs($time){}这个方法保存统计图的数据则需要对这个类进行services注册
+注册的时候会在在sdb_ectools_analysis中，注册的作用是每天定时运行这个方法,并且把数据存放在
+sdb_ectools_analysis_logs这个数据表中，统计图调用的数据则是这个表的数据
+</pre><pre>&lt;service id=&quot;ectools_analyse_day&quot;&gt;
+    &lt;class&gt;b2c_analysis_index&lt;/class&gt;
+&lt;/service&gt;
+</pre></p>
+</li>
+</ul>
+<h4><a name="id12">5区</a></h4>
+<p>这个区域和4区是一样的，只是这个是自定义的，而4区是ectools内置的，</p>
+
+<p>要把显示这个区域，则首先需要在定义如下方法<pre>public function rank(){
+        $filter = $this-&gt;_params;
+        $filter['time_from'] = isset($filter['time_from'])?$filter['time_from']:'';
+        $filter['time_to'] = isset($filter['time_to'])?$filter['time_to']:'';
+
+        $render = kernel::single('base_render');
+
+        $productObj = $this-&gt;app-&gt;model('analysis_productsale');
+        $numProducts = $productObj-&gt;getlist('*', $filter, $offset=0, 5, 'saleTimes desc');
+        $priceProducts = $productObj-&gt;getlist('*', $filter, $offset=0, 5, 'salePrice desc');
+
+        $render-&gt;pagedata['numProducts'] = $numProducts;
+        $render-&gt;pagedata['priceProducts'] = $priceProducts;
+        $imageDefault = app::get('image')-&gt;getConf('image.set');
+        $render-&gt;pagedata['defaultImage'] = $imageDefault['S']['default_image'];
+        $html = $render-&gt;fetch('admin/analysis/productlist.html','b2c');
+
+        $this-&gt;_render-&gt;pagedata['rank_html'] = $html;
+    }
+</pre>统计图需要自定义 admin/analysis/productlist.html</p>
+<h4><a name="id13">6区</a></h4>
+<p>如果finder区域不需要显示则一定要写如果下配置，不然会报错<pre>public $finder_options = array(
+        'hidden' =&gt; true,
+    );
+
+</pre></p>
+
+<p>finder区域，和一般的[finder]写法是差不多的<pre>public function finder(){
+        return array(
+            'model' =&gt; 'b2c_mdl_analysis_shopsale',
+            'params' =&gt; array(
+                'actions'=&gt;array(
+                    array(
+                        'label'=&gt;app::get('b2c')-&gt;_('生成报表'),
+                        'class'=&gt;'export',
+                        'icon'=&gt;'add.gif',
+                        'href'=&gt;'index.php?app=b2c&amp;ctl=admin_analysis&amp;act=shopsale&amp;action=export',
+                        'target'=&gt;'{width:400,height:170,title:\''.app::get('b2c')-&gt;_('生成报表').'\'}'),
+                ),
+                'title'=&gt;app::get('b2c')-&gt;_('店铺销售概况'),
+                'use_buildin_recycle'=&gt;false,
+                'use_buildin_selectrow'=&gt;false,
+            ),
+        );
+    }
+</pre>在生成报表列表的时候，和一般的finder是不同的，可能需要同时用到几个表，则需要在model重构几个方法，</p>
+
+<p>function count, function getList, function _filter ,function get_schema 重构可以参照[url]</p>
+
+<p>需要注意的是_filter的写法<pre>public function _filter($filter,$tableAlias=null,$baseWhere=null){
+        $where = array(1);
+        if(isset($filter['time_from']) &amp;&amp; $filter['time_from']){
+            $where[] = ' createtime &gt;='.$filter['time_from'];
+        }
+        if(isset($filter['time_to']) &amp;&amp; $filter['time_to']){
+            $where[] = ' createtime &lt;'.$filter['time_to'];
+        }
+        if(isset($filter['ship_status']) &amp;&amp; $filter['ship_status']){
+            $where[] = ' ship_status =\''.$filter['ship_status'].'\'';
+        }
+        if(isset($filter['pay_status']) &amp;&amp; $filter['pay_status']){
+            $where[] = ' pay_status =\''.$filter['pay_status'].'\'';
+        }
+
+        return implode($where,' AND ');
+    }
+
+</pre></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">ectools简介</a>
+    <li><a href="#id2" class="reference internal">此手册目标人群</a>
+    <li><a href="#id3" class="reference internal">ectools提供了下列功能：</a>
+        <ul>
+        <li><a href="#id4" class="reference internal">支付方式管理与配置</a>
+        <li><a href="#id5" class="reference internal">ectools的其他功能简介</a>
+        <li><a href="#id6" class="reference internal">ectools 报表,统计图调用</a>
+            <ul>
+            <li><a href="#id7" class="reference internal">调用流程</a>
+            <li><a href="#id8" class="reference internal">1区 标题</a>
+            <li><a href="#id9" class="reference internal">2区</a>
+            <li><a href="#id10" class="reference internal">3区</a>
+            <li><a href="#id11" class="reference internal">4区</a>
+            <li><a href="#id12" class="reference internal">5区</a>
+            <li><a href="#id13" class="reference internal">6区</a>
+        </ul>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../dbeav/dbeav.html"
+                                  title="上一章">dbeav 使用手册</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../desktop/index.html"
+                                  title="下一章">强大的后端 - desktop</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../desktop/index.html" title="强大的后端 - desktop" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../dbeav/dbeav.html" title="dbeav 使用手册" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

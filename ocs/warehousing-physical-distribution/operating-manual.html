@@ -1,0 +1,384 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      模拟仓储物流操作手册 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="OCS开发指南" href="../index.html" />
+
+        <link rel="next" title="../deployment/index" href="系统部署.html" />
+        <link rel="prev" title="../product_operating_manual/product_operating_manual" href="产品操作手册.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../deployment/index.html" title="系统部署" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../product_operating_manual/product_operating_manual.html" title="产品操作手册" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">OCS开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 模拟仓储物流操作手册</h1>
+            <h2><a name="id1">前置</a></h2>
+<p>使用此功能, 请先将omevirtualwms app包放置到app/omevirtualwms目录下并进行安装</p>
+<pre>/data/www/ocs/app %&gt; svn co https://app.ec-os.net/svn/omevirtualwms/trunk omevirtualwms
+...
+/data/www/ocs/app %&gt; cd base
+/data/www/ocs/app/base %&gt; ./cmd install omevirtualwms
+...
+</pre>
+<p>进入ocs可以看到菜单已经多了一个菜单组, 模拟仓储物流</p>
+<h2><a name="id2">仓储物流状态回传</a></h2>
+<p>用户根据不同的业务需求可以通过模拟仓储物流状态回传进行商品虚拟出入库等操作。</p>
+<h3><a name="id3">入库单回传</a></h3>
+<p>当操作员新建了一张入库单时，可以通过模拟入库单回传，进行商品虚拟入库。依次点击“模拟仓储物流——仓储物流状态回传——入库单回传”，输入入库单号进行搜索，对某一入库单进行回传，如图显示：</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/m-001.jpg" />￼</p>
+
+<p>点击“操作——开始模拟”，系统显示入库单回传界面￼<br /><img border="0" alt="" align="middle" src="images/m-002.jpg" />￼</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/m-003.jpg" />￼</p>
+
+<ul>
+<li>选择入库单状态：（可直接选择全部入库）
+<p><br /><img border="0" alt="" align="middle" src="images/m-004.jpg" />
+<ul>
+<li>接单失败：入库单接收失败
+<li>已接单：入库单接收成功
+<li>部分入库：已入库商品数量小于入库单中所有商品数量
+<li>全部入库：入库单中商品全部入库成功
+<li>取消：仓库接收到OCS发起的入库单取消指令同意取消此入库单
+<li>关闭：仓库发起入库单无效并关闭指令</ul>
+
+<li>填写入库商品明细
+<ul>
+<li>根据质检情况，填写商品良品、不良品数量。</ul>
+
+<li>提交
+<ul>
+<li>提交后，OCS系统会根据回传结果更改入库单单据状态以及商品库存情况</li>
+</ul>
+</li>
+</ul>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</p>
+</li>
+</ul>
+<h3><a name="id4">出库单回传</a></h3>
+<p>当操作员新建了一张出库单时，可以通过模拟出库单回传，进行商品虚拟出库。依次点击“模拟仓储物流——仓储物流状态回传——出库单回传”，输入出库单号进行搜索，对某一出库单进行回传。如图所示：</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/m-005.jpg" /></p>
+
+<p>点击“操作——开始模拟”，系统显示出库单回传界面</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/m-006.jpg" /></p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/m-007.jpg" />￼</ul>
+
+<ul>
+<li>选择出库单状态：（可直接选择全部出库）<br /><img border="0" alt="" align="middle" src="images/m-008.jpg" />
+<ul>
+<li>接单失败：出库单接收失败
+<li>已接单：出库单接收成功
+<li>部分入库：已出库商品数量小于出库单中所有商品数量
+<li>全部入库：出库单中商品全部出库成功
+<li>取消：仓库接收到OCS发起的出库单取消指令并同意取消此出库单
+<li>关闭：仓库发起出库单无效并关闭指令</ul>
+
+<li>填写出库商品明细
+<ul>
+<li>填写商品出库数量。</ul>
+
+<li>提交
+<ul>
+<li>提交后，OCS系统会根据回传结果更改出库单单据状态以及商品库存情况</li>
+</ul>
+</li>
+</ul>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</ul>
+<h3><a name="id5">发货单回传</a></h3>
+<p>当系统生成发货单时，可以通过模拟发货单回传，进行商品虚拟发货。依次点击“模拟仓储物流——仓储物流状态回传——发货单回传”，如下图所示：</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/m-009.jpg" /></p>
+
+<p>输入发货单号进行搜索，对某一发货单进行回传。</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/m-010.jpg" /></p>
+
+<p>点击“操作——开始模拟”，系统显示发货单回传界面</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/m-011.jpg" /><br /><img border="0" alt="" align="middle" src="images/m-012.jpg" /></p>
+</ul>
+
+<ul>
+<li>选择发货单状态：（可以直接选择已发货）
+<p><br /><img border="0" alt="" align="middle" src="images/m-013.jpg" />
+<ul>
+<li>接单失败：发货库单接收失败
+<li>已接单：发货单接收成功
+<li>已打印：发货单据已打印
+<li>已拣配：配货完成
+<li>已校验：商品校验完成
+<li>已打包：发货单商品已打包
+<li>已发货：发货单商品已发货</ul>
+
+<li>选择物流公司（物流公司为系统配置的物流公司）
+<li>填写商品包裹重量
+<ul>
+<li>重量不为空，可填写0</ul>
+
+<li>提交
+<ul>
+<li>提交后，OCS系统会根据回传结果更改发货单单据状态以及商品库存情况</li>
+</ul>
+</li>
+</ul>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</p>
+</li>
+</ul>
+<h3><a name="id6">退货单回传</a></h3>
+<p>当系统生成退货单时，可以通过模拟退货单回传，进行商品虚拟退货。依次点击“模拟仓储物流——仓储物流状态回传——退货单回传”，如下图所示：</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/m-014.jpg" /></p>
+
+<p>输入退货单号进行搜索，对某一退货单进行回传。</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/m-015.jpg" /></p>
+
+<p>点击“操作——开始模拟”，系统显示退货单回传界面</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/m-016.jpg" />￼</ul>
+
+<ul>
+<li>选择退货单状态：（可以直接选择收货完成）<br /><img border="0" alt="" align="middle" src="images/m-017.jpg" />
+<ul>
+<li>接单失败：退货库单接收失败
+<li>已接单：退货单接收成功
+<li>收货完成：售后商品入库成功
+<li>拒绝：拒绝售后商品入库</ul>
+
+<li>填写退货商品明细
+<ul>
+<li>根据质检结果，填写良品、不良品数量</ul>
+
+<li>提交
+<ul>
+<li>提交后，OCS系统会根据回传结果更改退货单单据状态以及商品库存情况</li>
+</ul>
+</li>
+</ul>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</ul>
+<h3><a name="id7">盘点结果回传</a></h3>
+<p>根据业务需求，对库存商品进行盘点结果回传，进行虚拟盘点。依次点击“模拟仓储物流——仓储物流状态回传——盘点结果回传”，如下图所示：</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/m-018.jpg" />￼</p>
+</ul>
+
+<ul>
+<li>填写盘点单号
+<li>选择盘点仓库（此仓库为系统配置的仓库）
+<li>填写盘点结果（货号、良品、不良品数量）
+<li>提交
+<ul>
+<li>提交后，OCS系统会记录此盘点结果，生成盘点申请单</li>
+</ul>
+</li>
+</li>
+</li>
+</li>
+</ul>
+<h3><a name="id8">库存对账结果回传</a></h3>
+<p>根据业务需求，对库存对账结果回传，进行虚拟库存对账。</p>
+
+<p>依次点击“模拟仓储物流——仓储物流状态回传——库存对账结果回传”，如下图所示：</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/m-019.jpg" />￼￼</ul>
+
+<ul>
+<li>选择对账仓库（此仓库为系统配置的仓库）
+<li>选择商品属性
+<ul>
+<li>良品、不良品</ul>
+
+<li>填写库存商品明细
+<ul>
+<li>货号、商品数量</ul>
+
+<li>提交
+<ul>
+<li>提交后，OCS系统会记录此对账结果，并与系统库存情况进行对比，生成库存对账报表。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</li>
+</ul>
+<h3><a name="id9">商品同步状态模拟回传</a></h3>
+<p>根据业务需求，对商品同步状态回传，进行虚拟商品同步。依次点击“模拟仓储物流——仓储物流状态回传——商品同步状态模拟回传”，如下图所示：</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/m-020.jpg" />￼</p>
+
+<p>点击“操作——开始模拟”，OCS系统记录此商品同步状态回传结果，并将此商品同步状态更改为已同步。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">前置</a>
+    <li><a href="#id2" class="reference internal">仓储物流状态回传</a>
+        <ul>
+        <li><a href="#id3" class="reference internal">入库单回传</a>
+        <li><a href="#id4" class="reference internal">出库单回传</a>
+        <li><a href="#id5" class="reference internal">发货单回传</a>
+        <li><a href="#id6" class="reference internal">退货单回传</a>
+        <li><a href="#id7" class="reference internal">盘点结果回传</a>
+        <li><a href="#id8" class="reference internal">库存对账结果回传</a>
+        <li><a href="#id9" class="reference internal">商品同步状态模拟回传</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../product_operating_manual/product_operating_manual.html"
+                                  title="上一章">产品操作手册</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../deployment/index.html"
+                                  title="下一章">系统部署</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../deployment/index.html" title="系统部署" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../product_operating_manual/product_operating_manual.html" title="产品操作手册" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">OCS开发指南</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

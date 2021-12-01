@@ -1,0 +1,422 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      性能 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="概述" href="outline.html" />
+
+        <link rel="next" title="misc/index" href="其他.html" />
+        <link rel="prev" title="architecture" href="技术白皮书 - 架构篇.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="misc/index.html" title="其他" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="architecture.html" title="技术白皮书 - 架构篇" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECOS开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="outline.html">概述</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 性能</h1>
+            
+<p>网站性能的用户体验对电子商务至关重要,如果想要决胜在未来,网站就必 须能以&quot;性能取胜&quot;。</p>
+<h2><a name="id1">前言</a></h2>
+<p>您无法忽视这个事实，电子商务网站性能的用户体验与业务发展是密切关联的。分享一则相关数据，美国比较购物官方网站Shopzilla 将页面载入时间从7秒缩减到2秒，转化率提升了7-12%，页面请求增加25%。所以，对于一个在线业务系统来说，更多的流量意味着更高的转化率，更多的收入和更少的边际成本。但如果网站不能支撑用户访问的负载，那就意味着投资化为乌有，也意味着你的品牌不但没有给用户带来益处，反而有可能导致品牌负面影响的产生。</p>
+
+<p>为了确保业务系统在任何情况下都能表现优异，电子商务平台需要对自身web性能情况有一个真实客观的了解，并提升用户访问体验，也就提升网站性能的&quot;质量&quot;。网站性能用户体验的提升，需要关注整个Web应用传输链，不能用直观感觉来衡量。Web应用传输链上任何一个环节发生问题，用户体验就会遭遇页面加载和相应时间变慢，交易超时、失败，不同地点响应时间差异明显等问题。</p>
+
+<p>那么如何提高电商网店的性能呢，我们的产品通过多年的技术积累为您带了下面的经验分享。</p>
+<h2><a name="id2">Ecos的高性能综述</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="images/p-001.jpg" /></p>
+
+<p>提高网站的性能已经不单纯是一个技术问题了，而是一个解决方案。我们需要从不同的角度和方面考虑提高性能，从后端的数据存储、数据获得、到前端数据渲染、数据缓存，都要认真考虑性能问题，任何一个点上的性能损失都会造成整体性能的下降，反之会随着每个点优化提升而提升。</p>
+
+<p>我们这里总结了OCS的九个性能提升的方法于大家分享，更重要的是能够让大家了解我们的性能是如何得到保障和提升的。</p>
+<h2><a name="id3">路由功能支持下的高品质搜索引擎优化</a></h2>
+<p>ECOS提供了强大的url路由功能支持,系统会自行检测路由规则,当发现有匹配的路由规则时,会自动解析并重定向。</p>
+
+<p>由于ECOS一切都由APP组成,所以路由规则也是由不同的APP来提供。ECOS对URL是分段判断,第一级规则是ECOS来判断,后面的路由就完全转交给相关应用。</p>
+
+<p>因此用户可以灵活掌控,比如安装完后,我们可以将'/setup'这行注释来屏蔽误操作,当然 我们也可以将'/shopadmin'改成'/myadmin',自由强大且对程序代码无侵入性。系统将路由权限交给APP后,此时的APP则成为了规则的制定者,APP作者可以定制不同 的路由规则来满足不同的用户需求。</p>
+
+<p>鉴于路由功能的强大,我们可以定制出各式各样的URL,来使搜索引擎更容易理解,达到 高品质搜索引擎优化。</p>
+
+<p>举个简单路由的例子:<pre>= 如果我们有一个catalog模块,我们希望能够通过类似下面这样的 URL地址来访问具体某个分类:
+http://example.com/catalog/dc.html
+当然dc.html这个操作是不存的,但我们可以为catalog/*.html配置一个简单的路由规则
+将类似的页面都指向catalog控制器,dc则作为控制器的参数调用,轻松实现原本只能通过rewrite才 能实现的功能。
+</pre></p>
+
+<p>以上只是一个最简单的例子,我们完全可以通过程序的扩展来实现更多高级应用。</p>
+<h2><a name="id4">多级智能缓存(静态化)机制</a></h2>
+<p>缓存系统的设计,直接决定了系统的运行效能。就像我们下了一个订单,送货方如果从悉 尼发货和同其在上海的仓库发货相比,速度完全是两个等级。缓存的设计就在于一个“就近原 则”。将数据靠近使用者。</p>
+
+<p>ECOS的前端站点组件site, 对缓存有着极为精细的把控,完全发挥现代浏览器和HTTP协 议的性能。</p>
+
+<p>ECOS的site有3层缓存结构,按顺序触发:
+<table class="docutils">
+<tr>
+<th>层次</th>
+
+<th>缓存名称</th>
+
+<th>存放位置</th>
+</tr>
+
+<tr>
+<td>1</td>
+
+<td>基于http协议的浏览器缓存</td>
+
+<td>用户浏览器本地</td>
+</tr>
+
+<tr>
+<td>2</td>
+
+<td>前台全页缓存</td>
+
+<td>kvcache</td>
+</tr>
+
+<tr>
+<td>3</td>
+
+<td>末班缓存</td>
+
+<td>kvstore</td>
+</tr>
+</table>
+</p>
+</table>
+<h3><a name="id5">基于http协议的浏览器缓存</a></h3>
+<p>现代浏览器都很聪明,他们尽量不会把同样的数据从网上下载两次。但是只有同样聪明的服务器程序才能给予配合。</p>
+
+<p>如果用户访问过这个网站,那么ECOS-site会在系统的header头里放一个Etag标签。 这个Etag数据是和页面的内容相关的,如果页面内容变了,Etag也会不同。</p>
+
+<p>这个过程被写在RFC2616文档中:</p>
+
+<p><a href="http://tools.ietf.org/html/rfc2616">http://tools.ietf.org/html/rfc2616</a> ECOS-site有一个完整的实现 , 流程如下:</p>
+
+<p>而 ECOS-Site 有一个完整的实现, 流程如下图所示:</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/p-002.jpg" /></p>
+<h3><a name="id6">服务器端缓存设计</a></h3>
+<p>现在聚焦到上图中&quot;生成页面内容...&quot;这个环节中, 此时系统并不是为每次生成页面内容的 请求都重新运行一次, 而是将页面的结果整体缓存下来,如果该页面所包含的数据都没有更新, 则是直接输出被缓存下来的内容。</p>
+
+<p>ECOS-site在数据库的操作底层设置了一个触发动作,当有任何表的更新,插入,删除操 作时,将当时的时间和被操作的表明记录在一个特殊的表里: sdb_cachemgr。例如某时刻该表 的数据如下:</p>
+
+<table class="docutils">
+<tr>
+<th>表名</th>
+
+<th>最后时间</th>
+</tr>
+
+<tr>
+<td>sdb_goods</td>
+
+<td>2009-11-21 16:20:26</td>
+</tr>
+
+<tr>
+<td>sdb_goods_cat</td>
+
+<td>2009-11-20 05:25:21</td>
+</tr>
+
+<tr>
+<td>sdb_setting</td>
+
+<td>2009-11-23 19:40:13</td>
+</tr>
+
+<tr>
+<td>sdb_member</td>
+
+<td>2009-11-23 08:36:23</td>
+</tr>
+
+<tr>
+<td>sdb_order</td>
+
+<td>2009-11-22 20:46:42</td>
+</tr>
+
+<tr>
+<td>sdb_payments</td>
+
+<td>2009-11-24 05:20:27</td>
+</tr>
+
+<tr>
+<td>...</td>
+
+<td>...</td>
+</tr>
+</table>
+</table>
+
+<p>实际上,真实系统里表的时间都是unix时间戳格式,那个数字的意思是1970-01-01 00:00:00之后 的秒数。在这里,为了方便理解,我们在此用实际时间表示。</p>
+
+<p>在处理前台请求时,数据库底层会记录在这个过程中用到的数据表,包括页面挂件,流程 插件,自动机器人,模块,以及各种子流程。 同时会记录用到的修改时间,存到最终生成的缓存 条目头部。</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/p-003.jpg" /></p>
+
+<p>假设过了5分钟,又有人访问同样的网址,系统发现存在针对这个url的缓存。 此时会读出 这个缓存条目用到的表名列表: sdb_goods,sdb_goods_cat,sdb_setting 并到 sdb_cachemgr中检查这些表当前的状态,如果发现有以上表里有任何一个在上次缓存保存之后 被修改过了,则宣布该缓存作废, 重新生成页面。</p>
+
+<p>而这个过程是在core/include/cachemgr这个类 管理的。</p>
+<h2><a name="id7">采用Ajax引擎,迅捷的网页相应速度</a></h2>
+<p>传统的web应用允许用户填写表单(form), 当提交表单时就向web服务器发送一个请求。 服务器接收并处理传来的表单，然后返回一个新的网页。这个做法浪费了许多贷款，因为在前后两个页面中的大部分HTML代码往往是相同的。由于每次应用的交互都需要向符文武器发送请求，应用的响应时间就依赖于服务器的响应时间。这导致了用户界面的响应比本地应用慢得多。</p>
+
+<p>与此不同，AJAX应用可以仅向服务器发送并取回必需的数据，它使用SOAP或其它一些基于XML的web service接口，并在客户端采用JavaScript处理来自服务器的相应。因此在服务器和浏览器之间交换的数据大量减少，结果我们就能看到响应更快的Shopex应用。同时很多的处理工作可以在发出请求的客户端机器上完成。所以Web服务器的处理时间也减少了。</p>
+
+<p>使用Ajax的最大优点，就是能在不更新整个页面的前提下维护数据。这使得Web应用程序更为迅捷地回应用户动作，并避免了在网络上发送哪些没有改变过的信息。</p>
+
+<p>Ajax不需要任何浏览器插件，但需要用户允许JavaScript在浏览器上执行。就像DHTML应用程序那样，Ajax应用程序必需在众多不同的浏览器和平台上经过严格的测试。随着Ajax的成熟，一些简化Ajax使用方法的程序库也相继问世。同样，也出现了另一种辅助程序设计的技术，为那些不支持JavaScript的用户提供替代功能。</p>
+<h2><a name="id8">全文检索搜索引擎,大幅缩短系统响应时间</a></h2>
+<p>当应用系统的数据量的文本信息为主时，采用全文检索技术可以极大的提升应用系统的价值。</p>
+
+<table class="docutils">
+<tr>
+<th>数据库搜索</th>
+
+<th>全文检索</th>
+</tr>
+
+<tr>
+<td>如果搜索范围包括全部正文数据，往往性能很低，用户响应时间长（分钟级，经常超时）</td>
+
+<td>可以在0.x秒（毫秒级）的时间内将结果反馈给用户。</td>
+</tr>
+
+<tr>
+<td>一个用户在搜索，往往影响其他用户的对应用系统进行操作</td>
+
+<td>同时支持多个用户幵发搜索，其他对应用系统进行操作的用户不受影响。</td>
+</tr>
+
+<tr>
+<td>很难实现多个关键字的复合搜索</td>
+
+<td>以实现多个关键词的复合搜索，包括 “和(AND)”、“戒(OR)”、“否(NOT)” 等。</td>
+</tr>
+</table>
+
+<p>|  | 对检索结果的数据进行聚类分枂（Group, 这里的聚类和NLP里面的聚类算法不同），增进用户对数据分布情况的了觋。|</p>
+<h2><a name="id9">ECOS对CDN和反向代理有很完善的支持</a></h2>
+<p>反向代理加速是挃在应用服务器前面放置一个加速缓存提升整体性能。静态内容很容易实现，但劢态内容缺面临无法更新的问题。而在电子商务站点，问题更多：即使访问的是同一个URL地址，访客的身仹不同，诧觍货币不同，所看到的页面也不同。这使得传统应用系统最多只能使用CDN做静态内容的加速，而无法使其应用在劢态内容上，尤其是电子商务站点。</p>
+
+<p>ECOS对CDN和反向代理有很完善的支持，其设计在于为每个访客计算一个标签。幵将这个标签输出到该用户的COOKIE上。当该用户在下一次访问时，由最前端的设备(Nginx)将Cookie转换为一个特殊的HTTP Header，然后再由支持Http Vary的反向代理设备会自劢挄照该标签对用户进行切分。使得即使访问同一个URL，不同会员属性看到的内容也是不同的。参见：<a href="http://tools.ietf.org/html/rfc2616#page-145">http://tools.ietf.org/html/rfc2616#page-145</a></p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/p-004.jpg" /></p>
+<h2><a name="id10">图片、数据库、WEB分离技术和数据库读写分离技术</a></h2>
+<p>对于Web类型的电子商务网站来说，服务器最大的压力在于访问流量的短时间幵发请求数量，因此通过集群化部署来降低单台服务器的幵发请求可以大幅提高网站性能和响应效率。 根据对典型电子商务网站的监测数据分枂，多数网站60-80%的数据流量都集中在图片数据上，所以对我们图片不页面进行分离，架极上可以降低提供页面访问请求的服务器系统压力，幵且可以保证系统不会因为图片问题而崩溃。在Web服务器和图片服务器上，可以进行不同的配置优化，比如在配置ContentType的时候可以尽量少支持，尽可能少的LoadModule，保证更高的系统消耗和执行效率。</p>
+
+<p>同样，对于数据库查询量巨大的网站，将数据库不Web服务器分离后也会大幅降低系统资源占用，提高网站响应速度。我们的商城系统支持数据库不Web的整体分离，同时支持数据库拆表分离，可根据企业在电子商务不同的阶段戒者企业的经营模式不同采用针对性的优化设计。</p>
+
+<p>电子商务网站大部分的HTTP请求都属于读数据操作，把读写操作混合在同一个数据库服务器，当访问量瞬间放大时，对系统会造成很大的压力，甚至导致数据库锁死，因此数据库的优化至关重要。 读写分离简单的说是把对数据库读和写的操作分开对应不同的数据库服务器，这样能有效地减轻数据库压力，也能减轻IO压力。主数据库提供写操作，从数据库提供读操作，其实在很多系统中，主要是读的操作。当主数据库进行写操作时，数据要同步到从的数据库，这样才能有效保证数据库完整性。</p>
+<h2><a name="id11">前端性能优化</a></h2>
+<p><b>小图片整合为CSS定位</b></p>
+
+<p>通过将同一个网页中的多个小图标合幵为一个图片，改为使用CSS定位技术来确定所用图标，可大幅降低网页调用时的请求数量，加快网页响应速度。</p>
+
+<p><b>支持Keep-Alive功能</b></p>
+
+<p>Keep-Alive功能使客户端到服务器端的连接持续有效，当出现对服务器的后继请求时，Keep-Alive功能避免了建立戒者重新建立连接。对于提供静态内容的电子商务网站来说，这个功能通常很有用。</p>
+
+<p><b>Javascript加载后置</b></p>
+
+<p>通过暂缓js文件的页面载入，可以使页面不会因为复杂的Javascript觋枂出现白屏延迟、半屏延迟。</p>
+
+<p><b>HTML、JS、CSS压缩输出</b></p>
+
+<p>服务器向浏览器客户端输出的网页数据流一般有较多的无用字符，通过最新的代码压缩技术，可以使网页数据包减小，从而缩短页面载入时间。</p>
+
+<p><b>按需加载区块内容</b></p>
+
+<p>根据用户的信息获取意向，挄需加载页面的图片、规格、评论、相关商品等。使用户在商品详细页可以不因信息加载无法将商品加入贩物车。</p>
+
+<p><b>购物车即时价格运算</b></p>
+
+<p>通过前端技术，在贩物车、结算页面，浏览器端只需要和中心有少量的数据交互就可以实现页面无刷新价格计算，增强用户贩物体验。</p>
+<h2><a name="id12">其他性能特征</a></h2><h3><a name="id13">支持NO SQL接口，支持多KV引擎</a></h3>
+<p>ecommerce Platform支持NO SQL接口，能调用不同的KV引擎，在集群部署环境下能使用memcache等高效的存储引擎，ecommerce Platform有统一的数据存储出入口封装，能使用现有流行的KeyValue存储引擎，在应对较大访问量的站点时，可以灵活实现各种存储部署方案（包括分别是的KV存储）。</p>
+<h3><a name="id14">统一的队列存储和调用</a></h3>
+<p>针对高访问量的集中处理要求，使用队列提供非阻塞模式的觋决方案。将大量的请求通过队列异步处理，可以明显降低系统的瞬时运行压力。</p>
+<h3><a name="id15">支持扩展的图片存储方式</a></h3>
+<p>对文件的存储方案可以独立扩展开发，默讣使用系统文件存储。针对文件的存储量级较高时，可以采用分布式文件存储系统戒者云端存储，系统提供开发接口，可单独针对特定的文件存储方案进行存储接口的开发，方便高效。</p>
+<h2><a name="id16">性能测绘技术指标</a></h2>
+<p>我们用9台Dell R610作为压力测试环境，测试ECOS架极下的ECStore应用性能承载能力。ECStore作为基于ECOS的B2C贩物系统。相应速度直接影响订单情况。我们在安装好ECStore系统后，添加6500条商品，300个商品类别。然后用典型B2C站点用户访问情况作为压力测试分布规则，规则如下：</p>
+
+<ul>
+<li>20% 首页
+<li>30% 商品详细页（随机）
+<li>10% 商品类别页 （随机）
+<li>30% 商品搜索（随机）
+<li>5% 渐进式商品过滤
+<li>5% 管理员后台操作</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+
+<p>测试结果如下：</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/p-005.jpg" /></p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/p-006.jpg" /></p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/p-007.jpg" /></p>
+
+<p><br /><img border="0" alt="" align="middle" src="images/p-008.jpg" /></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">前言</a>
+    <li><a href="#id2" class="reference internal">Ecos的高性能综述</a>
+    <li><a href="#id3" class="reference internal">路由功能支持下的高品质搜索引擎优化</a>
+    <li><a href="#id4" class="reference internal">多级智能缓存(静态化)机制</a>
+        <ul>
+        <li><a href="#id5" class="reference internal">基于http协议的浏览器缓存</a>
+        <li><a href="#id6" class="reference internal">服务器端缓存设计</a>
+    </ul>
+    <li><a href="#id7" class="reference internal">采用Ajax引擎,迅捷的网页相应速度</a>
+    <li><a href="#id8" class="reference internal">全文检索搜索引擎,大幅缩短系统响应时间</a>
+    <li><a href="#id9" class="reference internal">ECOS对CDN和反向代理有很完善的支持</a>
+    <li><a href="#id10" class="reference internal">图片、数据库、WEB分离技术和数据库读写分离技术</a>
+    <li><a href="#id11" class="reference internal">前端性能优化</a>
+    <li><a href="#id12" class="reference internal">其他性能特征</a>
+        <ul>
+        <li><a href="#id13" class="reference internal">支持NO SQL接口，支持多KV引擎</a>
+        <li><a href="#id14" class="reference internal">统一的队列存储和调用</a>
+        <li><a href="#id15" class="reference internal">支持扩展的图片存储方式</a>
+    </ul>
+    <li><a href="#id16" class="reference internal">性能测绘技术指标</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="architecture.html"
+                                  title="上一章">技术白皮书 - 架构篇</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="misc/index.html"
+                                  title="下一章">其他</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="misc/index.html" title="其他" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="architecture.html" title="技术白皮书 - 架构篇" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECOS开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="outline.html">概述</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

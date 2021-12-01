@@ -1,0 +1,933 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      api机制 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="基础框架 - base" href="index.html" />
+
+        <link rel="next" title="cache" href="缓存机制.html" />
+        <link rel="prev" title="mvc/c/extend" href="控制器扩展.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="cache.html" title="缓存机制" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="mvc/c/extend.html" title="控制器扩展" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">基础框架 - base</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> api机制</h1>
+            <h2><a name="id1">概述</a></h2><h3><a name="id2">API概述</a></h3>
+<p>应用程序接口（API：application programming interface）是一组定义、程序及协议的集合，通过 API 接口实现网络多节点间的相互通信.</p>
+
+<p>本API文档对两种机制做描述：
+<ul>
+<li>Ecstore对外提供的资源API接口（以下简称API）
+<li>Ecstore资源变更时主动发起的请求（以下简称主动发起）</li>
+</li>
+</ul>
+</p>
+
+<p>API：
+<ul>
+<li>Matrix对接API(api)
+<ul>
+<li>系统自带的标准API,　是和<a href=" http://open.shopex.cn">ShopEx开放平台(ShopExOpenPlatform)</a> 进行互联互通的专用API.　</ul>
+
+<li>直联API
+<ul>
+<li>不通过matrix直接联通的API机制，包括校验机制，调用方需要预先获取token</ul>
+
+<li>开放API(open api)
+<ul>
+<li>提供给与外系统直接进行互联的途径，没有校验机制，需自己添加</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</p>
+
+<p>主动发起：</ul>
+
+<ul>
+<li>订单变更
+<li>支付单变更
+<li>……</li>
+</li>
+</li>
+</ul>
+<h3><a name="id3">联通角色</a></h3>
+<ul>
+<li>Ecstore<pre class="quote">资源提供方，提供接口供接入方调用资源
+</pre>
+<li>ShopEx开放平台<pre class="quote">ShopEx开放平台（ShopEx Open Platform，简称SOP）ShopEx服务的开放平台，基于基础服务、数据和流程。提供互连互通服务。通过平台，连接一切。
+
+      ShopEx是面向电子商务企业的数据和服务的综合性平台，为互联网电子商务企业应用提供应用接入、应用分销、整合方案、服务接入等一整套服务的开放性平台，通过接入ShopEx开放平台，电子商务企业可轻松与第三方开放应用数据整合、成本控制、资源共享等完整的解决方案。
+
+      其主要内容包括：以OpenAPI形式开放的ShopEx电子商务基础服务、ShopEx自有的开放式应用平台、对第三方应用平台的开放式基础支持。
+
+</pre>
+<li>接入方<pre class="quote">接入方为资源使用方
+</pre></li>
+</li>
+</li>
+</ul>
+<h3><a name="id4">如何联通？</a></h3>
+<p>接入方发起（以下三种联通方式）：
+<ul>
+<li>联通ShopEx开放平台，通过ShopEx开放平台联通Ecstore
+<li>通过Ecstore提供的直联API，直接调用（需要获取token，使用固定传输规则）
+<li>通过Ecstore提供的开放API，直接调用</li>
+</li>
+</li>
+</ul>
+</p>
+
+<p>Ecstore发起：
+<ul>
+<li>接入方接入ShopEx开放平台，Ecstore资源发生变更时主动发起请求通过ShopEx开放平台通知调用方
+<li>Ecstore资源发生变更时直接发送请求通知调用方</li>
+</li>
+</ul>
+</p>
+<h2><a name="id5">Matrix对接API</a></h2><pre class="mark">前提：需要在ecstore后台绑定接入方，同时要再 app/${app_id}（默认b2c）/apiv_mapper.xml中绑定双方API版本映射关系
+</pre><h3><a name="id6">版本机制介绍</a></h3>
+<p>在Ecstore2.0中针对API设计了版本机制。目前最新的API版本是2.0，之前的API版本设为1.0。接入方接入Ecstore时需要指定API版本号，若不指定，默认使用最新版本。</p>
+<h4><a name="id7">API版本机制新增相关文件</a></h4><pre class="mark">  app/${app_id}/apiv_mapper.xml 版本关系映射表（接入方的API版本和Ecstore API版本关系对应表）
+  app/b2c/lib/apiv/             API机制主目录
+        exchange/               路由器目录
+        extends/                基类目录
+        interface/              类接口目录
+        apis/                   新增API实现目录
+</pre><h4><a name="id8">版本机制判断流程：</a></h4>
+<ul>
+<li>来源请求中包含 from_node_id（调用方编号） 和 from_api_v（调用方API版本号）
+<ul>
+<li>判断是否绑定
+<li>查看版本映射表中是否有调用方API版本（apiv_mapper.xml），计算对应的本地版本号</ul>
+
+<li>来源请求中不包含上列字段
+<ul>
+<li>设定默认请求本地最高版本API（目前是2.0）</ul>
+
+<li>从得到的本地版本开始查找，如果没有对应的接口，则向下递减（例如1.0）</li>
+</ul>
+</li>
+</li>
+</ul>
+</li>
+</ul>
+<h3><a name="id9">如何调用</a></h3>
+<p>matrix对接API需要接入方通过ShopEx开放平台联通
+<ul>
+<li><a href="../../ecstore/append-a/index.html">附录A-API清单</a></li>
+</ul>
+</p>
+<h4><a name="id10">API系统级请求参数</a></h4>
+<ul>
+<li>数据格式 utf-8
+<li>HTTP请求content-type:application/x-www-form-urlencoded
+<li>数据格式为datetime(如:)
+<li>数据返回格式（json）</li>
+</li>
+</li>
+</li>
+</ul>
+
+<table class="docutils">
+<tr>
+<th>参数</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>method</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>API接口名称</td>
+</tr>
+
+<tr>
+<td>v</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>矩阵API协议版本，可选值:1.0</td>
+</tr>
+
+<tr>
+<td>timestamp</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>时间戳，格式为yyyy-MM-dd hh:mm:ss，例如：2008-01-25 20:23:30。ShopEx API服务端允许客户端请求时间误差为10分钟</td>
+</tr>
+
+<tr>
+<td>format</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>可选，指定响应格式。默认JSON ,目前支持格式为JSON</td>
+</tr>
+
+<tr>
+<td>sign</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>对调用API时所有输入参数（包括应用级参数）进行签名结果</td>
+</tr>
+
+<tr>
+<td>certi_id</td>
+
+<td>Number</td>
+
+<td>N</td>
+
+<td>分配给应用的证书ID</td>
+</tr>
+
+<tr>
+<td>from_node_id</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>API调用的来源节点ID,对于第三方开发者来说，此id即为申请应用颁发的APP KEY</td>
+</tr>
+
+<tr>
+<td>from_api_v</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>请求方版本号</td>
+</tr>
+
+<tr>
+<td>to_node_id</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>API调用的目的节点ID(除了基础服务类api，其他接口必传此参数)</td>
+</tr>
+
+<tr>
+<td>to_api_v</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>接收方版本号</td>
+</tr>
+
+<tr>
+<td>callback_url</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>响应回调地址，带http路径的标准URL。（调用异步接口此参数必填）</td>
+</tr>
+</table>
+</table>
+<h4><a name="id11">响应结果</a></h4><pre>{
+  &quot;res&quot;:&quot;&quot;,
+  &quot;rsp&quot;:&quot;succ&quot;,
+  &quot;data&quot;:
+  {
+    &quot;tid&quot;:&quot;000001&quot;
+  }
+}
+</pre>
+<table class="docutils">
+<tr>
+<th>参数名称</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>Rsp</td>
+
+<td>请求是否正确 , succ 为成功 , fail 为失败</td>
+</tr>
+
+<tr>
+<td>Res</td>
+
+<td>返回的消息字符串.请求正确时为空,失败时为错误消息</td>
+</tr>
+
+<tr>
+<td>Data</td>
+
+<td>返回请求的数据结果集</td>
+</tr>
+</table>
+</table>
+<h4><a name="id12">签名算法(sign的生成方式)</a></h4><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">function&nbsp;</span><span style="color: #0000BB">get_sign</span><span style="color: #007700">(</span><span style="color: #0000BB">$params</span><span style="color: #007700">,</span><span style="color: #0000BB">$token</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">strtoupper</span><span style="color: #007700">(</span><span style="color: #0000BB">md5</span><span style="color: #007700">(</span><span style="color: #0000BB">strtoupper</span><span style="color: #007700">(</span><span style="color: #0000BB">md5</span><span style="color: #007700">(</span><span style="color: #0000BB">assemble</span><span style="color: #007700">(</span><span style="color: #0000BB">$params</span><span style="color: #007700">))).</span><span style="color: #0000BB">$token</span><span style="color: #007700">));<br />}<br />function&nbsp;</span><span style="color: #0000BB">assemble</span><span style="color: #007700">(</span><span style="color: #0000BB">$params</span><span style="color: #007700">)<br />{<br />&nbsp;&nbsp;&nbsp;&nbsp;if(!</span><span style="color: #0000BB">is_array</span><span style="color: #007700">(</span><span style="color: #0000BB">$params</span><span style="color: #007700">))&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">null</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">ksort</span><span style="color: #007700">(</span><span style="color: #0000BB">$params</span><span style="color: #007700">,</span><span style="color: #0000BB">SORT_STRING</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$sign&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">''</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;foreach(</span><span style="color: #0000BB">$params&nbsp;</span><span style="color: #007700">AS&nbsp;</span><span style="color: #0000BB">$key</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$val</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$sign&nbsp;</span><span style="color: #007700">.=&nbsp;</span><span style="color: #0000BB">$key&nbsp;</span><span style="color: #007700">.&nbsp;(</span><span style="color: #0000BB">is_array</span><span style="color: #007700">(</span><span style="color: #0000BB">$val</span><span style="color: #007700">)&nbsp;?&nbsp;</span><span style="color: #0000BB">assemble</span><span style="color: #007700">(</span><span style="color: #0000BB">$val</span><span style="color: #007700">)&nbsp;:&nbsp;</span><span style="color: #0000BB">$val</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$sign</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;<br /></span><br /><br />token的来源:<br /><br />token是在域名绑定shopex_id时由商派中心生成的一串验签码，此验签码存放在config/certi.php文件中，和证书一起。<br /><br /><br />调用方式：&nbsp;<br /><br />base_certificate::token();<br /></span>
+</code></div><h3><a name="id13">如何开发</a></h3></ul>
+
+<ol>
+<ol>
+<li>注册对应的API service（规则：api-response_版本号_接口名称），例如：<pre>    &lt;service id=&quot;api-response_1.0_b2c.order&quot;&gt;
+      &lt;class&gt;b2c_api_ocs_1_0_order&lt;/class&gt;
+    &lt;/service&gt;
+    &lt;service id=&quot;api-response_2.0_b2c.order&quot;&gt;
+      &lt;class&gt;b2c_apiv_apis_20_order&lt;/class&gt;
+    &lt;/service&gt;
+</pre>
+<li>实现对应的接口方法</li>
+</li>
+</ol>
+</ol>
+<h4><a name="id14">最佳实践（订单搜索）</a></h4>
+<ol>
+<li>注册订单模块API2.0接口：<pre>    &lt;service id=&quot;api-response_2.0_b2c.order&quot;&gt;
+      &lt;class&gt;b2c_apiv_apis_response20_order&lt;/class&gt;
+    &lt;/service&gt;
+</pre></li>
+</ol>
+
+<ol>
+<li>创建 app/b2c/lib/apiv/apis/response20/order.php
+<p>第一个参数为接入方请求的用户级参数，第二个参数是API控制对象<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">public&nbsp;function&nbsp;</span><span style="color: #0000BB">search</span><span style="color: #007700">(&nbsp;</span><span style="color: #0000BB">$params</span><span style="color: #007700">,&nbsp;&amp;</span><span style="color: #0000BB">$service&nbsp;</span><span style="color: #007700">)<br />&nbsp;&nbsp;&nbsp;&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//校验参数<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">if(&nbsp;!(&nbsp;</span><span style="color: #0000BB">$start_time&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$params</span><span style="color: #007700">[</span><span style="color: #DD0000">'start_time'</span><span style="color: #007700">]&nbsp;)&nbsp;)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$service</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">send_user_error</span><span style="color: #007700">(</span><span style="color: #DD0000">'7001'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'开始时间不能为空！'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(&nbsp;(</span><span style="color: #0000BB">$start_time&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">strtotime</span><span style="color: #007700">(</span><span style="color: #0000BB">trim</span><span style="color: #007700">(</span><span style="color: #0000BB">$start_time</span><span style="color: #007700">)))&nbsp;===&nbsp;</span><span style="color: #0000BB">false&nbsp;</span><span style="color: #007700">||&nbsp;</span><span style="color: #0000BB">$start_time&nbsp;</span><span style="color: #007700">==&nbsp;-</span><span style="color: #0000BB">1&nbsp;</span><span style="color: #007700">)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$service</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">send_user_error</span><span style="color: #007700">(</span><span style="color: #DD0000">'7002'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'开始时间不合法！'</span><span style="color: #007700">);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(&nbsp;!(&nbsp;</span><span style="color: #0000BB">$end_time&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$params</span><span style="color: #007700">[</span><span style="color: #DD0000">'end_time'</span><span style="color: #007700">]&nbsp;)&nbsp;)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$service</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">send_user_error</span><span style="color: #007700">(</span><span style="color: #DD0000">'7003'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'结束时间不能为空！'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(&nbsp;(</span><span style="color: #0000BB">$end_time&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">strtotime</span><span style="color: #007700">(</span><span style="color: #0000BB">trim</span><span style="color: #007700">(</span><span style="color: #0000BB">$end_time</span><span style="color: #007700">)))&nbsp;===&nbsp;</span><span style="color: #0000BB">false&nbsp;</span><span style="color: #007700">||&nbsp;</span><span style="color: #0000BB">$end_time&nbsp;</span><span style="color: #007700">==&nbsp;-</span><span style="color: #0000BB">1&nbsp;</span><span style="color: #007700">)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$service</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">send_user_error</span><span style="color: #007700">(</span><span style="color: #DD0000">'7004'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'结束时间不合法！'</span><span style="color: #007700">);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$obj_orders&nbsp;</span><span style="color: #007700">=&nbsp;&amp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">model</span><span style="color: #007700">(</span><span style="color: #DD0000">'orders'</span><span style="color: #007700">);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">……<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">}<br /></span>
+</span>
+</code></div></p>
+</li>
+</ol>
+<h2><a name="id15">直联API</a></h2><h3><a name="id16">如何调用</a></h3>
+<p>直联API同Matrix机制相同，唯一不同在于跳过了ShopEx开放平台。接入方直接发送请求到Ecstore。</ol>
+
+<ul>
+<ul>
+<li><a href="../../ecstore/append-a/index.html">附录A-API清单</a></li>
+</ul>
+</ul>
+<h4><a name="id17">API系统级请求参数</a></h4>
+<ul>
+<li>接入地址：<a href="http://网店地址/index.php/api">http://网店地址/index.php/api</a>
+<li>数据格式：utf-8
+<li>HTTP请求：支持GET、POST方式，支持GZIP压缩
+<li>数据格式，例：direct=true&amp;method=b2c.payment.create&amp;sign=6F30EF7D2005A3DAF6D14DBEFEB59A7A
+<li>数据返回格式（json）</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+
+<table class="docutils">
+<tr>
+<th>参数</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>direct</td>
+
+<td>string</td>
+
+<td>Y</td>
+
+<td>设置为true</td>
+</tr>
+
+<tr>
+<td>method</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>指定调用api的service和mehtod. 例如:method设为b2c.payment.create 那么service:api.b2c.payment, method:create</td>
+</tr>
+
+<tr>
+<td>sign</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>签名,参看签名算法</td>
+</tr>
+
+<tr>
+<td>date</td>
+
+<td>String</td>
+
+<td>Y</td>
+
+<td>时间戳，格式为yyyy-MM-dd hh:mm:ss，例如：2008-01-25 20:23:30</td>
+</tr>
+
+<tr>
+<td>format</td>
+
+<td>String</td>
+
+<td>N</td>
+
+<td>可选，指定响应格式。默认json</td>
+</tr>
+</table>
+</table>
+<h4><a name="id18">响应结果</a></h4><pre>{
+  &quot;res&quot;:&quot;&quot;,
+  &quot;rsp&quot;:&quot;succ&quot;,
+  &quot;data&quot;:
+  {
+    &quot;tid&quot;:&quot;000001&quot;
+  }
+}
+</pre>
+<table class="docutils">
+<tr>
+<th>参数名称</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>Rsp</td>
+
+<td>请求是否正确 , succ 为成功 , fail 为失败</td>
+</tr>
+
+<tr>
+<td>Res</td>
+
+<td>返回的消息字符串.请求正确时为空,失败时为错误消息</td>
+</tr>
+
+<tr>
+<td>Data</td>
+
+<td>返回请求的数据结果集</td>
+</tr>
+</table>
+</table>
+<h4><a name="id19">签名算法</a></h4>
+<p><a href="#id12">同matrix对接API</a></p>
+<h3><a name="id20">如何开发</a></h3>
+<p><a href="#id13">同matrix对接API</a></p>
+<h2><a name="id21">Ecstore主动发起</a></h2>
+<p>Ecstore资源发生变更时会对外主动发起请求。当前已有的发起点包括：</p>
+
+<ul>
+<li><a href="../../ecstore/append-b/index.html">附录B-Ecstore资源变更发起点</a></li>
+</ul>
+<h3><a name="id22">发起到ShopEx开放平台</a></h3><pre class="mark">前提：需要在ecstore后台绑定接入方，同时要再 app/${app_id}（默认b2c）/apiv_mapper.xml中绑定双方API版本映射关系
+</pre><h4><a name="id23">如何开发</a></h4></ul>
+
+<ol>
+<ol>
+<li>注册对应service，规则是 api-request_本地api版本号_目标平台_动作，例如（订单新增）：<pre>    &lt;service id=&quot;api-request_2.0_ecos.ome_ordercreate&quot;&gt;
+      &lt;class&gt;b2c_apiv_apis_request20_ome_order&lt;/class&gt;
+    &lt;/service&gt;
+</pre>
+<li>实现对应方法，需要 extends b2c_apiv_extends_request，重载对应方法和变量。</li>
+</li>
+</ol>
+</ol>
+<h4><a name="id24">最佳实践（订单创建时）</a></h4>
+<ol>
+<li>注册Service<pre>    &lt;service id=&quot;api-request_2.0_ecos.ome_ordercreate&quot;&gt;
+      &lt;class&gt;b2c_apiv_apis_request20_ome_order&lt;/class&gt;
+    &lt;/service&gt;
+</pre>
+<li>实现<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">b2c_apiv_apis_20_ome_order&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">b2c_apiv_extends_request<br /></span><span style="color: #007700">{<br />&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$method&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'store.trade.add'</span><span style="color: #007700">;<br />&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$callback&nbsp;</span><span style="color: #007700">=&nbsp;array();<br />&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$title&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'订单新增'</span><span style="color: #007700">;<br />&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$timeout&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">1</span><span style="color: #007700">;<br />&nbsp;&nbsp;var&nbsp;</span><span style="color: #0000BB">$async&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">;<br /><br />&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">get_params</span><span style="color: #007700">(</span><span style="color: #0000BB">$sdf</span><span style="color: #007700">)<br />&nbsp;&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$order_id&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$sdf</span><span style="color: #007700">[</span><span style="color: #DD0000">'order_id'</span><span style="color: #007700">];<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$order_detail&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c_order_full'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #0000BB">$order_id</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$order_detail</span><span style="color: #007700">;<br />&nbsp;&nbsp;}<br />}<br /></span>
+</span>
+</code></div></li>
+</li>
+</ol>
+<h3><a name="id25">直接发起到接入方</a></h3><h4><a name="id26">如何开发</a></h4>
+<ol>
+<li>注册对应service（单个触发点可多次注册），规则是 api-request_out_动作，例如（订单新增）：<pre>    &lt;service id=&quot;api-request_out_ordercreate&quot;&gt;
+      &lt;class&gt;b2c_apiv_apis_out_order&lt;/class&gt;
+    &lt;/service&gt;
+</pre>
+<li>实现对应方法，需要 implements b2c_apiv_interface_requestout，在方法内发起请求到对应接入方API接口。</li>
+</li>
+</ol>
+<h4><a name="id27">最佳实践（订单创建时）</a></h4>
+<ol>
+<li>注册Service<pre>    &lt;service id=&quot;api-request_out_ordercreate&quot;&gt;
+      &lt;class&gt;b2c_apiv_apis_out_order&lt;/class&gt;
+    &lt;/service&gt;
+</pre>
+<li>实现<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">b2c_apiv_apis_out_order&nbsp;</span><span style="color: #007700">implements&nbsp;</span><span style="color: #0000BB">b2c_apiv_interface_requestout<br /></span><span style="color: #007700">{<br />&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">init</span><span style="color: #007700">(</span><span style="color: #0000BB">$sdf</span><span style="color: #007700">)<br />&nbsp;&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$url&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'http://www.baidu.com'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$core_http&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'base_httpclient'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$response&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$core_http</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">set_timeout</span><span style="color: #007700">(</span><span style="color: #0000BB">10</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">post</span><span style="color: #007700">(</span><span style="color: #0000BB">$url</span><span style="color: #007700">,</span><span style="color: #0000BB">$sdf</span><span style="color: #007700">,array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'Content-Encoding'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'gzip'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;));<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">$response</span><span style="color: #007700">===</span><span style="color: #0000BB">HTTP_TIME_OUT</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$headers&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$core_http</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">responseHeader</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">log</span><span style="color: #007700">(</span><span style="color: #DD0000">'Request&nbsp;timeout,&nbsp;process-id&nbsp;is&nbsp;'</span><span style="color: #007700">.</span><span style="color: #0000BB">$headers</span><span style="color: #007700">[</span><span style="color: #DD0000">'process-id'</span><span style="color: #007700">]);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}else{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;}<br />}<br /></span>
+</span>
+</code></div></li>
+</li>
+</ol>
+<h2><a name="id28">开放API(openapi)</a></h2>
+<p>开放API, 是很轻量级的API. 系统不支持签名验证, 也没有做异常处理.　因此可以按照实际业务需要定制开发签名验证和异常处理.</p>
+<h3><a name="id29">如何调用Ecos开放api</a></h3><h4><a name="id30">请求地址</a></h4><pre>http://{$mydomain}/index.php/openapi/{$openapi_key}/{$openapi_method}/{$key_1}/{$value_1}/{$key_2}/{$value_2}
+</pre>
+<p>如果服务器设置过rewrite<pre>http://{$mydomain}/openapi/{$openapi_key}/{$openapi_method}/{$key_1}/{$value_1}/{$key_2}/{$value_2}
+</pre></p>
+<pre class="mark">$myadmin:	域名
+$openapi_key: 	open api的唯一标识
+$openapi_method: 	调用方法
+$key_1:		参数1
+$value_1:	参数1的值
+$key_2:		参数2
+$value_2:	参数2的值
+</pre><h4><a name="id31">请求方法</a></h4>
+<p>通过POST/GET进行请求<pre class="quote">小技巧:
+
+1. 在系统中可以直接用工具类base_httpclient 来实现.
+2. openapi的调用api可以用kernel::openapi_url()生成.
+
+例如:
+$http = new base_httpclient;
+$url =  kernel::openapi_url('openapi.queue','worker',array('task_id'=&gt;$task_id));
+$http-&gt;post($url,$_POST);
+
+</pre></p>
+<h4><a name="id32">请求参数</a></h4><h5><a name="id33">系统参数</a></h5>
+<p>无</p>
+<h5><a name="id34">用户参数</a></h5>
+<p>用户传参主要有以下两种方式</ol>
+
+<ul>
+<ul>
+<li>url传参(参见上文)
+<li>$_POST传参</li>
+</li>
+</ul>
+</ul>
+<h3><a name="id35">如何开发openapi</a></h3><h4><a name="id36">应用场景</a></h4>
+<ul>
+<li>系统内置回调api,　例如:队列, pam登陆
+<li>多系统联通, 例如:Ecstore和erp进行联通.　但需要自定义传输格式(json/xml/serilize/..), 错误处理及签名认证.</li>
+</li>
+</ul>
+<h4><a name="id37">如何注册新的openapi</a></h4>
+<p>openapi是通过<a href="app/service.html">service机制</a>进行注册的, 默认的service box以&quot;openapi.&quot;作为前缀, 来看一下我们系统目前所提供的所有openapi.</p>
+<pre>bryant@forsky %&gt; ./cmd dev:show services | grep -i &quot;^openapi&quot;
+openapi.rpc_callback                                    base_rpc_service
+openapi.check                                           base_rpc_check
+openapi.queue                                           base_service_queue
+openapi.pam_callback                                    pam_callback
+openapi.ectools_payment                                 ectools_payment_api
+openapi.b2c.callback.shoprelation                       b2c_api_callback_shoprelation
+</pre><pre class="mark">左侧:	$openapi_key		open api的唯一标识
+右侧: 	$openapi_class_name     注册在$openapi_key上的相应openapi处理类
+</pre><pre class="quote">补充知识:
+
+如果需要使用 ./cmd dev:show services, 需要预装dev app
+</pre><h4><a name="id38">openapi类的写法</a></h4>
+<p>api类的存放位置: app/{$app_id}/lib/openapi/{$openapi_class_name}.php</p>
+
+<p>系统实例化api类的时候会将对应的app对象({$app_id})作为参数传进来, 也可以通过调用app:get($app_id)来获取需要的app对象:<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #007700">class&nbsp;{</span><span style="color: #0000BB">$openapi_class_name</span><span style="color: #007700">}<br />{<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">/**<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;app&nbsp;object<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">public&nbsp;</span><span style="color: #0000BB">$app</span><span style="color: #007700">;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">/**<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;构造方法<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@param&nbsp;object&nbsp;app<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">public&nbsp;function&nbsp;</span><span style="color: #0000BB">__construct</span><span style="color: #007700">(</span><span style="color: #0000BB">$app</span><span style="color: #007700">)<br />&nbsp;&nbsp;&nbsp;&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'ectools'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app_b2c&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$app</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br /></span>
+</span>
+</code></div></p>
+
+<p>api类方法的写法:</p>
+
+<p>第一个参数:  将url传过来的参数转化成数组.array({$key1} =&gt; {$value1},{$key2} =&gt; {$vaule2),...)</p>
+
+<p>返回值: 可通过echo/print_r等直接输出. 也可以和通信方约定传输格式及错误处理</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;{</span><span style="color: #0000BB">$openapi_class_name</span><span style="color: #007700">}<br />{<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">/**<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;app&nbsp;object<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">public&nbsp;</span><span style="color: #0000BB">$app</span><span style="color: #007700">;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">/**<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;构造方法<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@param&nbsp;object&nbsp;app<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">public&nbsp;function&nbsp;</span><span style="color: #0000BB">__construct</span><span style="color: #007700">(</span><span style="color: #0000BB">$app</span><span style="color: #007700">)<br />&nbsp;&nbsp;&nbsp;&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'ectools'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app_b2c&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$app</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">create</span><span style="color: #007700">(</span><span style="color: #0000BB">$params</span><span style="color: #007700">)<br />&nbsp;&nbsp;&nbsp;&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;...<br />&nbsp;&nbsp;&nbsp;&nbsp;echo&nbsp;</span><span style="color: #DD0000">'succ'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />}<br /><br /></span>
+</span>
+</code></div><h4><a name="id39">为openapi增加签名验证机制和错误处理</a></h4><h5><a name="id40">增加签名验证</a></h5>
+<p>签名验证主要目的是为了保证多节点通信的多方之间的信任关系</p>
+
+<p>建议方法:
+<ul>
+<li>唯一标识验证
+<ul>
+<li>联通两端分别存放统一的token(一段字符串)
+<li>在调用端将token作为调用参数.　
+<li>在被调用端,　验证传输过来的token是否与本地存放token一致.</ul>
+
+<li>签名认证.
+<ul>
+<li>联通两端分别存放一致的token
+<li>调用端用token对传输的所有参数(params)通过AC算法生成签名(sign),　然后将sign作为调用参数
+<li>在被调用端,　取出sign参数,　然后用本地token对所有参数(除了sign参数)通过AC算法生成本地的sign,　然后跟远端传过来的sign进行比对看是否一致</li>
+</li>
+</li>
+</ul>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</ul>
+</p>
+
+<p>AC算法:<pre class="mark">&lt;?php
+function get_sign($params,$token){
+    return strtoupper(md5(strtoupper(md5(assemble($params))).$token));
+}
+function assemble($params)
+{
+    if(!is_array($params))  return null;
+    ksort($params,SORT_STRING);
+    $sign = '';
+    foreach($params AS $key=&gt;$val){
+        $sign .= $key . (is_array($val) ? assemble($val) : $val);
+    }
+    return $sign;
+}
+?&gt;
+</pre></p>
+<h5><a name="id41">增加错误处理机制</a></h5></ul>
+
+<ul>
+<li>通过set_error_handler函数定义错误处理函数(php4)或通过try catch进行捕获错误
+<li>对返回值进行包装. 加入错误处理, 及处理相应错误的错误ID号<pre class="mark">  例如:json
+
+  失败:{&quot;rsp&quot;:&quot;fail&quot;,&quot;res&quot;:&quot;4003&quot;,&quot;data&quot;:&quot;sign error&quot;}
+  成功:{&quot;rsp&quot;:&quot;succ&quot;,&quot;res&quot;:&quot;&quot;,&quot;data&quot;:&quot;.....&quot;}
+
+  请求失败的时候 res 会返回相关错误信息
+
+  请求成功的时候 res 一般为空 data项返回相关数据信息(详情要看相关api接口文档)
+</pre><h4><a name="id42">最佳实践</a></h4>
+<li>场景: 开发一个订单汇总系统, 需要各个销售前端主动将数据推送过来, 设计符合实际业务的api
+<ul>
+<li>安全性, 出于数据私密性的考虑, 对安全性有要求, 不希望接口被随意访问
+<li>可靠性, 希望不丢单
+<li>可维护性，当数据出了问题时, 能快速定位并解决</ul>
+
+<li>方案:
+<ul>
+<li>安全性: 增加签名验证, 已保证接口被可信任的系统访问
+<li>可靠性: 当接口发生错误时, 系统可以捕获错误. 并通知订单推送端数据重打, 当重试次数大于3次时记错误日志, 并发邮件给管理员
+<li>可维护性: 记录每一个打过来的业务api</ul>
+
+<li>解决:
+<ul>
+<li>安全性, 可靠性和可维护性都是公有化需求, 开发一个 myapp_openapi基类. 所有业务的api继承之, 下边给一个不算完整的例子以作参考
+<p>openapi基类: myapp_openapi<pre>    &lt;?php
+    class myapp_openapi {
+
+        public function __construct() {
+	    set_error_handler(array('myapp_openapi', 'error_handler'));
+	}
+
+        static function error_handler($errno, $errstr, $errfile, $errline ){
+            switch ($errno) {
+                case E_ERROR:
+                case E_USER_ERROR:
+                    throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
+                break;
+
+                case E_STRICT:
+                case E_USER_WARNING:
+                case E_USER_NOTICE:
+                default:
+                    //do nothing
+                break;
+	    }
+	}
+
+	function log($message) {
+	    error_log($message, 0);
+	}
+
+	function verify($params) {
+	    //验证是否合法
+	}
+
+	//返回成功
+	function send_user_succ($result){
+            $result_json = array(
+                'rsp'=&gt;'succ',
+                'data'=&gt;$result,
+            }
+           echo json_encode($result_json);
+	   exit;
+	}
+
+	//返回失败
+	function send_user_error($code, $data){
+            $res = array(
+                'rsp'   =&gt;  'fail',
+                'res'   =&gt;  $code,
+                'data'  =&gt;  $data,
+            );
+            echo json_encode($res);
+	    exit;
+	}
+    }
+</pre>业务api: myapp_openapi_login<pre>    &lt;?php
+    class myapp_openapi_login extends myapp_openapi {
+        public function __construct($app){
+            $this-&gt;app = $app;
+	    parent::__construct();
+        }
+
+	/登陆
+	function login($params) {
+	   if (parent::verify($parames)) {
+	       //如果成功则记录日志
+	       $this-&gt;log(&quot;join user&quot;);
+	   }else{
+	       //如果失败则返回错误信息
+	       $this-&gt;send_user_error('4003', 'user login fail');
+	   }
+	}
+    }
+</pre></p>
+</li>
+</ul>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</li>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">概述</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">API概述</a>
+        <li><a href="#id3" class="reference internal">联通角色</a>
+        <li><a href="#id4" class="reference internal">如何联通？</a>
+    </ul>
+    <li><a href="#id5" class="reference internal">Matrix对接API</a>
+        <ul>
+        <li><a href="#id6" class="reference internal">版本机制介绍</a>
+            <ul>
+            <li><a href="#id7" class="reference internal">API版本机制新增相关文件</a>
+            <li><a href="#id8" class="reference internal">版本机制判断流程：</a>
+        </ul>
+        <li><a href="#id9" class="reference internal">如何调用</a>
+            <ul>
+            <li><a href="#id10" class="reference internal">API系统级请求参数</a>
+            <li><a href="#id11" class="reference internal">响应结果</a>
+            <li><a href="#id12" class="reference internal">签名算法(sign的生成方式)</a>
+        </ul>
+        <li><a href="#id13" class="reference internal">如何开发</a>
+            <ul>
+            <li><a href="#id14" class="reference internal">最佳实践（订单搜索）</a>
+        </ul>
+    </ul>
+    <li><a href="#id15" class="reference internal">直联API</a>
+        <ul>
+        <li><a href="#id16" class="reference internal">如何调用</a>
+            <ul>
+            <li><a href="#id17" class="reference internal">API系统级请求参数</a>
+            <li><a href="#id18" class="reference internal">响应结果</a>
+            <li><a href="#id19" class="reference internal">签名算法</a>
+        </ul>
+        <li><a href="#id20" class="reference internal">如何开发</a>
+    </ul>
+    <li><a href="#id21" class="reference internal">Ecstore主动发起</a>
+        <ul>
+        <li><a href="#id22" class="reference internal">发起到ShopEx开放平台</a>
+            <ul>
+            <li><a href="#id23" class="reference internal">如何开发</a>
+            <li><a href="#id24" class="reference internal">最佳实践（订单创建时）</a>
+        </ul>
+        <li><a href="#id25" class="reference internal">直接发起到接入方</a>
+            <ul>
+            <li><a href="#id26" class="reference internal">如何开发</a>
+            <li><a href="#id27" class="reference internal">最佳实践（订单创建时）</a>
+        </ul>
+    </ul>
+    <li><a href="#id28" class="reference internal">开放API(openapi)</a>
+        <ul>
+        <li><a href="#id29" class="reference internal">如何调用Ecos开放api</a>
+            <ul>
+            <li><a href="#id30" class="reference internal">请求地址</a>
+            <li><a href="#id31" class="reference internal">请求方法</a>
+            <li><a href="#id32" class="reference internal">请求参数</a>
+                <ul>
+                <li><a href="#id33" class="reference internal">系统参数</a>
+                <li><a href="#id34" class="reference internal">用户参数</a>
+            </ul>
+        </ul>
+        <li><a href="#id35" class="reference internal">如何开发openapi</a>
+            <ul>
+            <li><a href="#id36" class="reference internal">应用场景</a>
+            <li><a href="#id37" class="reference internal">如何注册新的openapi</a>
+            <li><a href="#id38" class="reference internal">openapi类的写法</a>
+            <li><a href="#id39" class="reference internal">为openapi增加签名验证机制和错误处理</a>
+                <ul>
+                <li><a href="#id40" class="reference internal">增加签名验证</a>
+                <li><a href="#id41" class="reference internal">增加错误处理机制</a>
+            </ul>
+            <li><a href="#id42" class="reference internal">最佳实践</a>
+        </ul>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="mvc/c/extend.html"
+                                  title="上一章">控制器扩展</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="cache.html"
+                                  title="下一章">缓存机制</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="cache.html" title="缓存机制" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="mvc/c/extend.html" title="控制器扩展" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">基础框架 - base</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

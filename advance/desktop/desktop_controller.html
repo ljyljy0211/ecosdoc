@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      desktop_controller控制器基类 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="强大的后端 - desktop" href="index.html" />
+
+        <link rel="next" title="dev" href="desktop开发指南.html" />
+        <link rel="prev" title="index" href="强大的后端 - desktop.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="dev.html" title="desktop开发指南" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="强大的后端 - desktop" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">强大的后端 - desktop</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> desktop_controller控制器基类</h1>
+            <h2><a name="id1">功能描述</a></h2>
+<p>后台控制器专用基类, 默认情况下会开启session, 提供常用的页面渲染函数等.</p>
+<h2><a name="id2">应用场景</a></h2>
+<p>后台控制器</p>
+<h2><a name="id3">继承关系</a></h2><pre class="mark">sh: dot: command not found
+</pre><h2><a name="id4">使用方法</a></h2><h2><a name="id5">函数接口</a></h2><h3><a name="id6">__construct</a></h3>
+<ol>
+<li>定义后台不使用缓存
+<li>开启session，因此如果是调用了desktop_controller需要用到session的时候不需要在开启session;
+<li>判断自动登录
+<li>判断登录者的权限
+<li>获取注册service desktop_controller_content.*：修改输出内容
+<li>获取注册service desktop_controller_content_finderdetail.****，修改tab detail 里的内容</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ol>
+<h3><a name="id7">redirect</a></h3>
+<p>直接跳转到指定地址<pre class="mark">参数
+    array   $url
+
+返回
+   null
+</pre></p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">...<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">redirect</span><span style="color: #007700">(array(</span><span style="color: #DD0000">'app'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'desktop'</span><span style="color: #007700">,</span><span style="color: #DD0000">'ctl'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'admin_default'</span><span style="color: #007700">,</span><span style="color: #DD0000">'act'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'index'</span><span style="color: #007700">));<br />&nbsp;&nbsp;&nbsp;&nbsp;...<br /></span>
+</span>
+</code></div><h3><a name="id8">location_to</a></h3>
+<p>跳转到当前页面<pre class="mark">function location_to()
+</pre></p>
+<h3><a name="id9">finder</a></h3>
+<p>显示后台列表函数</p>
+
+<p><a href="http://www.ec-os.net/advance/desktop/dev.html#id5">参见</a></p>
+<h3><a name="id10">url_frame</a></h3>
+<p>后台的列表区域自定义iframe<pre>function index(){
+   $this-&gt;url_frame('www.baidu.com');
+}
+</pre><br /><img border="0" alt="" align="middle" src="image/url_frame.png" /></p>
+<h3><a name="id11">singlepage</a></h3>
+<p>显示页面,默认配合target=_blank使用时，显示的页面不包含框架的其他页面，只是本身页面</p>
+<pre>'href'=&gt;'index.php?app=b2c&amp;ctl=admin_goods_editor&amp;act=add',
+'target'=&gt;'_blank'),
+...
+$this-&gt;singlepage('admin/goods/detail/frame.html');
+</pre>
+<p><br /><img border="0" alt="" align="middle" src="image/singlepage.png" /></p>
+<h3><a name="id12">page</a></h3>
+<p>显示页面,如果page配合target=_blank使用时,显示的页面包含在框架里面，显示在后台的自定义列表中</p>
+
+<p>如果是page配合target=dialog使用时，则显示的是弹出层页面（display配合target=dialog使用时也有同样的效果）</p>
+
+<p>例1<pre>'href'=&gt;'index.php?app=b2c&amp;ctl=admin_goods_editor&amp;act=add',
+'target'=&gt;'_blank'),
+...
+$this-&gt;page('admin/goods/detail/frame.html');
+</pre><br /><img border="0" alt="" align="middle" src="image/desktop_page.png" /></p>
+
+<p>例2<pre>'href'=&gt;'index.php?app=b2c&amp;ctl=admin_member&amp;act=add_page','target'=&gt;'dialog::{title:\''.
+app::get('b2c')-&gt;_('添加会员').'\',width:460,height:460}'),
+...
+$this-&gt;page('admin/member/new.html');
+</pre><br /><img border="0" alt="" align="middle" src="image/display.png" /></p>
+<h3><a name="id13">splash</a></h3>
+<p>信息提示，ajax输出,begin end方法信息输出调用此方法</p>
+<pre class="mark">function splash($status='success',$url=null,$msg=null,$method='redirect',$params=array())
+
+参数
+    string  $status=error是输出错误信息，默认输出正确提示信息
+    string  $url自定义拼接的URL,一般为空
+    string  $msg要输出的信息
+    string  $method
+    array   $params当参数为array('splash'=&gt;'1') 时，则表示只是输出自定义信息
+</pre>
+<p>例1<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /><br /></span><span style="color: #FF8000">//输出正确信息<br /></span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">splash</span><span style="color: #007700">(</span><span style="color: #DD0000">'success'</span><span style="color: #007700">,</span><span style="color: #DD0000">''</span><span style="color: #007700">,</span><span style="color: #DD0000">'正确信息'</span><span style="color: #007700">);<br /><br /></span><span style="color: #FF8000">//输出错误信息<br /></span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">splash</span><span style="color: #007700">(</span><span style="color: #DD0000">'error'</span><span style="color: #007700">,</span><span style="color: #DD0000">''</span><span style="color: #007700">,</span><span style="color: #DD0000">'错误信息'</span><span style="color: #007700">,</span><span style="color: #DD0000">'redirect'</span><span style="color: #007700">,array(</span><span style="color: #DD0000">'splash'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'1'</span><span style="color: #007700">));<br /></span>
+</span>
+</code></div></p>
+<h3><a name="id14">jumpTo</a></h3>
+<p>跳转到当前app的，控制器中的某个方法中进行运行<pre class="mark">function jumpTo($act='index',$ctl=null,$args=null){
+参数
+    string  $act控制器中的方法名
+    string  $ctl控制器名
+    array   $args参数
+</pre></p>
+<h3><a name="id15">has_permission</a></h3>
+<p>判断当前用户的权限</p>
+<h3><a name="id16">display</a></h3>
+<p>display和base_render中的display方法一样</p>
+
+<p>display配合target=dialog使用时，显示的页面为弹出层<pre>'href'=&gt;'index.php?app=b2c&amp;ctl=admin_member&amp;act=add_page','target'=&gt;'dialog::{title:\''.
+app::get('b2c')-&gt;_('添加会员').'\',width:460,height:460}'),
+...
+$this-&gt;display('admin/member/new.html');
+</pre><br /><img border="0" alt="" align="middle" src="image/display.png" /></p>
+<h3><a name="id17">pre_display</a></h3>
+<p>和base_render中的pre_display方法一样，只是注册的service是不一样的.</p>
+
+<p>这个service是desktop_render_pre_display</p>
+<h2><a name="id18">desktop_controller提供的service</a></h2><h3><a name="id19">app_pre_auth_use</a></h3>
+<p>登录之前的预先验证</p>
+<h3><a name="id20">desktop_controller_content.%s.%s.%s</a></h3><h3><a name="id21">desktop_controller_content_finderdetail.%s.%s.%s.%s</a></h3><h3><a name="id22">desktop_controller_destruct</a></h3><h3><a name="id23">desktop_controller_display.%s.%s.%s</a></h3><h3><a name="id24">tpl_source.</a></h3><h3><a name="id25">desktop_render_pre_display</a></h3>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">功能描述</a>
+    <li><a href="#id2" class="reference internal">应用场景</a>
+    <li><a href="#id3" class="reference internal">继承关系</a>
+    <li><a href="#id4" class="reference internal">使用方法</a>
+    <li><a href="#id5" class="reference internal">函数接口</a>
+        <ul>
+        <li><a href="#id6" class="reference internal">__construct</a>
+        <li><a href="#id7" class="reference internal">redirect</a>
+        <li><a href="#id8" class="reference internal">location_to</a>
+        <li><a href="#id9" class="reference internal">finder</a>
+        <li><a href="#id10" class="reference internal">url_frame</a>
+        <li><a href="#id11" class="reference internal">singlepage</a>
+        <li><a href="#id12" class="reference internal">page</a>
+        <li><a href="#id13" class="reference internal">splash</a>
+        <li><a href="#id14" class="reference internal">jumpTo</a>
+        <li><a href="#id15" class="reference internal">has_permission</a>
+        <li><a href="#id16" class="reference internal">display</a>
+        <li><a href="#id17" class="reference internal">pre_display</a>
+    </ul>
+    <li><a href="#id18" class="reference internal">desktop_controller提供的service</a>
+        <ul>
+        <li><a href="#id19" class="reference internal">app_pre_auth_use</a>
+        <li><a href="#id20" class="reference internal">desktop_controller_content.%s.%s.%s</a>
+        <li><a href="#id21" class="reference internal">desktop_controller_content_finderdetail.%s.%s.%s.%s</a>
+        <li><a href="#id22" class="reference internal">desktop_controller_destruct</a>
+        <li><a href="#id23" class="reference internal">desktop_controller_display.%s.%s.%s</a>
+        <li><a href="#id24" class="reference internal">tpl_source.</a>
+        <li><a href="#id25" class="reference internal">desktop_render_pre_display</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">强大的后端 - desktop</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="dev.html"
+                                  title="下一章">desktop开发指南</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="dev.html" title="desktop开发指南" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="强大的后端 - desktop" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">强大的后端 - desktop</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

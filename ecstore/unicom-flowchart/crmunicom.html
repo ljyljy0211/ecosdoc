@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      ecstore 联通 crm 业务 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="ecstore 联通外部系统业务流程图" href="index.html" />
+
+        <link rel="next" title="sms" href="对接短信平台.html" />
+        <link rel="prev" title="updatepaymentlist" href="同步支付方式列表.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="sms.html" title="对接短信平台" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="updatepaymentlist.html" title="同步支付方式列表" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../api.html">API</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore 联通外部系统业务流程图</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> ecstore 联通 crm 业务</h1>
+            <h2><a name="id1">新建订单</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="images/crm_creatorder.jpg" />
+<ol>
+<li>ecstore创建订单；
+<li>通过接口（<a href="../append-b/creatorder.html">creatorder</a>）抛数据给crm ；
+<li>crm根据接收的订单数据创建订单
+<li>通过callback地址，返回创建订单信息</li>
+</li>
+</li>
+</li>
+</ol>
+</p>
+<h2><a name="id2">订单支付</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="images/crm_payment.jpg" />
+<ol>
+<li>ecstore/ocs/erp发起支付动作；
+<li>订单支付状态变更；
+<li>通过接口（<a href="../append-b/orderpay.html">orderpay</a>）接口抛订单数据给crm；
+<li>crm接收数据处理完成，callback数据给ecstore</li>
+</li>
+</li>
+</li>
+</ol>
+</p>
+<h2><a name="id3">订单发货</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="images/crm_delivery.jpg" />
+<ol>
+<li>ecstore ocs erp 发起发货动作；
+<li>订单发货状态变更；
+<li>通过接口（<a href="../append-b/orderupdate.html">orderupdate</a>）接口抛订单数据给crm；
+<li>crm接收数据处理完成后callback处理结果给ecstore</li>
+</li>
+</li>
+</li>
+</ol>
+</p>
+<h2><a name="id4">订单退款</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="images/crm_return.jpg" />
+<ol>
+<li>ecstore ocs erp 发起退款动作；
+<li>订单支付状态变更；
+<li>通过接口（<a href="../append-b/orderupdate.html">orderupdate</a>）接口抛订单数据给crm；
+<li>crm接收数据处理完成后callback处理结果给ecstore</li>
+</li>
+</li>
+</li>
+</ol>
+</p>
+<h2><a name="id5">订单退货</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="images/crm_refund.jpg" />
+<ol>
+<li>ecstore ocs erp 发起退款动作；
+<li>订单发货状态变更；
+<li>通过接口（<a href="../append-b/orderupdate.html">orderupdate</a>）接口抛订单数据给crm；
+<li>crm接收数据处理完成后callback处理结果给ecstore</li>
+</li>
+</li>
+</li>
+</ol>
+</p>
+<h2><a name="id6">订单取消</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="images/crm_reset.jpg" />
+<ol>
+<li>ecstore ocs erp 发起订单取消动作；
+<li>订单状态变更；
+<li>通过接口（<a href="../append-b/orderupdate.html">orderupdate</a>）接口抛订单数据给crm；
+<li>crm接收数据处理完成后callback处理结果给ecstore</li>
+</li>
+</li>
+</li>
+</ol>
+</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">新建订单</a>
+    <li><a href="#id2" class="reference internal">订单支付</a>
+    <li><a href="#id3" class="reference internal">订单发货</a>
+    <li><a href="#id4" class="reference internal">订单退款</a>
+    <li><a href="#id5" class="reference internal">订单退货</a>
+    <li><a href="#id6" class="reference internal">订单取消</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="updatepaymentlist.html"
+                                  title="上一章">同步支付方式列表</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="sms.html"
+                                  title="下一章">对接短信平台</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="sms.html" title="对接短信平台" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="updatepaymentlist.html" title="同步支付方式列表" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../api.html">API</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore 联通外部系统业务流程图</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

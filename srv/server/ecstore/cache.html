@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      Cache 相关配置 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../doc.html" />
+    <link rel="up" title="部署站点ecstore" href="index.html" />
+
+        <link rel="next" title="key-value" href="Key-Value引擎相关配置.html" />
+        <link rel="prev" title="database" href="Database相关配置.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="key-value.html" title="Key-Value引擎相关配置" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="database.html" title="Database相关配置" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群部署文档</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">部署站点ecstore</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> Cache 相关配置</h1>
+            <h2><a name="id1">Cache 相关配置</a></h2><pre>#cache控制选项，true为开启，false关闭
+#cache为临时性缓存，调试时可以关闭；正常使用时开启，可以提高性能
+define('WITHOUT_CACHE',false);
+
+#定义cache引擎；选项有：
+#base_cache_nocache 不使用缓存
+#base_cache_secache 使用文件缓存，该项为默认选项
+#base_cache_memcache 使用memcache ** 推荐使用 **
+#base_cache_memcached 使用memcached
+#base_cache_apc 使用apc做为缓存引擎
+#base_cache_eaccelerator 使用eaccelerator做为缓存引擎
+#base_cache_xcache 使用xcache做为缓存引擎
+#base_cache_wincache 使用Windows Cache做为缓存引擎
+define('CACHE_STORAGE', '');
+
+#如果使用memcache做为缓存引擎，则需提供memcache的相关连接参数
+#可选如下几种方式
+# 1.通过memcached服务端socket文件访问，如：'unix:///tmp/memcached.sock'
+# 2.直接通过主机名或IP，以及memcache端口号（默认是11211）访问，如： '127.0.0.1:11211'
+# 如有多个memcache服务，可以使用逗号隔开，如：'unix:///tmp/memcached.sock,127.0.0.1:11211,127.0.0.1:11212'
+define('CACHE_MEMCACHE_CONFIG', '');
+
+</pre>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">Cache 相关配置</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="database.html"
+                                  title="上一章">Database相关配置</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="key-value.html"
+                                  title="下一章">Key-Value引擎相关配置</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="key-value.html" title="Key-Value引擎相关配置" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="database.html" title="Database相关配置" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群部署文档</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">部署站点ecstore</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

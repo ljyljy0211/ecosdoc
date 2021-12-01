@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      review board &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="codecube" href="index.html" />
+
+        <link rel="next" title="../../_refs" href="资料.html" />
+        <link rel="prev" title="codecube" href="codecube.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../../_refs.html" title="资料" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="codecube.html" title="codecube" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">codecube</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> review board</h1>
+            <h2><a name="id1">安装环境</a></h2>
+<ul>
+<li>mysql
+<li>apache + mod_wsgi
+<li>django
+<li>subversion</li>
+</li>
+</li>
+</li>
+</ul>
+<h3><a name="id2">mysql</a></h3><pre>wget http://www.cmake.org/files/v2.8/cmake-2.8.4.tar.gz
+tar zxvf cmake-2.8.4.tar.gz
+cd cmake-2.8.4
+./bootstrap
+make
+make install
+cd ..
+
+wget http://ftp.gnu.org/gnu/bison/bison-2.5.tar.gz
+tar zxvf bison-2.5.tar.gz
+cd bison-2.5
+./configure
+make
+make install
+cd ..
+
+tar xvf /data/tmp/codecube/mysql-5.5.17.tar.gz
+cd mysql-5.5.17/
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local/mysql \
+-DMYSQL_UNIX_ADDR=/tmp/mysql.sock \
+-DDEFAULT_CHARSET=utf8 \
+-DDEFAULT_COLLATION=utf8_general_ci \
+-DWITH_EXTRA_CHARSETS:STRING=utf8,gbk,gb2312 \
+-DWITH_MYISAM_STORAGE_ENGINE=1 \
+-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+-DWITH_MEMORY_STORAGE_ENGINE=1 \
+-DWITH_READLINE=1 \
+-DENABLED_LOCAL_INFILE=1 \
+-DMYSQL_USER=mysql
+make
+make install
+
+ln -s /usr/local/mysql/lib/libmysqlclient.so.18 /usr/lib/libmysqlclient.so.18
+ln -s /usr/local/mysql/bin/* /usr/bin/
+
+cd support-files/
+cp my-large.cnf /etc/my.cnf
+cp mysql.server /etc/rc.d/init.d/mysqld
+cd ../../
+
+chown -R mysql:mysql /usr/local/mysql
+chmod +w /usr/local/mysql
+chmod +x /etc/init.d/mysqld
+
+#service mysqld start 失败的话运行下面命令
+#/usr/local/mysql/scripts/mysql_install_db --user=mysql --basedir=/usr/local/mysql --datadir=/usr/local/mysql/data &amp;
+</pre>
+<p>设置开机启动<pre>chkconfig --add mysqld
+chkconfig mysqld on
+</pre></p>
+<h3><a name="id3">apache</a></h3><pre>tar xvf /data/tmp/codecube/httpd-2.2.22.tar.gz
+cd httpd-2.2.22/
+./configure --prefix=/usr/local/apache2 -enable-dav -enable-so -enable-maintainer-mode -enable-rewrite
+make
+make install
+cd ../../
+</pre>
+<p>编辑httpd.conf<pre>User daemon
+Group daemon
+DocumentRoot &quot;/usr/local/apache2/htdocs&quot;
+&lt;Directory &quot;/usr/local/apache2/htdocs&quot;&gt;
+</pre>改为<pre>User www
+Group www
+DocumentRoot &quot;/data/svn&quot;
+&lt;Directory &quot;/data/svn&quot;&gt;
+</pre>服务配置<pre>vim  /usr/local/apache2/bin/apachectl
+</pre>在第二行添加两行<pre># chkconfig: 2345 85 15
+# description: Activates/Deactivates Apache Web Server
+</pre>复制脚本文件<pre>ln -s /usr/local/apache2/bin/apachectl /etc/init.d/
+</pre></p>
+
+<p>设置开机启动<pre>chkconfig --add httpd
+chkconfig httpd on
+</pre></p>
+<h3><a name="id4">mod_wsgi</a></h3><pre>wget http://modwsgi.googlecode.com/files/mod_wsgi-2.5.tar.gz
+tar zxfv mod_wsgi-2.5.tar.gz
+cd mod_wsgi-2.5
+./configure
+make
+make install
+cd ..
+
+cat &gt;&gt; /usr/local/apache2/conf/httpd.conf &lt;&lt;&quot;EOF&quot;
+LoadModule wsgi_module modules/mod_wsgi.so
+EOF
+</pre><h3><a name="id5">subversion</a></h3><pre>yum install subversion
+</pre><h2><a name="id6">reviewboard</a></h2><pre>yum install python-setuptools
+easy_install -U setuptools
+yum install python-devel
+easy_install python-memcached
+yum install patch
+easy_install ReviewBoard
+easy_install mysql-python
+yum install subversion
+easy_install django-storages
+</pre><h2><a name="id7">安装站点</a></h2><pre>rb-site install /data/www/reviews.example.com
+
+chown -R www:www /data/www/reviews.example.com
+cat &gt;&gt; /usr/local/apache2/conf/httpd.conf &lt;&lt;&quot;EOF&quot;
+Include /data/www/reviews.example.com/conf/apache-wsgi.conf
+EOF
+</pre><h2><a name="id8">官方文档</a></h2>
+<p><a href="http://www.reviewboard.org/docs/manual/dev/admin/installation/linux/">http://www.reviewboard.org/docs/manual/dev/admin/installation/linux/</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">安装环境</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">mysql</a>
+        <li><a href="#id3" class="reference internal">apache</a>
+        <li><a href="#id4" class="reference internal">mod_wsgi</a>
+        <li><a href="#id5" class="reference internal">subversion</a>
+    </ul>
+    <li><a href="#id6" class="reference internal">reviewboard</a>
+    <li><a href="#id7" class="reference internal">安装站点</a>
+    <li><a href="#id8" class="reference internal">官方文档</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="codecube.html"
+                                  title="上一章">codecube</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../../_refs.html"
+                                  title="下一章">资料</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../../_refs.html" title="资料" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="codecube.html" title="codecube" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">集群方案</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">codecube</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

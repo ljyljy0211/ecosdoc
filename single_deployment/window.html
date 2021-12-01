@@ -1,0 +1,367 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      iis + windows单机部署(开发版本) &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="ECstore部署文档" href="index.html" />
+
+        <link rel="next" title="windows-apache" href="windows-Apache单机部署(开发版本).html" />
+        <link rel="prev" title="deploygment_one/index" href="linux单机部署.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="windows-apache.html" title="windows-Apache单机部署(开发版本)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="deploygment_one/index.html" title="linux单机部署" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ECstore部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> iis + windows单机部署(开发版本)</h1>
+            <pre class="mark">声明:
+此方案只限于本地化开发.
+ecstore目前不支持windows的生产环境
+</pre><h2><a name="id1">安装包下载</a></h2>
+<p>php下载地址：<a href="http://pan.baidu.com/s/1qvJCA">php-5.3.18-nts-Win32-VC9-x86.msi</a></p>
+
+<p>或者从PHP官网下载最新版的PHP5.3（nts非线程安全版且必须为安装版，当前版本为PHP5.3.28）：<a href="http://windows.php.net/downloads/releases/php-5.3.28-nts-Win32-VC9-x86.msi">php-5.3.28-nts-Win32-VC9-x86.msi</a></p>
+
+<p>mysql下载地址：<a href="http://pan.baidu.com/s/1ek9Kg">mysql-5.6.10-win32.msi</a></p>
+
+<p>IIS7下载地址:暂不提供, 请自由获取</p>
+<h2><a name="id2">环境安装</a></h2><h3><a name="id3">IIS 安装</a></h3>
+<p>windows7旗舰版自带, 其他版本请自行安装<h3><a name="id4">IIS 安装步骤</a></h3>
+<ol>
+<li>进入控制面板
+<li>选择 程序和功能
+<li>选择 打开或者关闭Windows功能
+<li>找到Internet 信息服务 开启它的所有功能（打上勾即可），找到它上面的那个服务全部开启（Internet Informations Servicces 可承载的web核心）
+<li>最后确定 这个安装需要几分钟，请耐心等待。
+<li>IIS安装完毕。</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ol>
+</p>
+<h3><a name="id5">IIS 配置</a></h3>
+<p>开启IIS等一些服务</p>
+
+<p>控制面板-》程序和功能-》（左侧）打开或关闭Windows功能　　弹出对话框</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/windows-install2.png" /></p>
+
+<p>Internet信息服务选项下</p>
+
+<p>Web管理工具　　（这里全选）<br /><img border="0" alt="" align="middle" src="image/windows-install3.png" /></p>
+
+<p>万维网服务　　（这里安全性、常见HTTP功能、性能功能全选。应用程序开放功能、运行状况和诊断根据需求选择（CGI选项位于应用程序开放功能里，图一的报错解决）。运行状况和诊断可以有选择性的选择。）<br /><img border="0" alt="" align="middle" src="image/windows-install4.png" /></p>
+
+<p>应用程序开放功能、运行状况和诊断选项中，要求必须开启CGI，其他配置请根据实际情况自行设置<br /><img border="0" alt="" align="middle" src="image/windows-install4-2.png" /></p>
+
+<p>应用程序</p>
+<pre>IIS命令
+
+开始-》运行　　cmd
+
+net stop iisadmin 停止IIS
+
+net start iisadmin 启动IIS
+
+net start w3svc WEB服务
+
+IIS重启
+
+开始-》运行　　输入iisreset回车
+</pre>
+<p>这里启动IIS。安装完成后，打开浏览器输入127.0.0.1或者localhost会出现这样一个页面</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/windows-install5.png" /></p>
+<h3><a name="id6">php安装</a></h3>
+<p>Web Server Setup页面选择IIS FastCGI<br /><img border="0" alt="" align="middle" src="image/windows-install6-1.png" /></p>
+
+<p>在根目录下新建info.php文件测试php的信息（默认根目录是C:\inetpub\wwwroot\，当然你们的不一定是C盘）</p>
+
+<p>info.php内容<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />phpinfo</span><span style="color: #007700">();&nbsp;<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div><br /><img border="0" alt="" align="middle" src="image/windows-install6.png" /></p>
+<h3><a name="id7">配置zendloader</a></h3>
+<p>安装ZendLoader</p>
+
+<p>下载ZendLoader.dll (下载地址 <a href="http://pan.baidu.com/s/11lh9H)">http://pan.baidu.com/s/11lh9H)</a> ，放置在PHP的ext目录下（推荐）[<a href="http://pan.baidu.com/s/11lh9H">http://pan.baidu.com/s/11lh9H</a>]</p>
+
+<p>编辑php.ini, 修改为<pre>[Zend.loader]
+zend_loader.enable=1
+zend_loader.disable_licensing=0
+zend_loader.obfuscation_level_support=3
+zend_loader.license_path=
+
+;这一行的ZendLoader.dll文件的路径请根据实际情况自行配置。
+zend_extension=&quot;D:\PHP\ext\ZendLoader.dll&quot;
+
+</pre></p>
+
+<p><b>注意：</b>把php.ini拷贝到C:\Windows (如果没有这步，无法运行加密的)</p>
+
+<p>增加环境变量　　</ol>
+
+<ul>
+<ul>
+<li>变量名：PHPRC  　　
+<li>变量值：（你PHP安装路径）：D:\PHP\  （如何添加环境变量，这里就不解说了）</li>
+</li>
+</ul>
+</ul>
+
+<p>命令窗口 php -v出现<pre>Zend Engine v2.3.0, Copyright (c) 1998-2011 Zend Technologies说明Zend Guard Loader 
+</pre>没有运行起来，配置有问题。</p>
+
+<p>出现<pre>Zend Engine v2.3.0, Copyright (c) 1998-2011 Zend Technologies with Zend Guard Loader v3.3, Copyright (c) 1998-2010, by Zend Technologies
+</pre></p>
+
+<p>说明 Zend Guard Loader成功。</p>
+
+<p>重启IIS</p>
+
+<p>上边已经说过IIS的一些命令</p>
+
+<p>phpinfo信息中会出现</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/windows-install7.png" /></p>
+
+<p>这里一定要有 with Zend Guard Loader...才表示Zend Guard Loader成功。</p>
+
+<p>注意，windows下的apache +PHP 目前是不能使用zend guard 5.5！</p>
+
+<p>注意：现在默认的网站根目录是C:\inetpub\wwwroot,把网的根目录放在C盘太不安全了。</p>
+
+<p>这里我把网站的根目录迁到D盘下边，把C:\inetpub下边的wwwroot文件夹剪贴或者复制到D盘下边</p>
+
+<p>控制面板-》管理工具-》Internet 信息服务(IIS)管理器</p>
+
+<p>定位到</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/windows-install9.png" /></p>
+
+<p>网站上去，右边 路径列</p>
+
+<p>修改这个路径就可以修改网站的根目录了</p>
+
+<p>右键点击Default Web Site这行，选择基本设置</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/windows-install10.png" /></p>
+
+<p>修改物理路径即可。</p>
+<h3><a name="id8">mysql安装</a></h3>
+<p>运行mysql-5.6.10-win32.msi 建议安装D:\mysql目录下</p>
+
+<p>运行D:\mysql\bin\mysqld.exe 启动mysql服务</p>
+
+<p>在命令行下切换目录到D:\mysql\bin，键入mysql -u root -p 回车，如果提示Enter password: 则表示mysql安装成功。默认是空密码。</p>
+
+<p>注意：net start mysql及net stop mysql服务名无效的解决方法</p>
+
+<p>原因是mysql没有加入到window的服务中</p>
+
+<p>解决方法：命令行进入mysql安装路径，输入mysqld --install</p>
+<h2><a name="id9">ecstore安装</a></h2>
+<p>ecstore ego版本的代码是有加密的，所以首先要配置解密工具，其次是获取授权文件，最后才能成功安装ecstore，具体步骤如下</p>
+<h3><a name="id10">获取ecstore源码安装包</a></h3><h3><a name="id11">配置授权文件</a></h3>
+<ul>
+<li>解密文件 developer.zl在安装包中/config/developer.zl下，配置php.ini文件。<pre>;zend_loader.license_path=
+zend_loader.license_path=***/config/developer.zl
+</pre><pre class="quote">    注意：同时运行ecstore1.2与ecstore2.0或者ocs时，请做一下配置，
+    zend_loader.license_path指向一个目录，该目录下同时包含两个developer.zl文件，一个是1.2，一个是2.0的。
+    请避免俩developer.zl文件重名，1.2的developer.zl改名为1.x.zl，2.0的developer.zl改名为2.x.zl，ocs的developer.zl改名为ocs.x.zl。
+    例如：zend_loader.license_path=&quot;d:/data/html/www/&quot;
+    &quot;d:/data/html/www/&quot;目录下存在ocs.150.zl、ecstore.12.zl、ecsotre.20.zl
+</pre>
+<ul>
+<li>查看phpinfo，看看授权文件是否配置成功
+<p><br /><img border="0" alt="" align="middle" src="image/windows-install8.png" />
+<li>如果要用windows作为正式服务器，获取机器码的方式如图(获取机器码的方式其实和linux是一样的，就是用php执行hardware.sh文件，这里要注重的就是php的安装路径和ecstore的config路径)；<br /><img border="0" alt="" align="middle" src="image/wincmd.jpg" />
+<li>重启IIS</ul>
+</ul>
+
+<ol>
+<li>安装ecstore(dos命令行安装 和 网页安装)
+<ul>
+<li>手动安装采用的是dos命令安装，这个可以查看文档[<a href="http://ec-os.net/quickstart/notebook/new-project.html">http://ec-os.net/quickstart/notebook/new-project.html</a>]，文档里有具体的安装操作步骤
+<li>网页安装是通过网址解析路由来安装，安装网址是您网站的域名后跟”index.php/setup“，例如”localhost/ecstore/index.php/setup“</li>
+</li>
+</ul>
+</li>
+</ol>
+</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3><a name="id12">安装ecstore(dos命令行安装 和 网页安装)</a></h3></ul>
+</ol>
+
+<ul>
+<ul>
+<li>手动安装采用的是dos命令安装，这个可以查看文档[<a href="http://ec-os.net/quickstart/notebook/new-project.html">http://ec-os.net/quickstart/notebook/new-project.html</a>]，文档里有具体的安装操作步骤
+<li>网页安装是通过网址解析路由来安装，安装网址是您网站的域名后跟”index.php/setup“，例如”localhost/ecstore/index.php/setup“</li>
+</li>
+</ul>
+</ul>
+<h3><a name="id13">常见错误以及解决方案</a></h3>
+<p>1、安装PHP过程中，第五步卡住。这里是因为IIS的CGI没有配置，请根据《IIS配置》文档配置后重启IIS（iisreset命令），部分情况需要重启windows。<br /><img border="0" alt="" align="middle" src="image/windows-install1.png" /></p>
+
+<p>2、打开info.php页面后提示500错误<pre>HTTP错误500.21-Internal Server Error 
+处理程序“PHP_via_FastCGI”在其模块列表中有一个错误模块“FastCgiModule”
+
+</pre><br /><img border="0" alt="" align="middle" src="image/error0.png" />是IIS FastCGI没有开启导致的。请在“控制面板”-&gt;“程序”-&gt;“程序和功能”-&gt;“打开或关闭Windows功能”-&gt;“Internet信息服务”-&gt;“万维网服务”-&gt;“应用程序开发功能”中勾选“CGI”。<br /><img border="0" alt="" align="middle" src="image/windows-install4-2.png" /></p>
+
+<p>3、打开info.php页面后提示500错误<pre>HTTP错误500.0-Internal Server Error 
+无法再&lt;fastCGI&gt;应用程序配置中找到&lt;handler&gt;scriptProcesser
+
+</pre><br /><img border="0" alt="" align="middle" src="image/error0.png" />产生原因未知，一般出现在上一个错误修正之后。重装PHP即可解决</p>
+
+<p>4、打开info.php页面后提示500错误<pre>HTTP错误500.0-Internal Server Error 
+%PHP%\php-cgi.exe-FastCGI进程意外退出
+
+</pre><br /><img border="0" alt="" align="middle" src="image/error2.png" />由于使用非安装版PHP导致的错误。采用安装版PHP重装即可解决</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">安装包下载</a>
+    <li><a href="#id2" class="reference internal">环境安装</a>
+        <ul>
+        <li><a href="#id3" class="reference internal">IIS 安装</a>
+        <li><a href="#id4" class="reference internal">IIS 安装步骤</a>
+        <li><a href="#id5" class="reference internal">IIS 配置</a>
+        <li><a href="#id6" class="reference internal">php安装</a>
+        <li><a href="#id7" class="reference internal">配置zendloader</a>
+        <li><a href="#id8" class="reference internal">mysql安装</a>
+    </ul>
+    <li><a href="#id9" class="reference internal">ecstore安装</a>
+        <ul>
+        <li><a href="#id10" class="reference internal">获取ecstore源码安装包</a>
+        <li><a href="#id11" class="reference internal">配置授权文件</a>
+        <li><a href="#id12" class="reference internal">安装ecstore(dos命令行安装 和 网页安装)</a>
+        <li><a href="#id13" class="reference internal">常见错误以及解决方案</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="deploygment_one/index.html"
+                                  title="上一章">linux单机部署</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="windows-apache.html"
+                                  title="下一章">windows-Apache单机部署(开发版本)</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="windows-apache.html" title="windows-Apache单机部署(开发版本)" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="deploygment_one/index.html" title="linux单机部署" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ECstore部署文档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

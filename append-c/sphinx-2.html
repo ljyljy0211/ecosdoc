@@ -1,0 +1,492 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      ECStore2.0 search-sphinx &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="附录C -- search( sphinx )" href="../append-c.html" />
+
+        <link rel="next" title="../ecos_guide/index" href="ECOS开发指南.html" />
+        <link rel="prev" title="sphinx-1" href="ECStore1.2 安装search( sphinx ).html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../ecos_guide/index.html" title="ECOS开发指南" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="sphinx-1.html" title="ECStore1.2 安装search( sphinx )" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../append-c.html">附录C -- search( sphinx )</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> ECStore2.0 search-sphinx</h1>
+            <h3><a name="id1">前置安装</a></h3>
+<ul>
+<li>安装ecstore
+<li>安装search app 和 searchrule app</li>
+</li>
+</ul>
+<h3><a name="id2">install sphinx && install scws</a></h3>
+<ul>
+<li>install sphinx 推荐安装sphinx 2.0.7-release <a href="http://sphinxsearch.com">http://sphinxsearch.com</a><pre>wget http://sphinxsearch.com/files/sphinx-2.0.8-release.tar.gz
+tar zxvf sphinx-2.0.8-release.tar.gz
+cd sphinx-2.0.8-release
+./configure --prefix=/usr/local/webserver/sphinx --with-mysql=/usr/local/webserver/mysql/
+make &amp;&amp; make install
+
+注释：
+--prefix : 指定Sphinx安装到何处,我的安装目录是“/usr/local/webserver/sphinx”
+--with-mysql : mysql的安装目录,我的安装目录是“/usr/local/webserver/mysql/”
+
+其他的参数 请用./configure help查看，建议使用以上参数
+</pre>
+<p>运行sphinx searchd命令：如看到以下信息则表示安装成功 (根据自己配置/usr/local/webserver/sphinx/bin是否需要放在环境变量中)<pre class="mark">[root@centos44 ~]# searchd
+Sphinx 2.0.8-release (r3831)
+Copyright (c) 2001-2012, Andrew Aksyonoff
+Copyright (c) 2008-2012, Sphinx Technologies Inc (http://sphinxsearch.com)
+
+FATAL: no readable config file (looked in /usr/local/webserver/sphinx/etc/sphinx.conf, ./sphinx.conf).
+</pre></p>
+</li>
+</ul>
+
+<ul>
+<li>install scws <a href="http://www.xunsearch.com/scws/download.php">http://www.xunsearch.com/scws/download.php</a><pre>安装scws
+
+wget http://www.xunsearch.com/scws/down/scws-1.2.2.tar.bz2
+tar xvf scws-1.2.2.tar.bz2
+cd scws-1.2.2
+./configure --prefix=/usr/local/webserver/scws
+make &amp;&amp; make install
+
+
+安装php的scws扩展(回到scws源目录中scws-1.2.2)
+
+cd phpext/
+/usr/local/webserver/php/bin/phpize
+./configure --with-scws=/usr/local/webserver/scws/ --with-php-config=/usr/local/webserver/php/bin/php-config
+make &amp;&amp; make install
+
+配置php.ini，在php.ini中添加如下代码
+
+[scws]
+extension = scws.so
+scws.default.charset = utf8
+;以下的的路径就是编译时的--with-scws的值
+scws.default.fpath = /usr/local/webserver/scws/
+</pre>
+<p>重启php，查看phpinfo scws扩展是否安装成功<pre class="mark">[root@centos44 www]# php phpinfo.php  | grep scws
+scws
+SCWS BugReport =&gt; http://www.xunsearch.com/scws
+scws.default.charset =&gt; utf8 =&gt; utf8
+scws.default.fpath =&gt; /usr/local/webserver/scws/ =&gt; /usr/local/webserver/scws/
+</pre>安装scws的词典<pre>cd /usr/local/webserver/scws/etc/
+
+wget http://www.xunsearch.com/scws/down/scws-dict-chs-gbk.tar.bz2
+tar xvjf scws-dict-chs-gbk.tar.bz2
+
+wget http://www.xunsearch.com/scws/down/scws-dict-chs-utf8.tar.bz2
+tar xvjf scws-dict-chs-utf8.tar.bz2
+
+注意：scws只能单机部署，如果是集群部署每台web机都需要部署scws
+</pre>ecstore config.php配置scws词典调用路径(去掉注释)<pre class="mark">#scws 词典目录 编码默认为utf8
+#如果是集群部署，词典路径需一致，或者词典放在同步目录里面调用
+#define('SCWS_DICT','/usr/local/scws/etc/dict.utf8.xdb');
+#define('SCWS_RULE','/usr/local/scws/etc/rules.utf8.ini');
+</pre></p>
+</li>
+</ul>
+<h3><a name="id3">配置</a></h3>
+<ul>
+<li>ecstore config.php中指定sphinx服务器地址<pre class="mark">#sphinx 配置
+#sphinx默认调用地址为127.0.0.1:9306
+#define('SPHINX_SERVER_HOST', '127.0.0.1:9306');
+#define('SPHINX_PCONNECT',1); #是否启用sphinx持续连接？
+</pre>
+<li>修改配置文件&lt;&lt;sphinx.conf&gt;&gt;<pre class="mark">[root@centos44 ~]# searchd
+Sphinx 2.0.8-release (r3831)
+Copyright (c) 2001-2012, Andrew Aksyonoff
+Copyright (c) 2008-2012, Sphinx Technologies Inc (http://sphinxsearch.com)
+
+FATAL: no readable config file (looked in /usr/local/webserver/sphinx/etc/sphinx.conf, ./sphinx.conf).
+
+注意：其中/usr/local/webserver/sphinx/etc/sphinx.conf为sphinx默认调用配置文件
+</pre>
+<p>将ecstore中提供的sphinx.conf文件复制到默认调用配置文件中<pre>cp  /data/www/ecstore2.0/app/search/config/sphinx.conf  /usr/local/webserver/sphinx/etc/sphinx.conf
+
+#也可把配置文件放到自定义目录中
+如果配置文件放在自定义目录中，则在调用的时候需要特定的指定调用配置文件的路径
+</pre><pre>vi /usr/local/webserver/sphinx/etc/sphinx.conf
+
+1、mysql连接(类似以下数据的有三处，数据必须一致,请勿遗漏)
+    sql_host        = localhost  //当前系统连接mysql的host
+    sql_user        = root       //当前系统连接mysql的用户名
+    sql_pass        =            //mysql当前用户名密码 ，注意密码不能有 '#' 等特殊符号,否则会导致连接不上数据库
+    sql_db          = ecstore13  //当前系统的数据库名称
+    sql_port        = 3306  # optional, default is 3306 //数据库端口
+2、log记录路径(以下代码中是sphinx的log存放地址，请给一个有写入权限的目录 )
+    log         =  /usr/local/var/log/searchd.log
+    query_log       = /usr/local/var/log/query.log
+    read_timeout        = 5
+    client_timeout      = 300
+    max_children        = 30
+    pid_file        = /usr/local/var/log/searchd.pid
+3、data记录路径(以下三处需要注意，三处的路径目录都要写入权限，并且保证它的持久性，不能随意删除掉)
+
+    index b2c_goods_merge
+    {
+    source          = b2c_goods
+    path            = /usr/local/var/data/b2c_goods
+    ....
+
+    index b2c_goods_delta
+    {
+    source          = b2c_goods_delta
+    path            = /usr/local/var/data/b2c_goods_delta
+    ....
+
+    index search_associate
+    {
+    source          = search_associate
+    path            = /usr/local/var/data/search_associate
+    .....
+
+
+注意事项：
+1 商品前台搜索索引必须为索引表的名称 如:表sdb_b2c_goods 的索引名称必须为 b2c_goods
+2 如果使用分布式索引 则主索引必须为在分布式索引名称后面加上_merge 如:b2c_goods_merge
+index b2c_goods
+{
+    type  = distributed
+    local = b2c_goods_delta //主索引
+    local = b2c_goods_merge //增量索引
+}
+</pre>
+<li>查看是否配置成功<pre class="mark">在更新索引之前需要先安装search 和searchrule两个app,并且是启用状态
+否则会在建立索引的时候报找不到对应的数据表
+</pre><pre>#更新索引,如果sphingx配置文件放在自定义目录 使用--config 指定
+[root@centos44 bin]# indexer --all --rotate
+Sphinx 2.0.8-release (r3831)
+Copyright (c) 2001-2012, Andrew Aksyonoff
+Copyright (c) 2008-2012, Sphinx Technologies Inc (http://sphinxsearch.com)
+
+using config file '/usr/local/webserver/sphinx/etc/sphinx.conf'...
+indexing index 'b2c_goods_merge'...
+collected 20160 docs, 3.9 MB
+collected 562282 attr values
+sorted 0.6 Mvalues, 100.0% done
+sorted 0.8 Mhits, 100.0% done
+total 20160 docs, 3894397 bytes
+total 1.696 sec, 2295645 bytes/sec, 11883.79 docs/sec
+indexing index 'b2c_goods_delta'...
+collected 0 docs, 0.0 MB
+collected 0 attr values
+sorted 0.0 Mvalues, 100.0% done
+total 0 docs, 14 bytes
+total 0.142 sec, 98 bytes/sec, 0.00 docs/sec
+skipping non-plain index 'b2c_goods'...
+indexing index 'search_associate'...
+WARNING: Attribute count is 0: switching to none docinfo
+collected 0 docs, 0.0 MB
+total 0 docs, 0 bytes
+total 0.002 sec, 0 bytes/sec, 0.00 docs/sec
+total 356208 reads, 0.127 sec, 0.0 kb/call avg, 0.0 msec/call avg
+total 35 writes, 0.024 sec, 762.6 kb/call avg, 0.6 msec/call avg
+rotating indices: successfully sent SIGHUP to searchd (pid=18632).
+</pre><pre class="mark">在这里我们可以到全部创建索引所需要的时间，可以给以后更新增量索引和合并索引(或者重新创建索引)提供参考
+</pre>
+<li>使用mysql协议连接sphinx<pre class="mark">因为ecstore中的sphinx是使用sphinxql对sphinx进行操作,因此需要保证可以用mysql协议可以直接连接
+</pre><pre>#启动开启sphinx  命令searchd
+[root@centos44 ~]# /usr/local/webserver/sphinx/bin/searchd
+Sphinx 2.0.8-release (r3831)
+Copyright (c) 2001-2012, Andrew Aksyonoff
+Copyright (c) 2008-2012, Sphinx Technologies Inc (http://sphinxsearch.com)
+
+using config file '/usr/local/webserver/sphinx/etc/sphinx.conf'...
+WARNING: compat_sphinxql_magics=1 is deprecated; please update your application and config
+listening on all interfaces, port=9312
+listening on all interfaces, port=9306
+precaching index 'b2c_goods_merge'
+rotating index 'b2c_goods_merge': success
+precaching index 'b2c_goods_delta'
+rotating index 'b2c_goods_delta': success
+precaching index 'search_associate'
+rotating index 'search_associate': success
+precached 3 indexes in 0.013 sec
+
+#使用mysql命令进行连接
+[root@centos44 ~]# /usr/local/mysql/bin/mysql -P9306 -h127.0.0.1
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 1
+Server version: 2.0.8-release (r3831) #这里表示进入的是sphinx
+
+Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql&gt; show tables; #可以看到已有的索引
++------------------+-------------+
+| Index            | Type        |
++------------------+-------------+
+| b2c_goods        | distributed |
+| b2c_goods_delta  | local       |
+| b2c_goods_merge  | local       |
+| search_associate | local       |
++------------------+-------------+
+4 rows in set (0.00 sec)
+
+mysql&gt;
+</pre></li>
+</li>
+</p>
+</li>
+</li>
+</ul>
+
+<ul>
+<li>配置启动sphinx脚本
+<p>vi  app/search/config/build_main_index.sh<pre>#!/bin/sh
+
+#需要修改以下三行数据 sphinx的安装目录、ecstore的安装目录、log的存放目录
+sphinx_path=&quot;/usr/local/webserver/sphinx/bin&quot;
+ecstore_path=&quot;/data/www/ecstore2.0&quot;
+log_path=&quot;/usr/local/var/log&quot;
+
+#如果sphinx.conf在默认路径则不需要指定 --config路径
+&quot;${sphinx_path}/searchd&quot; --stop
+&quot;${sphinx_path}/indexer&quot; b2c_goods_merge --config &quot;${ecstore_path}/app/search/config/sphinx.conf&quot;  &gt;&gt; &quot;${log_path}/main_goods_indexlog&quot;
+&quot;${sphinx_path}/indexer&quot; search_associate  --config &quot;${ecstore_path}/app/search/config/sphinx.conf&quot;  &gt;&gt; &quot;${log_path}/main_associate_indexlog&quot;
+&quot;${sphinx_path}/searchd&quot;
+</pre>
+<li>启动sphinx<pre>app/search/config/build_main_index.sh
+
+
+提示：在启动时，也许会有mysql的报错，根据提示解决问题即可
+常见报错：
+error while loading shared libraries: libmysqlclient.so.18 找不到此文件
+类似这样的问题，根据提示在mysql安装目录中lib下  软连该文件到 usr/lib(64) 注意自己是多少位的系统 放在响应目录下即可
+
+</pre></li>
+</p>
+</li>
+</ul>
+
+<ul>
+<li>配置合并商品增量表脚本
+<p>vi app/search/config/build_delta_index.sh<pre>#!/bin/sh
+
+#需要修改以下三行数据 sphinx的安装目录、ecstore的安装目录、log的存放目录
+sphinx_path=&quot;/usr/local/webserver/sphinx/bin&quot;
+ecstore_path=&quot;/data/www/ecstore13&quot;
+log_path=&quot;/usr/local/var/log&quot;
+
+
+#如果sphinx.conf在默认路径则不需要指定 --config路径
+&quot;${sphinx_path}/searchd&quot; --stop
+&quot;${sphinx_path}/indexer&quot;  b2c_goods_delta --config &quot;${ecstore_path}/app/search/config/sphinx.conf&quot; --rotate
+&quot;${sphinx_path}/indexer&quot; --merge b2c_goods_merge b2c_goods_delta --config &quot;${ecstore_path}/app/search/config/sphinx.conf&quot; &gt;&gt; &quot;${log_path}/detal_goods_indexlog&quot;
+&quot;${sphinx_path}/searchd&quot;
+
+</pre></p>
+</li>
+</ul>
+
+<ul>
+<li>设置定时任务划增量索引<pre>crontab -e
+#商品增量索引
+* * * * * /path/to/sphinx/bin/indexer b2c_goods_delta --config /path/app/search/config/sphinx.conf --rotate
+#联想词索引更新
+* * * * * /path/to/sphinx/bin/indexer search_associate --config /path/app/search/config/sphinx.conf --rotate
+</pre></li>
+</ul>
+
+<ul>
+<li>设置定时任务合并增量索引到主索引(如果重新创建索引时间较短的情况下可以直接重建索引)
+<p><b>注意：根据设置定时计划的合并频率时间修改sphinx.conf中的 where条件后面的时候 last_modify&gt;unix_timestamp()-86400( 1天)</b><pre>crontab -e
+30 2 * * * /app/search/config/build_delta_index.sh &gt; /dev/null 2&gt;&amp;1
+</pre></p>
+</li>
+</ul>
+
+<ul>
+<li>定期删除增量表中的数据<pre class="mark">ecstore后台计划中任务 : 删除增量索引表拉圾数据(索引名b2c_goods)
+
+注意：编辑了此计划任务的执行周期请对应的修改执行方法的时间
+</pre></li>
+</ul>
+<h2><a name="id4">使用sphinx和未使用sphinx对比</a></h2>
+<ul>
+<li>搜索范围
+<p>不使用sphinx范围 在商品列表页中搜索关键字 只会在商品名称，商品关键字，商品编号有对应的关键字进行搜索使用sphinx范围   分类，品牌，商品名称，商品编号，商品关键字，商品扩展属性 进行搜索</p>
+</li>
+</ul>
+
+<ul>
+<li>联想搜索
+<p>使用sphinx 可以进行联想搜索，在sphinx app中有个联想搜索词库可以用户自己进行维护，默认联想的词是分类和关键字</p>
+</li>
+</ul>
+
+<ul>
+<li>搜索商品关键字高亮</li>
+</ul>
+
+<ul>
+<li>分词，在使用sphinx搜索的时候可以进行分词之后搜索，是搜索的更准确和商品更多</li>
+</ul>
+
+<ul>
+<li>如果有一个商品名称为：女士休闲板鞋 使用关键字“板鞋 女” 进行搜索在不使用sphingx的时候是搜索不到对应的商品 而是sphinx则可以搜索到</li>
+</ul>
+
+<ul>
+<li>性能</li>
+</ul>
+<h2><a name="id5">二次开发文档</a></h2>
+<ul>
+<li>商品搜索本身二次开发</li>
+</ul>
+
+<ul>
+<li>联想分词二次开发</li>
+</ul>
+
+<ul>
+<li>新增搜索索引开发</li>
+</ul>
+<h2><a name="id6">sphinx、scws 线上资料</a></h2>
+<p><a href=" http://sphinxsearch.com/docs/2.1.1/installing.html">SPHINX</a></p>
+
+<p><a href=" http://www.xunsearch.com/scws/docs.php">SCWS</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+        <ul>
+        <li><a href="#id1" class="reference internal">前置安装</a>
+        <li><a href="#id2" class="reference internal">install sphinx && install scws</a>
+        <li><a href="#id3" class="reference internal">配置</a>
+    </ul>
+    <li><a href="#id4" class="reference internal">使用sphinx和未使用sphinx对比</a>
+    <li><a href="#id5" class="reference internal">二次开发文档</a>
+    <li><a href="#id6" class="reference internal">sphinx、scws 线上资料</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="sphinx-1.html"
+                                  title="上一章">ECStore1.2 安装search( sphinx )</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../ecos_guide/index.html"
+                                  title="下一章">ECOS开发指南</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../ecos_guide/index.html" title="ECOS开发指南" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="sphinx-1.html" title="ECStore1.2 安装search( sphinx )" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../append-c.html">附录C -- search( sphinx )</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

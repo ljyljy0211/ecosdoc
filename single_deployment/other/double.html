@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      双机方案 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="其他方案" href="index.html" />
+
+        <link rel="next" title="three" href="三机方案.html" />
+        <link rel="prev" title="performance-big" href="ecstore 性能指标 - 2.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="three.html" title="三机方案" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="performance-big.html" title="ecstore 性能指标 - 2" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECstore部署文档</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">其他方案</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 双机方案</h1>
+            <h2><a name="id1">架构图</a></h2>
+<p><br /><img border="0" alt="" align="middle" src="../image/1.jpg" /></p>
+<h2><a name="id2">服务器角色</a></h2><pre>1. web服务器
+2. mysql 数据库服务器
+3. memcache缓存服务器
+4. mongod key-value存储服务器
+</pre><h3><a name="id3">nginx [ web 服务器 ]</a></h3><pre>   yum install pcre pcre-devel
+   yum install zlib zlib-devel
+
+   wget wget http://www.nginx.org/download/nginx-1.3.10.tar.gz
+   tar zxvf nginx-1.3.10.tar.gz
+   cd nginx-1.3.10
+   ./configure --prefix=/usr/local/nginx
+   make &amp;&amp; mak install
+</pre><h2><a name="id4">mysql [数据库服务器]</a></h2><pre>   wget http://cdn.mysql.com/Downloads/MySQL-5.5/mysql-5.5.29-linux2.6-x86_64.tar.gz
+   tar zxvf mysql-5.5.29-linux2.6-x86_64.tar.gz
+   cp mysql-5.5.29-linux2.6-x86_64 /usr/local/mysql
+   cd /usr/local/mysql/
+   groupadd mysql
+   useradd -r -g mysql mysql
+   chown -R mysql .
+   chgrp -R mysql .
+   scripts/mysql_install_db --user=mysql
+   chown -R root .
+   chown -R mysql data
+   cp support-files/my-medium.cnf /etc/my.cnf
+   bin/mysqld_safe --user=mysql &amp;
+   cp support-files/mysql.server /etc/init.d/mysql.server
+   bin/mysqladmin -u root password 'your password'
+</pre><h2><a name="id5">mysql-master</a></h2><pre>    #vim /etc/hosts
+    10.0.0.9 cluster2
+</pre><pre>    #vim /etc/my.conf
+    log-bin=master-bin
+    log-bin-index = master-bin.index
+    server-id = 1
+</pre><pre>    service mysql.server restart
+</pre><pre>    /usr/local/mysql/bin/mysql -u root -p
+
+    mysql&gt; CREATE USER repl_user;
+    mysql&gt; GRANT REPLICATION SLAVE ON *.* TO repl_user IDENTIFIED BY '123456';
+</pre><h2><a name="id6">mysql-slave</a></h2><pre>    #vim /etc/hosts
+    10.0.0.8 cluster1
+</pre><pre>    #vim /etc/my.conf
+    server-id = 2
+    relay-log = slave-relay-bin
+    relay-log-index = slave-relay-bin.index
+</pre><pre>    mysql&gt; CHANGE MASTER TO MASTER_HOST = 'cluster1', MASTER_PORT = 3306, MASTER_USER = 'repl_user', MASTER_PASSWORD = '123456';
+    mysql&gt; START SLAVE;
+</pre><h2><a name="id7">memcache [缓存服务器]</a></h2><pre>   wget http://memcached.googlecode.com/files/memcached-1.4.15.tar.gz
+   tar zxvf memcached-1.4.15.tar.gz
+   cd memcached-1.4.15
+   ./configure --prefix=/usr/local/memcached
+   make &amp;&amp; make install
+</pre><h2><a name="id8">mongodb [key-value存储服务器]</a></h2><pre>   wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-2.2.2.tgz
+   tar zxvf mongodb-linux-x86_64-2.2.2.tgz
+   mv mongodb-linux-x86_64-2.2.2 /usr/local/mongo
+   cd /usr/local/mongo
+   mkdir -p /data/db
+   ./bin/mongod
+</pre><h2><a name="id9">php</a></h2><pre>   wget http://us1.php.net/distributions/php-5.3.20.tar.gz
+   ./configure --prefix=/usr/local/php --with-mysql=/usr/local/mysql --enable-fpm
+   make &amp;&amp; make install
+</pre>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">架构图</a>
+    <li><a href="#id2" class="reference internal">服务器角色</a>
+        <ul>
+        <li><a href="#id3" class="reference internal">nginx [ web 服务器 ]</a>
+    </ul>
+    <li><a href="#id4" class="reference internal">mysql [数据库服务器]</a>
+    <li><a href="#id5" class="reference internal">mysql-master</a>
+    <li><a href="#id6" class="reference internal">mysql-slave</a>
+    <li><a href="#id7" class="reference internal">memcache [缓存服务器]</a>
+    <li><a href="#id8" class="reference internal">mongodb [key-value存储服务器]</a>
+    <li><a href="#id9" class="reference internal">php</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="performance-big.html"
+                                  title="上一章">ecstore 性能指标 - 2</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="three.html"
+                                  title="下一章">三机方案</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="three.html" title="三机方案" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="performance-big.html" title="ecstore 性能指标 - 2" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECstore部署文档</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">其他方案</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

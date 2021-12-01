@@ -1,0 +1,296 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      导入导出 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="未归档" href="index.html" />
+
+        <link rel="next" title="sphinx" href="sphinx.html" />
+        <link rel="prev" title="index" href="未归档.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="sphinx.html" title="sphinx" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="未归档" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 导入导出</h1>
+            
+<p>在ECOS后台中<a href="http://www.ec-os.net/advance/desktop/index.html">内置</a>了导入导出的功能</p>
+
+<p>在系统中默认的导入导出的文件格式是.csv。如果需要扩增别的导出格式这可注册service进行</p>
+
+<p>扩增,service的id为desktop_io</p>
+<pre>&lt;service id=&quot;desktop_io&quot;&gt;
+    &lt;class&gt;desktop_io_type_csv&lt;/class&gt;
+&lt;/service&gt;
+</pre><h2><a name="id1">导出</a></h2>
+<p>在ECOS系统中默认的内置的导出的是根据finder中的定义的model将数据库中的数据导出来。它导出的数据并不是finder中所看到的数据</p>
+
+<p>ECOS中对导出的处理</p>
+<pre>/** end **/
+if( method_exists($model,'fgetlist_'.$_POST['_io_type']) ){
+    /** 导出头部 **/
+    $oImportType-&gt;export_header( $data,$model,$_POST['_export_type'] );
+    while( $listFlag = $model-&gt;fgetlist_.'$_POST['_io_type']'($data,$_POST,$offset,$_POST['_export_type']) ){
+        $offset++;
+    }
+    $oImportType-&gt;export( $data,$offset,$model,$_POST['_export_type'] );
+}else{
+    /** 导出头部 **/
+    $oImportType-&gt;export_header( $data,$model,$_POST['_export_type'] );
+    while( $listFlag = $oImportType-&gt;fgetlist($data,$model,$_POST,$offset,$_POST['_export_type']) ){
+        $offset++;
+        $oImportType-&gt;export( $data,$offset,$model,$_POST['_export_type'] );
+    }
+}
+</pre><h3><a name="id2">修改导出heaer</a></h3>
+<p>在对应的model下面定义export_header方法可以定义导出的header，</p>
+
+<p>可以参照系统默认的导出header,<pre>function export_header(&amp;$data,&amp;$model,$exportType=1){
+    header(&quot;Content-Type: text/csv&quot;); //定义csv格式
+    $filename = $data['name'].&quot;.csv&quot;; //定义导出的名字
+    $encoded_filename = urlencode($filename);
+    $encoded_filename = str_replace(&quot;+&quot;, &quot;%20&quot;, $encoded_filename);
+
+    $ua = $_SERVER[&quot;HTTP_USER_AGENT&quot;];
+    if (preg_match(&quot;/MSIE/&quot;, $ua)) {
+        header('Content-Disposition: attachment; filename=&quot;' . $encoded_filename . '&quot;');
+    } else if (preg_match(&quot;/Firefox/&quot;, $ua)) {
+    header('Content-Disposition: attachment; filename*=&quot;utf8\'\'' . $filename . '&quot;');
+    } else {
+        header('Content-Disposition: attachment; filename=&quot;' . $filename . '&quot;');
+    }
+    //header(&quot;Content-Disposition: attachment; filename=&quot;.$data['name'].'.csv');
+    header('Cache-Control:must-revalidate,post-check=0,pre-check=0');
+    header('Expires:0');
+    header('Pragma:public');
+}
+</pre></p>
+<h3><a name="id3">修改导出数据格式</a></h3>
+<p>根据导出的类型，在对应的model中定义fgetlist_csv(默认的是fgetlist_csv，名字是根据导出的类型来定义的 fgetlist_.$_POST['_io_type'])。</p>
+
+<p>来自己组织数据进行导出</p>
+<pre>function fgetlist_csv(&amp;$data,$filter,$offset,$exportType=1){
+    //$filter finder中每条记录的主键ID对应的值 $filter = array('ID'=&gt;array('0'=&gt;1));
+
+    //因为所有导出的数据都是先放在内存中，在将数据导出。因此可以先把内存放大
+    /** 适当放大内存到512M **/
+    if ($offset == 0){
+        @ini_set('memory_limit','512M');
+    }
+    /** end **/
+
+    //需要导出的数据是放在$data中的 $data['title'] 存放导出的头部标题  数据$data['contents']--内容
+
+    return true;
+}
+</pre><h2><a name="id4">导入</a></h2>
+<p>在ECOS中导入使用了队列,导入默认只支持.csv格式的文件。另外导入需要在对应的model中自己解析数据，返回filter条件的格式</p>
+<h3><a name="id5">解析数据</a></h3>
+<p>首先根据 prepared_import_csv_row 方法进行数据解析,这里接受到数据$row是导入地csv文件中一行一行的抛过来的</p>
+<pre>function prepared_import_csv_row($row,$title,&amp;$Tmpl,&amp;$mark,&amp;$newObjFlag,&amp;$msg){
+        if( substr($row[0],0,2) == 'ID' ){//判断是否是标题
+            $mark = 'title';  //定义这是标题信息
+            $newObjFlag = true;
+            foreach($row as $k=&gt;$v){
+               $pnt2 = &quot;/\((.+?)\)/&quot;;
+               if(preg_match($pnt2,$v,$match)){
+                  $row[$k] =  $match[1];
+               }
+            }
+            /*
+            返回的title数据
+             Array
+            (
+                [user_id] =&gt; 0
+                [user_name] =&gt; 1
+                [user_info] =&gt; 2
+                [user_time] =&gt; 3
+                [user_email] =&gt; 4
+            )
+              */
+            return array_flip($row);
+        }else{
+            $mark = 'contents'; //定义这是数据内容
+            $newObjFlag = true;
+            /*
+             返回的数据格式
+              Array
+                (
+                    [0] =&gt; 1
+                    [1] =&gt; wuwei
+                    [2] =&gt; wuei11
+                    [3] =&gt;
+                    [4] =&gt; fasdf@q.c
+                )
+            */
+            return $row;
+        }
+    }
+
+</pre><h3><a name="id6">根据解析后的数据，组织成条件返回</a></h3>
+<p>prepared_import_csv_obj 方法，是根据解析过来的数据组成filter条件再返回出去，解析的数据也是一行一行的抛过来的</p>
+<pre>function prepared_import_csv_obj($data,&amp;$mark,$Tmpl,&amp;$msg = ''){
+        if( !$data['contents'] )return null;
+        $mark = 'contents';
+        $key = $data['title'];
+        $value = $data['contents'];
+        foreach($key as $k=&gt;$v){
+            $return[$k] =  $value[0][$v];
+        }
+        /*
+          返回$filter类型的数据
+            Array
+            (
+                [user_id] =&gt; 1
+                [user_name] =&gt; wuwei
+                [user_info] =&gt; wuei11
+                [user_time] =&gt;
+                [user_email] =&gt; fasdf@q.c
+            )
+         */
+        return $return;
+    }
+</pre><h3><a name="id7">调试</a></h3>
+<p>在prepared_import_csv_row和prepared_import_csv_obj两个方法中，如果是直接断点输出则什么都不显示，如果要查看断点输出的值</p>
+
+<p>1   可以在http header的响应中查看到所断点echo出来的值</p>
+
+<p>2   可以使用error_log查看</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">导出</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">修改导出heaer</a>
+        <li><a href="#id3" class="reference internal">修改导出数据格式</a>
+    </ul>
+    <li><a href="#id4" class="reference internal">导入</a>
+        <ul>
+        <li><a href="#id5" class="reference internal">解析数据</a>
+        <li><a href="#id6" class="reference internal">根据解析后的数据，组织成条件返回</a>
+        <li><a href="#id7" class="reference internal">调试</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">未归档</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="sphinx.html"
+                                  title="下一章">sphinx</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="sphinx.html" title="sphinx" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="未归档" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

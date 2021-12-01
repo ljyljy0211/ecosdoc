@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      测试驱动开发 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="基础框架 - base" href="index.html" />
+
+        <link rel="next" title="common-library/index" href="常用类库.html" />
+        <link rel="prev" title="task2" href="新版定时任务.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="common-library/index.html" title="常用类库" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="task2.html" title="新版定时任务" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">基础框架 - base</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 测试驱动开发</h1>
+            <h2><a name="id1">概述</a></h2><pre class="quote">   测试驱动开发（Test-driven development）是现代计算机软件开发方法的一种。利用
+测试来驱动软件程序的设计和实现。测试驱动开始流行于20世纪90年代。测试驱动开发是极限
+编程中倡导的程序开发方法，方法主要是先写测试程序，然后再编码使其通过测试。测试驱
+动开发的目的是取得快速反馈并使用“illustrate the main line”方法来构建程序。测试
+驱动开发的比喻。开发可以从两个方面去看待：实现的功能和质量。测试驱动开发更像两顶
+帽子思考法的开发方式，先戴上实现功能的帽子，在测试的辅助下，快速实现正确的功能；
+再戴上重构的帽子，在测试的保护下，通过去除冗余和重复的代码，提高代码重用性，实现
+对质量的改进。可见测试在测试驱动开发中确实属于核心地位，贯穿了开发的始终。
+</pre><h2><a name="id2">在Ecos中如何测试驱动开发</a></h2>
+<ul>
+<li>主要针对model和lib
+<li>在开发之前先根据需要定义好边界, 入参及返回参数. 根据场景预先开发测试用例
+<li>内置的自动测试工具类为 <a href="http://www.phpunit.de/manual/3.5/en/index.html">PHPunit</a>, 版本为3.0.0</li>
+</li>
+</li>
+</ul>
+<h2><a name="id3">如何写测试用例</a></h2>
+<p>放置位置app/{$app_id}/testcase/{$test_case_name}.php</p>
+
+<ul>
+<li>需要继承PHPUnit_Framework_TestCase类
+<li>每一个测试方法以test作为前缀, 例如: 函数testGoodsType
+<li>当开始对一个方法进行测试时, 会先调用setUP
+<li>测试函数: assertEquals/assertEmpty/assertGreaterThan 等等</li>
+</li>
+</li>
+</li>
+</ul>
+
+<p>例子1:</p>
+
+<p>app/myapp/testcase/{$test_case_name}.php<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">test&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">PHPUnit_Framework_TestCase<br /></span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;protected&nbsp;</span><span style="color: #0000BB">$app</span><span style="color: #007700">;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">setUp</span><span style="color: #007700">()&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">test_setconf</span><span style="color: #007700">()<br />&nbsp;&nbsp;&nbsp;&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">assertEquals</span><span style="color: #007700">(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">setConf</span><span style="color: #007700">(</span><span style="color: #DD0000">'test_test'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">10</span><span style="color: #007700">),&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">test_getconf</span><span style="color: #007700">()<br />&nbsp;&nbsp;&nbsp;&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">assertEquals</span><span style="color: #007700">(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">getConf</span><span style="color: #007700">(</span><span style="color: #DD0000">'test_test'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">10</span><span style="color: #007700">),&nbsp;</span><span style="color: #0000BB">10</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">testFailure3</span><span style="color: #007700">()<br />&nbsp;&nbsp;&nbsp;&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">assertEquals</span><span style="color: #007700">(</span><span style="color: #DD0000">"foo\nbar\nbaz\n"</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">"foo\nbah\nbaz\n"</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />}<br /></span>
+</span>
+</code></div></p>
+<h2><a name="id4">如何进行测试</a></h2>
+<p>首先要保证系统已经安装dev app. 然后使用命令行工具进行测试</p>
+<pre class="quote">使用方法: cmd dev:test do app的id 测试文件名
+例子: dev:test do dev sample.php
+</pre>
+<p>例子2: 代码见例子1<pre>bryant@forsky /var/www/ecstore/app/base %&gt; ./cmd dev:test do myapp test.php
+
+--  test  --------------------------------------------------------------
+PHPUnit 3.1.3 by Sebastian Bergmann.
+
+..F
+
+Time: 0 seconds
+
+There was 1 failure:
+
+1) testFailure3(test)
+Failed asserting that two strings are equal.
+--- Expected
++++ Actual
+@@ -1,3 +1,3 @@
+ foo
+-bar
++bah
+ baz
+
+/Users/bryant/codes/ecos2/app/myapp/testcase/test.php:22
+/Users/bryant/codes/ecos2/app/dev/lib/command/test.php:27
+/Users/bryant/codes/ecos2/app/base/lib/shell/prototype.php:103
+/Users/bryant/codes/ecos2/app/base/lib/shell/loader.php:222
+/Users/bryant/codes/ecos2/app/base/lib/shell/loader.php:199
+/Users/bryant/codes/ecos2/app/base/lib/shell/loader.php:54
+/Users/bryant/codes/ecos2/app/base/cmd:55
+
+FAILURES!
+Tests: 3, Failures: 1.
+</pre></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">概述</a>
+    <li><a href="#id2" class="reference internal">在Ecos中如何测试驱动开发</a>
+    <li><a href="#id3" class="reference internal">如何写测试用例</a>
+    <li><a href="#id4" class="reference internal">如何进行测试</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="task2.html"
+                                  title="上一章">新版定时任务</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="common-library/index.html"
+                                  title="下一章">常用类库</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="common-library/index.html" title="常用类库" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="task2.html" title="新版定时任务" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">基础框架 - base</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

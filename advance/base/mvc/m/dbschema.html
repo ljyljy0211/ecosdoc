@@ -1,0 +1,513 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      dbschema 数据库表定义文件 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../../doc.html" />
+    <link rel="up" title="模型(model)" href="../m.html" />
+
+        <link rel="next" title="base_db_model" href="base_db_model.html" />
+        <link rel="prev" title="base" href="概述.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="base_db_model.html" title="base_db_model" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="base.html" title="概述" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">MVC框架</a> &raquo;
+        </li>
+                <li>
+          <a href="../m.html">模型(model)</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> dbschema 数据库表定义文件</h1>
+            
+<p>在ecos框架前，我们使用PowerDesigner来管理这些表结构，但是在一些项目的版本管理过程中，有时需要维护多个版本。powerdesigner的储存文件为一个单一的巨大的xml格式pdm文件。 这在进行版本的合并分支时几乎无法处理。 而在ecos，我们使用php去描述表结构有了以下几个优势：</p>
+
+<ul>
+<li>数据库定义具有版本管理特性
+<ul>
+<li>各分支开发互不干扰
+<li>协同更改时，可以进行合并操作
+<li>针对单表的版本还原与操作日志
+<li>容易做自动化的表结构对比</ul>
+
+<li>按照用途来定义字段类型，不会出现同一种数据类型而字段定义不一致的情况
+<li>简单的外键实现，方便的统计表的依赖关系，使得外键字段定义完全一致
+<li>作为数据抽象层, 我们可以更用以
+<li>app 更容易扩展独立的表
+<li>将数据库特性进行包装, 可以统一设定, 数据库版本 type = MyISAM DEFAULT CHARACTER SET语法 等</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</ul>
+<h2><a name="id1">dbschema 是什么</a></h2>
+<p>我们先看一下base/dbschema/apps.php 文件</p>
+
+<p>可以将注释中间的代码去掉 注释中间的代码和<a href="../desktop/index.html">desktop</a> app相关<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$db</span><span style="color: #007700">[</span><span style="color: #DD0000">'apps'</span><span style="color: #007700">]=array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'columns'&nbsp;</span><span style="color: #007700">=&gt;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'app_id'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'varchar(32)'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'required'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">''</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'pkey'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;begin&nbsp;和desktop相关&nbsp;----------------------<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'width'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">100</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'程序目录'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'hidden'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">1</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'editable'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default_in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;end&nbsp;--------------------------------------<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'app_name'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'varchar(50)'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;begin&nbsp;和desktop相关&nbsp;----------------------<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'width'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">150</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'应用程序'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'is_title'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">1</span><span style="color: #007700">,&nbsp;</span><span style="color: #FF8000">//在链接表中显示的字段<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default_in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">1<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;end&nbsp;--------------------------------------<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'debug_mode'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'bool'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'false'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;begin&nbsp;和desktop相关&nbsp;----------------------<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'width'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">100</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'调试模式'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default_in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;end&nbsp;--------------------------------------<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'app_config'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'text'<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'status'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'installed'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'已安装,&nbsp;未启动'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'resolved'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'已配置'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'starting'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'正在启动'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'active'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'运行中'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'stopping'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'正在关闭'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'uninstalled'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'尚未安装'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'broken'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'已损坏'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;begin&nbsp;和desktop相关&nbsp;----------------------<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'状态'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'width'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">100</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'uninstalled'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default_in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;end&nbsp;--------------------------------------<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'webpath'</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'varchar(20)'<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'description'</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'varchar(255)'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;begin&nbsp;和desktop相关&nbsp;----------------------<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'width'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">300</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'说明'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default_in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">1<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;end&nbsp;--------------------------------------<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'local_ver'</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'varchar(20)'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;begin&nbsp;和desktop相关&nbsp;----------------------<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'width'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">100</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'当前版本'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default_in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">1<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;end&nbsp;--------------------------------------<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'remote_ver'</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'varchar(20)'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;begin&nbsp;和desktop相关&nbsp;----------------------<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'width'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">100</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'最新版本'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default_in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;end&nbsp;--------------------------------------<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'author_name'</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'varchar(100)'<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'author_url'</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'varchar(100)'<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'author_email'</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'varchar(100)'<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'dbver'</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'varchar(32)'<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'remote_config'</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'serialize'<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'version'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'$Rev:&nbsp;44008&nbsp;$'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'unbackup'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />);<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div></p>
+
+<p>这个就是以上代码经过解析后生成的sql语句<pre>CREATE TABLE `sdb_base_apps` (
+	`app_id` varchar(32) not null default '',
+	`app_name` varchar(50),
+	`debug_mode` enum('true','false') default 'false',
+	`app_config` text,
+	`status` enum('installed','resolved','starting','active','stopping','uninstalled','broken') default 'uninstalled',
+	`webpath` varchar(20),
+	`description` varchar(255),
+	`local_ver` varchar(20),
+	`remote_ver` varchar(20),
+	`author_name` varchar(100),
+	`author_url` varchar(100),
+	`author_email` varchar(100),
+	`dbver` varchar(32),
+	`remote_config` longtext,
+	primary key (app_id)
+)ENGINE = MyISAM DEFAULT CHARACTER SET utf8;
+</pre></p>
+
+<p><b>dbschema文件有几个重要的功能</b></p>
+
+<p>1. 描述表结构</p>
+
+<p>2. 定义<a href="../desktop/index.html">desktop</a> app的列表项</p>
+<h2><a name="id2">用dbschema来描述表结构</a></h2>
+<p>在<a href="../../../quickstart/step-2.html#id2">ecos安装</a>时,会扫描相关app中的dbschema中的文件,用这个文件生成相应的表结构并创建</p>
+<pre class="quote">约定:
+
+    文件名 apps.php 对应于 $db['apps'] 生成的表名为 [prefix]_[appname]_apps
+       如: 表前缀: sdb
+           文件: base/dbschemma/apps.php
+           生成的表名为 sdb_base_apps
+           与之对应的model为  base_mdl_apps
+</pre><h3><a name="id3">columns</a></h3>
+<p>表字段<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'columns'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'ref_id'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;字段名称<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'int(8)'</span><span style="color: #007700">,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;字段类型<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'required'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;不能为空&nbsp;默认为false<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'pkey'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;是否是主键&nbsp;默认为false<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'id'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'editable'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'extra'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'auto_increment'</span><span style="color: #007700">,&nbsp;</span><span style="color: #FF8000">//&nbsp;自增<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'goods_id'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'table:goods'</span><span style="color: #007700">,&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;对应用于同一app下goods表中的主键类型<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">0</span><span style="color: #007700">,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;默认值<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'required'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'editable'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'status'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'uninstalled'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array&nbsp;(&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;生成枚举类型&nbsp;enum('installed','resolved','starting'....)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'installed'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'已安装,&nbsp;未启动'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'resolved'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'已配置'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'starting'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'正在启动'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'active'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'运行中'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'stopping'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'正在关闭'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'uninstalled'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'尚未安装'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'broken'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'已损坏'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'状态'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'width'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">100</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default_in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;)<br />)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div></p>
+<h3><a name="id4">字段名称</a></h3>
+<p>字段名称就是键值<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'columns'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'goods_id'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(),<br />)<br /></span>
+</span>
+</code></div></p>
+<h3><a name="id5">sdf</a></h3><h3><a name="id6">type</a></h3>
+<p><b>1 mysql字段类型</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'author_name'</span><span style="color: #007700">=&gt;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'varchar(100)'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>生成的语句是 `author_name` varchar(100),</p>
+
+<p>还有 int(n),varchar(n),text,等mysql字段的类型</p>
+
+<p><b>2 枚举类型</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'status'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'uninstalled'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array&nbsp;(&nbsp;&nbsp;</span><span style="color: #FF8000">//&nbsp;生成枚举类型&nbsp;enum('installed','resolved','starting'....)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'installed'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'已安装,&nbsp;未启动'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'resolved'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'已配置'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'starting'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'正在启动'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'active'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'运行中'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'stopping'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'正在关闭'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'uninstalled'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'尚未安装'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'broken'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'base'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'已损坏'</span><span style="color: #007700">),<br />)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 `status` enum('installed','resolved','starting','active','stopping','uninstalled','broken') default 'uninstalled',</p>
+
+<p>在<a href="../desktop/index.html">desktop</a>中的高级搜索将产生一个select选项可以进行选择</p>
+
+<p><b>3 money</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'price'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'0.00'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'money'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'price' decimal(20,3) default 0.00</p>
+
+<p>涉及到金额类的可以直接使用这个,你还在犹豫什么呢</p>
+
+<p>使用<a href="../dbeav/index.html">dbeav</a>的save时会验证是否是money类型的数据 如果不是将抛出异常</p>
+
+<p><b>4 email</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'email'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'email'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'email' varchar(255)</p>
+
+<p>使用<a href="../dbeav/index.html">dbeav</a>的save时会验证是否是email类型的数据 如果不是将抛出异常</p>
+
+<p><b>5 bn</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'bn'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'bn'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'bn' varchar(255)</p>
+
+<p>商品的货号 货品的货号,订单项的货号等等是使用的这个 便于理解</p>
+
+<p><b>6 html</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'content'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'html'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'content' text</p>
+
+<p>商品详情 文章内容等等是使用的这个 一下就知道这个是使用编辑器处理的数据 便于理解</p>
+
+<p><b>7 bool</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'disabled'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'false'<br />&nbsp;&nbsp;&nbsp;&nbsp;'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'bool'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'disabled' enum('true','false') default 'false'</p>
+
+<p>一般一些开关类型的字段可以选这种类型</p>
+
+<p><b>8 time</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'create_time'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'time'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'create_time' int(10) unsigned</p>
+
+<p>存储时间类的类型 在<a href="../desktop/index.html">desktop</a>的高级搜索里绑定日历<br /><img border="0" alt="" align="middle" src="images/time.png" /></p>
+
+<p><b>9 cdate</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'create_time'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'cdate'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'create_time' int(10) unsigned</p>
+
+<p>和 time的区别在于 在<a href="../desktop/index.html">desktop</a>的高级搜索里没有绑定日历,一般不用于高级搜索</p>
+
+<p><b>10 intbool</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'is_open'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'0'<br />&nbsp;&nbsp;&nbsp;&nbsp;'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'intbool'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'is_open' enum('0','1') default '0'</p>
+
+<p>和bool类型区别不大 个人习惯问题 一般一些开关类型的字段可以选这种类型</p>
+
+<p><b>11 region </b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'area'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'region'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'area' varchar(255)</p>
+
+<p><b>12 password </b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'passwd'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'password'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'passwd' varchar(32)</p>
+
+<p>一般存储密码的字段 一般是md5加密后的字符 便于理解</p>
+
+<p><b>13 tinybool</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'is_open'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'N'<br />&nbsp;&nbsp;&nbsp;&nbsp;'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'tinybool'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'is_open' enum('N','Y') default 'N'</p>
+
+<p>和intbool,bool类型区别不大 个人习惯问题 一般一些开关类型的字段可以选这种类型</p>
+
+<p><b>14 number</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'nums'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'number'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'nums' mediumint unsigned</p>
+
+<p>一般用于数量等类型</p>
+
+<p><b>15 float</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'rate'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'float'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'rate' float</p>
+
+<p><b>16 gender</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'sex'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'gender'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'sex' enum('male','false') NULL</p>
+
+<p>用于会员性别</p>
+
+<p><b>17 ipaddr</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'ip'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'ipaddr'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'ip' varchar(20)</p>
+
+<p>ip地址 便于理解</p>
+
+<p><b>18 serialize</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'config'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'serialize'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'config' longtext</p>
+
+<p>一般使用此类型的字段 在使用<a href="../dbeav/index.html">dbeav</a>的save 时传入的数据是一个数组保存时将以系列化形式保存入库在使用<a href="../dbeav/index.html">dbeav</a>的dump时此类型字段将从数据库取出后反系列化后返回</p>
+
+<p><b>19 last_modify</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'update_time'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'last_modify'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将生成的sql语句 'update_time' int(10) unsigned</p>
+
+<p>和time类型相似  只是名称可以理解成 最后更新时间</p>
+
+<p><b>20 关联表主键</b><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'type_id'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'table:table_name'<br /></span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>将本app下的table_name这个表的关键字作为关联关系</p>
+
+<p>在desktop的高级搜索里这个字段会取出所有相关的数据</p>
+<h3><a name="id7">required</a></h3>
+<p>是否必填 必填:true, 可以不填:false(默认)mysql中的&quot; not null &quot;</p>
+<h3><a name="id8">default</a></h3>
+<p>默认值mysql中的&quot; default null &quot;</p>
+<h3><a name="id9">pkey</a></h3>
+<p>是否是主键 是:true, 否:false(默认)mysql中的&quot; primary key (app_id) &quot;</p>
+<h3><a name="id10">extra</a></h3>
+<p>扩展值(可以这什么说吧)</p>
+
+<p>'extra' =&gt; 'auto_increment' mysql中的 &quot; AUTO_INCREMENT &quot;</p>
+
+<p>'extra' =&gt; 'CHARACTER SET &quot;utf8&quot;' mysql中的 &quot; CHARACTER SET 'utf8' &quot;</p>
+<h3><a name="id11">index</a></h3>
+<p>索引 默认为空</p>
+
+<p>以下是mysql创建索引的语法说明<pre>CREATE [UNIQUE|FULLTEXT|SPATIAL] INDEX index_name
+    [index_type]
+    ON tbl_name (index_col_name,...)
+[index_type]
+
+index_col_name:
+    col_name [(length)] [ASC | DESC]
+
+index_type:
+    USING {BTREE | HASH | RTREE}
+</pre>在dbschema上的设置索引<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'index'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'ind_prefix'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(&nbsp;</span><span style="color: #FF8000">//&nbsp;索引名称<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'columns'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(&nbsp;</span><span style="color: #FF8000">//&nbsp;要创建索引的数据库字段名<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">0&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'prefix'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'prefix'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">''&nbsp;</span><span style="color: #FF8000">//&nbsp;索引的类型&nbsp;UNIQUE|FULLTEXT|SPATIAL&nbsp;如果为空&nbsp;为一般的索引<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">''&nbsp;</span><span style="color: #FF8000">//&nbsp;指定索引算法&nbsp;BTREE&nbsp;|&nbsp;HASH&nbsp;|&nbsp;RTREE<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">)<br />)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div></p>
+<h3><a name="id12">version</a></h3>
+<p>版本号<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'version'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'$Rev:&nbsp;44008&nbsp;$'<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div></p>
+<h3><a name="id13">unbackup</a></h3>
+<p>是否备份 true:不备份, false:备份(默认)<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'unbackup'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true<br />?&gt;<br /></span>
+</span>
+</code></div></p>
+<h3><a name="id14">ignore_cache</a></h3>
+<p>是否缓存 true:不缓存, false:缓存(默认)<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'ignore_cache'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true<br />?&gt;<br /></span>
+</span>
+</code></div></p>
+<h3><a name="id15">engine</a></h3>
+<p>mysql引擎 如果没有指定 为mysql默认设置<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'engine'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'innodb'<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div></p>
+<h3><a name="id16">comment</a></h3>
+<p>表描述<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'comment'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'商品规格索引表'</span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div></p>
+<h2><a name="id17">用dbschema来定义 desktop的列表</a></h2><h3><a name="id18">1 label</a></h3><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'分类'</span><span style="color: #007700">)<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>
+<p><br /><img border="0" alt="" align="middle" src="images/label.png" /></p>
+<h3><a name="id19">2 width</a></h3><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'width'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">"150"<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>
+<p>定义<a href="../desktop/index.html">desktop</a>列表中本列的初始宽度</p>
+<h3><a name="id20">3 editable(已弃用)</a></h3><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'editable'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true<br />?&gt;<br /></span>
+</span>
+</code></div>
+<p>定义在<a href="../desktop/index.html">desktop</a>列表中本列数据数据是否能进行编辑</p>
+
+<p>是否在列表上进行编辑 true:可以 false:不可以(默认)</p>
+<h3><a name="id21">4 in_list</a></h3><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true<br />?&gt;<br /></span>
+</span>
+</code></div>
+<p>定义在<a href="../desktop/index.html">desktop</a>列表中是否显示 true:是 false:否(默认)<br /><img border="0" alt="" align="middle" src="images/in_list.png" /></p>
+<h3><a name="id22">5 default_in_list</a></h3><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'default_in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true<br />?&gt;<br /></span>
+</span>
+</code></div>
+<p>默认在<a href="../desktop/index.html">desktop</a>列表中是否显示 true:是 false:否(默认)如果有相关列表项配置 按配置显示<br /><img border="0" alt="" align="middle" src="images/configlist.png" /></p>
+<h3><a name="id23">6 filterdefault</a></h3><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'filterdefault'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true<br />?&gt;<br /></span>
+</span>
+</code></div>
+<p>默认在<a href="../desktop/index.html">desktop</a>高级搜索中是否默认显示 true:是 false:否(默认)如果有相关搜索项配置 按配置显示<br /><img border="0" alt="" align="middle" src="images/configsearch.png" /></p>
+<h3><a name="id24">7 filtertype,filtercustom</a></h3><div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'filtertype'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'normal'&nbsp;</span><span style="color: #FF8000">//&nbsp;normal按type的来生成过滤&nbsp;&nbsp;custom&nbsp;按dbschema中设定的filtercustom&nbsp;设置过滤<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div><h3><a name="id25">8 searchtype</a></h3>
+<p>列表页中简单搜索的处理方式,如果dbschema中存在searchtype则会在<a href="../desktop/index.html">desktop</a>列表上显示相关的简单搜索</p>
+
+<p>如果searchtype=&gt;<span class="mark"> 为</span>则默认为'nequal'</p>
+
+<p>以下是相关代码段自己慢慢理解<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #DD0000">'than'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'&nbsp;&gt;&nbsp;'</span><span style="color: #007700">.</span><span style="color: #0000BB">$var</span><span style="color: #007700">,<br /></span><span style="color: #DD0000">'lthan'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'&nbsp;&lt;&nbsp;'</span><span style="color: #007700">.</span><span style="color: #0000BB">$var</span><span style="color: #007700">,<br /></span><span style="color: #DD0000">'nequal'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'&nbsp;=&nbsp;\''</span><span style="color: #007700">.</span><span style="color: #0000BB">$var</span><span style="color: #007700">.</span><span style="color: #DD0000">'\''</span><span style="color: #007700">,<br /></span><span style="color: #DD0000">'noequal'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'&nbsp;&lt;&gt;&nbsp;\''</span><span style="color: #007700">.</span><span style="color: #0000BB">$var</span><span style="color: #007700">.</span><span style="color: #DD0000">'\''</span><span style="color: #007700">,<br /></span><span style="color: #DD0000">'tequal'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'&nbsp;=&nbsp;\''</span><span style="color: #007700">.</span><span style="color: #0000BB">$var</span><span style="color: #007700">.</span><span style="color: #DD0000">'\''</span><span style="color: #007700">,<br /></span><span style="color: #DD0000">'sthan'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'&nbsp;&lt;=&nbsp;'</span><span style="color: #007700">.</span><span style="color: #0000BB">$var</span><span style="color: #007700">,<br /></span><span style="color: #DD0000">'bthan'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'&nbsp;&gt;=&nbsp;'</span><span style="color: #007700">.</span><span style="color: #0000BB">$var</span><span style="color: #007700">,<br /></span><span style="color: #DD0000">'has'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'&nbsp;like&nbsp;\'%'</span><span style="color: #007700">.</span><span style="color: #0000BB">$var</span><span style="color: #007700">.</span><span style="color: #DD0000">'%\''</span><span style="color: #007700">,<br /></span><span style="color: #DD0000">'head'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'&nbsp;like&nbsp;\''</span><span style="color: #007700">.</span><span style="color: #0000BB">$var</span><span style="color: #007700">.</span><span style="color: #DD0000">'%\''</span><span style="color: #007700">,<br /></span><span style="color: #DD0000">'foot'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'&nbsp;like&nbsp;\'%'</span><span style="color: #007700">.</span><span style="color: #0000BB">$var</span><span style="color: #007700">.</span><span style="color: #DD0000">'\''</span><span style="color: #007700">,<br /></span><span style="color: #DD0000">'nohas'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'&nbsp;not&nbsp;like&nbsp;\'%'</span><span style="color: #007700">.</span><span style="color: #0000BB">$var</span><span style="color: #007700">.</span><span style="color: #DD0000">'%\''</span><span style="color: #007700">,<br /></span><span style="color: #DD0000">'between'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'&nbsp;{field}&gt;='</span><span style="color: #007700">.</span><span style="color: #0000BB">$var</span><span style="color: #007700">[</span><span style="color: #0000BB">0</span><span style="color: #007700">].</span><span style="color: #DD0000">'&nbsp;and&nbsp;'</span><span style="color: #007700">.</span><span style="color: #DD0000">'&nbsp;{field}&lt;'</span><span style="color: #007700">.</span><span style="color: #0000BB">$var</span><span style="color: #007700">[</span><span style="color: #0000BB">1</span><span style="color: #007700">],<br /></span><span style="color: #DD0000">'in'&nbsp;</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">"&nbsp;in&nbsp;('"</span><span style="color: #007700">.</span><span style="color: #0000BB">implode</span><span style="color: #007700">(</span><span style="color: #DD0000">"','"</span><span style="color: #007700">,(array)</span><span style="color: #0000BB">$var</span><span style="color: #007700">).</span><span style="color: #DD0000">"')&nbsp;"</span><span style="color: #007700">,<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div><br /><img border="0" alt="" align="middle" src="images/simplesearch.png" /></p>
+<h3><a name="id26">9 is_title(2011-04-28：sunjinrong)</a></h3>
+<p>该属性的意义为是否为链接显示字段，true(是) false(否)，不设置该属性默认为false。注意：该属性为唯一性属性，将多个字段设置为该属性时，会默认显示第一个设置字段。如果被链接的表没有一个字段被设置为，'is_title'=&gt;true,则默认情况会显示该表主键的下一个字段。</p>
+<h2><a name="id27">bryant写的部分</a></h2>
+<p>数据库抽象层dbschema(bryant)</p>
+
+<p>在ecos框架前，我们使用powerdesigner来管理这些表结构，但是在一些项目的版本管理过程中，有时需要维护多个版本。powerdesigner的储存文件为一个单一的巨大的xml格式pdm文件。 这在进行版本的合并分支时几乎无法处理。 而在ecos，我们使用php去描述表结构有了以下几个优势：</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$db</span><span style="color: #007700">[</span><span style="color: #DD0000">'table_name'</span><span style="color: #007700">]&nbsp;=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'columns'</span><span style="color: #007700">=&gt;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'col_1'</span><span style="color: #007700">=&gt;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'int'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'pkey'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">true</span><span style="color: #007700">,</span><span style="color: #DD0000">'comment'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'id字段'</span><span style="color: #007700">),&nbsp;</span><span style="color: #FF8000">//主键<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'col_p1'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'int'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'pkey'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">true</span><span style="color: #007700">,</span><span style="color: #DD0000">'comment'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'主键2'</span><span style="color: #007700">),&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//联合主键<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'col_33'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'mediumint&nbsp;unsigned'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//当然也支持通常的type<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'col_2'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'email'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'comment'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'id字段'</span><span style="color: #007700">),&nbsp;&nbsp;</span><span style="color: #FF8000">//email&nbsp;=&nbsp;varchar(255)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'col_3'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'money'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'notnull'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">true</span><span style="color: #007700">,</span><span style="color: #DD0000">'default'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">3</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//money&nbsp;=&nbsp;decimal(20,3),&nbsp;非空字段,默认为3.000<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'col_4'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'html'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'comment'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'id字段'</span><span style="color: #007700">),&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//html&nbsp;=&nbsp;text<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'col_4'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'bool'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'comment'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'id字段'</span><span style="color: #007700">),&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//bool&nbsp;=&nbsp;enum('true','false')<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'table2_c1'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'table_2:c1'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'comment'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'表table_2的c1字段'</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//类型和table_2的c1字段相同,&nbsp;当外键处理,自动加索引<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'index'</span><span style="color: #007700">=&gt;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'...'</span><span style="color: #007700">,</span><span style="color: #FF8000">//再定义<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">)<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'engine'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'heap'</span><span style="color: #FF8000">//可不填，默认为myisam<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'option'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">''</span><span style="color: #FF8000">//其他扩展语法<br /></span><span style="color: #007700">);<br /></span>
+</span>
+</code></div>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">dbschema 是什么</a>
+    <li><a href="#id2" class="reference internal">用dbschema来描述表结构</a>
+        <ul>
+        <li><a href="#id3" class="reference internal">columns</a>
+        <li><a href="#id4" class="reference internal">字段名称</a>
+        <li><a href="#id5" class="reference internal">sdf</a>
+        <li><a href="#id6" class="reference internal">type</a>
+        <li><a href="#id7" class="reference internal">required</a>
+        <li><a href="#id8" class="reference internal">default</a>
+        <li><a href="#id9" class="reference internal">pkey</a>
+        <li><a href="#id10" class="reference internal">extra</a>
+        <li><a href="#id11" class="reference internal">index</a>
+        <li><a href="#id12" class="reference internal">version</a>
+        <li><a href="#id13" class="reference internal">unbackup</a>
+        <li><a href="#id14" class="reference internal">ignore_cache</a>
+        <li><a href="#id15" class="reference internal">engine</a>
+        <li><a href="#id16" class="reference internal">comment</a>
+    </ul>
+    <li><a href="#id17" class="reference internal">用dbschema来定义 desktop的列表</a>
+        <ul>
+        <li><a href="#id18" class="reference internal">1 label</a>
+        <li><a href="#id19" class="reference internal">2 width</a>
+        <li><a href="#id20" class="reference internal">3 editable(已弃用)</a>
+        <li><a href="#id21" class="reference internal">4 in_list</a>
+        <li><a href="#id22" class="reference internal">5 default_in_list</a>
+        <li><a href="#id23" class="reference internal">6 filterdefault</a>
+        <li><a href="#id24" class="reference internal">7 filtertype,filtercustom</a>
+        <li><a href="#id25" class="reference internal">8 searchtype</a>
+        <li><a href="#id26" class="reference internal">9 is_title(2011-04-28：sunjinrong)</a>
+    </ul>
+    <li><a href="#id27" class="reference internal">bryant写的部分</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="base.html"
+                                  title="上一章">概述</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="base_db_model.html"
+                                  title="下一章">base_db_model</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="base_db_model.html" title="base_db_model" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="base.html" title="概述" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">MVC框架</a> &raquo;
+        </li>
+                <li>
+          <a href="../m.html">模型(model)</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

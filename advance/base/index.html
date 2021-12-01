@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      基础框架 - base &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="Ecos手册" href="../index.html" />
+
+        <link rel="next" title="base" href="概述.html" />
+        <link rel="prev" title="../index" href="Ecos手册.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="base.html" title="概述" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../index.html" title="Ecos手册" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 基础框架 - base</h1>
+            
+<ul>
+    <li><a href="base.html" class="">概述</a>
+    <li><a href="pre-study.html" class="">前置学习</a>
+    <li><a href="run-flow.html" class="">执行流程</a>
+    <li><a href="cmd.html" class="">命令行工具</a>
+    <li><a href="app.html" class="">app机制</a>
+        <ul>
+        <li><a href="app/base.html" class="">app机制概述</a>
+        <li><a href="app/service.html" class="">service机制</a>
+        <li><a href="app/setting.html" class="">setting - 专属app的配置信息</a>
+        <li><a href="app/application.html" class="">app包管理</a>
+        <li><a href="app/app-content.html" class="">资源探测器</a>
+        <li><a href="app/dev-application.html" class="">维护app的生命周期</a>
+        <li><a href="app/app_class.html" class="">app - app处理类</a>
+    </ul>
+    <li><a href="mvc/index.html" class="">MVC框架</a>
+        <ul>
+        <li><a href="mvc/basic.html" class="">架构说明</a>
+        <li><a href="mvc/m.html" class="">模型(model)</a>
+        <li><a href="mvc/v.html" class="">视图(view)</a>
+        <li><a href="mvc/c.html" class="">控制器(controller)</a>
+    </ul>
+    <li><a href="api.html" class="">api机制</a>
+    <li><a href="cache.html" class="">缓存机制</a>
+    <li><a href="kvstore.html" class="">key-value存储机制</a>
+    <li><a href="storager.html" class="">文件存储</a>
+    <li><a href="queue/index.html" class="">队列</a>
+        <ul>
+        <li><a href="queue/mysql.html" class="">MySQL队列(默认队列)</a>
+        <li><a href="queue/rabbitmq.html" class="">RabbitMQ</a>
+    </ul>
+    <li><a href="task.html" class="">定时任务</a>
+    <li><a href="task2.html" class="">新版定时任务</a>
+    <li><a href="tdd.html" class="">测试驱动开发</a>
+    <li><a href="common-library/index.html" class="">常用类库</a>
+        <ul>
+        <li><a href="common-library/base_tar.html" class="">压缩工具类 - base_tar</a>
+        <li><a href="common-library/base_xml.html" class="">xml工具类 - base_xml</a>
+        <li><a href="common-library/base_initial.html" class="">APP数据初始化类 - base_initial</a>
+        <li><a href="common-library/base_demo.html" class="">系统演示数据初始化类 - base_demo</a>
+        <li><a href="common-library/base_charset.html" class="">编码转换工具 - base_charset</a>
+        <li><a href="common-library/base_pget.html" class="">简易爬虫 - base_pget</a>
+    </ul>
+    <li><a href="services.html" class="">app提供的services</a>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../index.html"
+                                  title="上一章">Ecos手册</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="base.html"
+                                  title="下一章">概述</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="base.html" title="概述" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../index.html" title="Ecos手册" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">Ecos手册</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

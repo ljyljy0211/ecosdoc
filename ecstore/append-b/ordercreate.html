@@ -1,0 +1,684 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      ordercreate 订单新增 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="资料" href="../../_refs.html" />
+
+        <link rel="next" title="iframeedit" href="iframeedit 订单更新.html" />
+        <link rel="prev" title="../../ecstore20/lnmp/memcached2" href="Memcached安装.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="iframeedit.html" title="iframeedit 订单更新" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../../ecstore20/lnmp/memcached2.html" title="Memcached安装" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../_refs.html">资料</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> ordercreate 订单新增</h1>
+            
+<table class="docutils">
+<tr>
+<th>返回参数名称</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>描述</th>
+</tr>
+
+<tr>
+<td>tid</td>
+
+<td>String</td>
+
+<td>y</td>
+
+<td>交易编号（交易id）</td>
+</tr>
+
+<tr>
+<td>title</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>交易标题</td>
+</tr>
+
+<tr>
+<td>created</td>
+
+<td>Date</td>
+
+<td>n</td>
+
+<td>交易创建时间。格式:yyyy-MM-dd HH:mm:ss</td>
+</tr>
+
+<tr>
+<td>modified</td>
+
+<td>Date</td>
+
+<td>n</td>
+
+<td>交易修改时间。格式:yyyy-MM-dd HH:mm:ss</td>
+</tr>
+
+<tr>
+<td>status</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>交易状态，可选值： TRADE_ACTIVE:交易处理中, TRADE_CLOSED:交易作废即交易关闭, TRADE_FINISHED:交易成功</td>
+</tr>
+
+<tr>
+<td>pay_status</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>交易支付状态，可选值：  PAY_NO:未付款,  PAY_FINISH:已付款,  PAY_TO_MEDIUM:付款至担保交易, PAY_PART:部分付款,  REFUND_PART:部分退款, REFUND_ALL:全额退款</td>
+</tr>
+
+<tr>
+<td>ship_status</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>交易物流状态，可选值：  SHIP_NO:未发货,  SHIP_PREPARE:配货中, SHIP_PART:部分发货,  SHIP_FINISH:全部发货,  RESHIP_PART:部分退货, RESHIP_ALL:全部退货</td>
+</tr>
+
+<tr>
+<td>has_invoice</td>
+
+<td>Boolean</td>
+
+<td>n</td>
+
+<td>是否开发票。可选值：true(开),false(不开)。默认不开</td>
+</tr>
+
+<tr>
+<td>invoice_title</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>发票title。如果要invoice为true,则此参数为必须</td>
+</tr>
+
+<tr>
+<td>invoice_fee</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>发票税金</td>
+</tr>
+
+<tr>
+<td>total_goods_fee</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>商品总额(不包括配送费用)</td>
+</tr>
+
+<tr>
+<td>total_trade_fee</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>交易应付总额（包括商品价格 + 配送费用)</td>
+</tr>
+
+<tr>
+<td>discount_fee</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>折扣优惠金额</td>
+</tr>
+
+<tr>
+<td>goods_discount_fee</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>商品优惠金额</td>
+</tr>
+
+<tr>
+<td>orders_discount_fee</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>订单优惠金额</td>
+</tr>
+
+<tr>
+<td>promotion_details</td>
+
+<td>PromotionDetail</td>
+
+<td>n</td>
+
+<td>详细优惠方案  json{ “promotion_name string 优惠描述”, “promotion_fee String 优惠金额”, “pmt_id String 优惠对应的订单ID，可能是交易号tid,也可能是oid.ID决定优惠是在交易上还是子订单上” }</td>
+</tr>
+
+<tr>
+<td>payed_fee</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>已支付金额</td>
+</tr>
+
+<tr>
+<td>Currency</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>当前交易选择的货币类型。可选值：CNY（人民币），USD（美元），JPY（日元）。- 默认为CNY（人民币）</td>
+</tr>
+
+<tr>
+<td>currency_rate</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>当前货别汇率</td>
+</tr>
+
+<tr>
+<td>total_currency_fee</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>当前货币订单总额</td>
+</tr>
+
+<tr>
+<td>buyer_obtain_point_fee</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>买家获得积分,返点的积分。格式:100;单位:个</td>
+</tr>
+
+<tr>
+<td>point_fee</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>买家使用积分。格式:100;单位:个</td>
+</tr>
+
+<tr>
+<td>total_weight</td>
+
+<td>Number</td>
+
+<td>n</td>
+
+<td>该笔交易的商品总重量</td>
+</tr>
+
+<tr>
+<td>receiver_time</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>收货人要求到货时间</td>
+</tr>
+
+<tr>
+<td>shipping_tid</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>创建交易时的物流方式ID（交易完成前，物流方式有可改变）</td>
+</tr>
+
+<tr>
+<td>shipping_type</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>交易物流方式名称</td>
+</tr>
+
+<tr>
+<td>shipping_fee</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>交易物流配送费用</td>
+</tr>
+
+<tr>
+<td>is_protect</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>是否保价（针对物流配送)</td>
+</tr>
+
+<tr>
+<td>protect_fee</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>保价费用（针对物流配送)</td>
+</tr>
+
+<tr>
+<td>payment_tid</td>
+
+<td>Number</td>
+
+<td>n</td>
+
+<td>支付方式ID</td>
+</tr>
+
+<tr>
+<td>payment_type</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>支付方式名称</td>
+</tr>
+
+<tr>
+<td>is_cod</td>
+
+<td>Boolean</td>
+
+<td>n</td>
+
+<td>是否货到付款。可选值:true(是),false(否)</td>
+</tr>
+
+<tr>
+<td>receiver_name</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>收货人的姓名</td>
+</tr>
+
+<tr>
+<td>receiver_email</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>收货人email地址</td>
+</tr>
+
+<tr>
+<td>receiver_mobile</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>收货人的手机号码</td>
+</tr>
+
+<tr>
+<td>receiver_state</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>收货人的所在省份</td>
+</tr>
+
+<tr>
+<td>receiver_city</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>收货人的所在城市</td>
+</tr>
+
+<tr>
+<td>receiver_district</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>收货人的所在地区</td>
+</tr>
+
+<tr>
+<td>receiver_address</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>收货人的详细地址</td>
+</tr>
+
+<tr>
+<td>receiver_zip</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>收货人的邮编</td>
+</tr>
+
+<tr>
+<td>receiver_phone</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>收货人的电话号码</td>
+</tr>
+
+<tr>
+<td>pay_cost</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>支付手续费</td>
+</tr>
+
+<tr>
+<td>buyer_memo</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>买家备注</td>
+</tr>
+
+<tr>
+<td>orders_number</td>
+
+<td>Number</td>
+
+<td>n</td>
+
+<td>当前交易下订单数量</td>
+</tr>
+
+<tr>
+<td>buyer_uname</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>买家帐号</td>
+</tr>
+
+<tr>
+<td>buyer_name</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>买家姓名</td>
+</tr>
+
+<tr>
+<td>buyer_address</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>买家的详细地址</td>
+</tr>
+
+<tr>
+<td>buyer_mobile</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>买家的手机号码</td>
+</tr>
+
+<tr>
+<td>buyer_phone</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>买家的电话号码</td>
+</tr>
+
+<tr>
+<td>buyer_email</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>买家email</td>
+</tr>
+
+<tr>
+<td>buyer_zip</td>
+
+<td>String</td>
+
+<td>n</td>
+
+<td>买家的邮编</td>
+</tr>
+
+<tr>
+<td>Orders</td>
+
+<td>Order</td>
+
+<td>n</td>
+
+<td>订单列表</td>
+</tr>
+
+<tr>
+<td>Payments</td>
+
+<td>Payment</td>
+
+<td>n</td>
+
+<td>支付单列表</td>
+</tr>
+</table>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="../../ecstore20/lnmp/memcached2.html"
+                                  title="上一章">Memcached安装</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="iframeedit.html"
+                                  title="下一章">iframeedit 订单更新</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="iframeedit.html" title="iframeedit 订单更新" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="../../ecstore20/lnmp/memcached2.html" title="Memcached安装" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../_refs.html">资料</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

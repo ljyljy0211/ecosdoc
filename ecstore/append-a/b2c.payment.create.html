@@ -1,0 +1,379 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      b2c.payment.create 添加订单支付单 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="ecstore  被外部系统请求的api接口" href="index.html" />
+
+        <link rel="next" title="b2c.refund.create" href="b2c.refund.create 添加订单退款单.html" />
+        <link rel="prev" title="b2c.order.iframe_url" href="b2c.order.iframe_url 外部订单编辑url地址获取.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="b2c.refund.create.html" title="b2c.refund.create 添加订单退款单" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="b2c.order.iframe_url.html" title="b2c.order.iframe_url 外部订单编辑url地址获取" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../api.html">API</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore  被外部系统请求的api接口</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> b2c.payment.create 添加订单支付单</h1>
+            
+<p>外部系统向ECSTORE中添加订单支付</p>
+<h2><a name="id1">API应用级输入参数</a></h2>
+<table class="docutils">
+<tr>
+<th>参数</th>
+
+<th>类型</th>
+
+<th>是否必须</th>
+
+<th>说明</th>
+</tr>
+
+<tr>
+<td>order_bn</td>
+
+<td>string</td>
+
+<td>Y</td>
+
+<td>支付订单号</td>
+</tr>
+
+<tr>
+<td>payment_id</td>
+
+<td>string</td>
+
+<td>Y</td>
+
+<td>支付单号</td>
+</tr>
+
+<tr>
+<td>account</td>
+
+<td>string</td>
+
+<td>N</td>
+
+<td>收款账号</td>
+</tr>
+
+<tr>
+<td>bank</td>
+
+<td>string</td>
+
+<td>N</td>
+
+<td>收款银行</td>
+</tr>
+
+<tr>
+<td>pay_account</td>
+
+<td>string</td>
+
+<td>N</td>
+
+<td>付款账号</td>
+</tr>
+
+<tr>
+<td>currency</td>
+
+<td>string</td>
+
+<td>N</td>
+
+<td>货币</td>
+</tr>
+
+<tr>
+<td>money</td>
+
+<td>double</td>
+
+<td>Y</td>
+
+<td>支付金额</td>
+</tr>
+
+<tr>
+<td>paycost</td>
+
+<td>string</td>
+
+<td>N</td>
+
+<td>支付网关费用</td>
+</tr>
+
+<tr>
+<td>cur_money</td>
+
+<td>string</td>
+
+<td>Y</td>
+
+<td>支付货币金额</td>
+</tr>
+
+<tr>
+<td>pay_type</td>
+
+<td>string</td>
+
+<td>Y</td>
+
+<td>支付类型(online在线支付 offline线下支付 deposit预存款支付)</td>
+</tr>
+
+<tr>
+<td>payment_tid</td>
+
+<td>string</td>
+
+<td>Y</td>
+
+<td>支付方式app名称</td>
+</tr>
+
+<tr>
+<td>paymethod</td>
+
+<td>string</td>
+
+<td>Y</td>
+
+<td>支付接口名称</td>
+</tr>
+
+<tr>
+<td>t_begin</td>
+
+<td>string</td>
+
+<td>Y</td>
+
+<td>支付开始时间</td>
+</tr>
+
+<tr>
+<td>t_end</td>
+
+<td>string</td>
+
+<td>Y</td>
+
+<td>支付结束时间</td>
+</tr>
+
+<tr>
+<td>ip</td>
+
+<td>string</td>
+
+<td>Y</td>
+
+<td>支付IP</td>
+</tr>
+
+<tr>
+<td>trade_no</td>
+
+<td>string</td>
+
+<td>Y</td>
+
+<td>支付单交易编号</td>
+</tr>
+</table>
+</table>
+
+<p>常见错误：
+<ol>
+<li>支付单tid没有收到！ 缺少order_bn参数
+<li>需要支付的订单号不存在！ order_bn在系统中不存在
+<li>支付多次重复请求！  多次发送请求</li>
+</li>
+</li>
+</ol>
+</p>
+<h2><a name="id2">API应用级返回结果</a></h2>
+<p>订单支付单创建成功后，返回结果</p>
+<pre class="mark">Array
+(
+    [rsp] =&gt; fail
+    [res] =&gt; 成功！
+    [data] =&gt; Array
+        (
+            [tid] =&gt; 20111114137167
+            [payment_id] =&gt; 13212530399287
+        )
+
+)
+
+</pre>
+<p>失败返回<pre class="mark">Array
+(
+    [rsp] =&gt; fail
+    [res] =&gt; 支付多次重复请求！
+    [data] =&gt; Array
+        (
+            [tid] =&gt; 20111114137167
+            [payment_id] =&gt; 13212530399287
+        )
+
+)
+
+
+</pre></p>
+<pre class="mark">Array
+(
+    [rsp] =&gt; fail
+    [res] =&gt; 支付单tid没有收到！
+    [data] =&gt; Array
+        (
+        )
+
+)
+</pre>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">API应用级输入参数</a>
+    <li><a href="#id2" class="reference internal">API应用级返回结果</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="b2c.order.iframe_url.html"
+                                  title="上一章">b2c.order.iframe_url 外部订单编辑url地址获取</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="b2c.refund.create.html"
+                                  title="下一章">b2c.refund.create 添加订单退款单</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="b2c.refund.create.html" title="b2c.refund.create 添加订单退款单" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="b2c.order.iframe_url.html" title="b2c.order.iframe_url 外部订单编辑url地址获取" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="../api.html">API</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore  被外部系统请求的api接口</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

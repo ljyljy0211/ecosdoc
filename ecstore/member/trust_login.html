@@ -1,0 +1,503 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      信任登录 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="会员" href="index.html" />
+
+        <link rel="next" title="../promotion/promotion" href="促销.html" />
+        <link rel="prev" title="login" href="会员登录.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../promotion/promotion.html" title="促销" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="login.html" title="会员登录" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">会员</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 信任登录</h1>
+            <h2><a name="id1">简介</a></h2>
+<p>信任登录是指用第三方比较成熟的用户库来登录当前访问的网站。目前比较常见的第三方信任登录帐号如：QQ号淘宝帐号、支付宝帐号、微博帐号等。</p>
+
+<p>信任登录的好处是可以利用第三方庞大的用户群来推广、营销网站，同时减少用户的注册、登录时间。</p>
+
+<p>提到信任登录，我们就不得不提到oAuth，正是有了oAuth，我们的信任登录才得以实现。下面我们就来看下关于oAuth的一些介绍。</p>
+<h2><a name="id2">oAuth</a></h2>
+<p>我们看到<b>维基百科</b>对oAuth的解释如下；<pre class="quote">  OAuth（开放授权）是一个开放标准，允许用户让第三方应用访问该用户在某一网站上存储的私密的资源
+（如照片，视频，联系人列表），而无需将用户名和密码提供给第三方应用。
+
+  OAuth允许用户提供一个令牌，而不是用户名和密码来访问他们存放在特定服务提供者的数据。每一个令
+牌授权一个特定的网站（例如，视频编辑网站)在特定的时段（例如，接下来的2小时内）内访问特定的资源
+（例如仅仅是某一相册中的视频）。这样，OAuth允许用户授权第三方网站访问他们存储在另外的服务提供者
+上的信息，而不需要分享他们的访问许可或他们数据的所有内容。
+</pre>
+<ul>
+<li>由此可见oAuth 其实是一个协议，我们通过遵守这个协议来完成我们网站与第三方用户的信任登录。</li>
+</ul>
+</p>
+<h3><a name="id3">oAuth 2.0流程</a></h3>
+<p>在<b>维基百科</b>上oAuth2.0的介绍如下：<pre class="quote">  OAuth 2.0是OAuth协议的下一版本，但不向后兼容OAuth 1.0。 OAuth 2.0关注客户端开发者的简易性，同时
+为Web应用，桌面应用和手机，和起居室设备提供专门的认证流程。规范还在IETF OAuth工作组的开发中，
+按照Eran Hammer-Lahav的说法，OAuth将于2010年末完成。
+</pre><br /><img border="0" alt="" align="middle" src="images/mem2.jpg" />
+<ul>
+<li>注：目前腾讯、淘宝平台都已经全面支持oAuth2.0。在下面的案例中，我们将以<b>腾讯QQ</b>为第三方服务商来展示我们是如何开发ECStore与QQ的信任登录的。</li>
+</ul>
+</p>
+<h2><a name="id4">前期准备工作</a></h2>
+<p>为了能够顺利的进行下去，完成我们的信任登录任务，我们除了要了解以上的信任登录知识，还需要做一些其他准备工作，比如：搭建一个外线的测试站、申请一个appid和appkey等（针对qq信任登录）。</p>
+<h3><a name="id5">搭建外线测试站</a></h3>
+<p>我已经用ecae搭建了一个ECStore外线测试站点：demand.ec-ae.com。PS：自从有了ECAE（www.ec-ae.com）我们发现搭建一个ECStore 站点变的如此的简单！</p>
+<h3><a name="id6">申请appid、appkey</a></h3>
+<p>根据oAuth 2.0 的标准，我们必须要向第三方服务商提供一个“令牌”，通过后，用户方可进入第三方提供的登录页面。我们想腾讯开发平台申请的这个appid、appkey就是起到了“令牌”的作用。申请网址：<a href="http://connect.qq.com/">http://connect.qq.com/</a></p>
+
+<p>图3：申请腾讯开发平台应用</p>
+
+<p><br /><img border="0" alt="" align="middle" src="images\mem3.jpg" />
+<ul>
+<li>根据提示，我们完成申请工作。</li>
+</ul>
+</p>
+
+<p>图4：获得appid和appkey<br /><img border="0" alt="" align="middle" src="images\mem4.jpg" /></p>
+<h3><a name="id7">下载sdk包测试</a></h3>
+<p>我们可以下载sdk包在本地进行测试，sdk下载地址：<a href="http://wiki.opensns.qq.com/wiki/%E3%80%90QQ%E7%99%BB%E5%BD%95%E3%80%91SDK%E4%B8%8B%E8%BD%BD#2._QQ.E7.99.BB.E5.BD.95PHP_SDK">http://wiki.opensns.qq.com/wiki/%E3%80%90QQ%E7%99%BB%E5%BD%95%E3%80%91SDK%E4%B8%8B%E8%BD%BD#2._QQ.E7.99.BB.E5.BD.95PHP_SDK</a>
+<ul>
+<li>注：所有准备工作完成后，我们开始着手“改造”ECStore，以便完成我们的信任登录。</li>
+</ul>
+</p>
+<h2><a name="id8">“改造”ECStore</a></h2>
+<p>通过上图的oAuth 2.0流程图，我们发现作为“购物网站”的我们，在整个流程中要做以下的事情：</p>
+</ul>
+
+<ol>
+<ol>
+<li>发起请求，将“令牌”（appid、appkey）发送到第三方服务商提供的api进行验证。
+<li>验证通过后，第三方服务商将是否登录成功的状态发送到我们提供的回调地址。
+<li>我们获取到状态信息后，再次通过api获取用户其他信息。
+<li>最后，我们根据需求对用户信息进行相关操作（如插入到我们网站自己的用户表）。</li>
+</li>
+</li>
+</li>
+</ol>
+</ol>
+<h3><a name="id9">新建app--loginqq</a></h3><h4><a name="id10">1、创建必要的目录</a></h4>
+<table class="docutils">
+<tr>
+<th>路径</th>
+
+<th>说明</th>
+</tr>
+
+<tr>
+<td>app/loginqq/lib</td>
+
+<td>php类库文件</td>
+</tr>
+
+<tr>
+<td>app/loginqq/statics</td>
+
+<td>图片等静态文件</td>
+</tr>
+
+<tr>
+<td>app/loginqq/app.xml</td>
+
+<td>app信息文件</td>
+</tr>
+
+<tr>
+<td>app/loginqq/services.xml</td>
+
+<td>services注册文件</td>
+</tr>
+</table>
+</table>
+<h4><a name="id11">2、app.xml</a></h4></ol>
+
+<ul>
+<ul>
+<li>根据自己的需求填写app.xml。</li>
+</ul>
+</ul>
+<h4><a name="id12">3、注册services</a></h4>
+<ul>
+<li>为了实现信任登录，我们需要用的services有两个：
+<p><b>1、 passport（信任登录services）</b>,方法抽象见下方【5、loginqq_passport_qq】：</p>
+</li>
+</ul>
+
+<p><b>2、openid_imageurl（各种登陆方式的图片地址）</b>，方法抽象见下方【4、loginqq_imageurl】：</p>
+
+<ul>
+<li>我们的services.xml 代码如下：<pre>&lt;services&gt;
+    &lt;service id=&quot;passport&quot;&gt;
+        &lt;class&gt;loginqq_passport_qq&lt;/class&gt;
+    &lt;/service&gt;  
+
+    &lt;service id=&quot;openid_imageurl&quot;&gt;
+        &lt;class&gt;loginqq_imageurl&lt;/class&gt; 
+    &lt;/service&gt;
+&lt;/services&gt;    
+</pre></li>
+</ul>
+<h4><a name="id13">4、loginqq_imageurl</a></h4>
+<ul>
+<li>loginqq_imageurl主要为了获取图片，主要方法为：</li>
+</ul>
+<pre>==get_image_url==
+ /**
+ * 返回信任登录的图片地址
+ * @return string
+ */
+ get_image_url()
+</pre>
+<p>注：该方法主要为了获得图片地址，登录所用图片，图片一般由第三方开放平台提供。</p>
+<h4><a name="id14">5、loginqq_passport_qq</a></h4>
+<p>接下来我们开始写类loginqq_passport_qq，这是信任登录的核心代码。由于我们的测试环境还没有搭建起来，所以我们暂时无法一下子将所有代码写全，需要分几步将该类的代码补全。根据我们前面的提示，我们知道该类主要抽象方面如下：</p>
+<pre>==get_config==
+ /**
+ * 获取登录方式配置信息
+ * @return array
+ */
+ get_config()
+
+==get_name==
+ /**
+ * 获取登录方式名称
+ * @return string
+ */
+ get_name()
+
+==get_login_form==
+ /**
+ * 获取登录表单
+ * @param object $auth pam_auth对象
+ * @param string $app_id
+ * @param string $filename
+ * @param array $pagedata
+ * @return string
+ */
+ get_login_form($auth,$app_id,$filename,$pagedata)
+
+==loginout==
+ /**
+ * 用户登出
+ * @param object $auth pam_auth对象
+ * @param string $backurl 跳转地址
+ * @return boolean
+ */
+ loginout($auth,$backurl)
+
+</pre>
+<ul>
+<li>我们首先要添加如下代码，文件位置：app/loginqq/lib/passport/qq.php:</li>
+</ul>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">loginqq_passport_qq&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">openid_interface_passport</span><span style="color: #007700">{&nbsp;&nbsp;&nbsp;&nbsp;<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;</span><span style="color: #0000BB">$isThirdPart&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">get_name</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'openid'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'腾迅QQ信任登陆'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">/**<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;登录图片<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@param&nbsp;无<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@return&nbsp;string<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">function&nbsp;</span><span style="color: #0000BB">get_image_url</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'loginqq'</span><span style="color: #007700">)&nbsp;-&gt;&nbsp;</span><span style="color: #0000BB">res_url&nbsp;</span><span style="color: #007700">.&nbsp;</span><span style="color: #DD0000">'/accountlogos/qq_login.png'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">/**<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;获得跳转URL（点击QQ登录后进入的URL）<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@param&nbsp;无<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@return&nbsp;string<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">function&nbsp;</span><span style="color: #0000BB">get_link_url</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'openid_ctl_site_trust'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">gen_url</span><span style="color: #007700">(array(</span><span style="color: #DD0000">'app'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">,</span><span style="color: #DD0000">'ctl'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'site_passport'</span><span style="color: #007700">,</span><span style="color: #DD0000">'act'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'openid_login_url'</span><span style="color: #007700">,</span><span style="color: #DD0000">'full'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">1</span><span style="color: #007700">,</span><span style="color: #DD0000">'arg0'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'qq'</span><span style="color: #007700">));</span><span style="color: #FF8000">//点击qq登录图片后的url<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">}<br />...<br /></span>
+</span>
+</code></div><h4><a name="id15">6、修改挂件：topbar</a></h4>
+<ul>
+<li>为了使“qq登录”图片能在前台显示，我们必须对<b>topbar</b>这个<b>widgets</b>进行修改。</li>
+</ul>
+
+<ul>
+<li>在<b>app/b2c/widgets/topbar/widget_topbar.php</b>添加如下代码：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">......<br />&nbsp;if(</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'openid'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">is_actived</span><span style="color: #007700">())<br />&nbsp;&nbsp;&nbsp;&nbsp;{&nbsp;&nbsp;&nbsp;&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$member_data</span><span style="color: #007700">[</span><span style="color: #DD0000">'thirdpart'</span><span style="color: #007700">]&nbsp;=&nbsp;array();<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$third_part_openid&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">servicelist</span><span style="color: #007700">(</span><span style="color: #DD0000">"passport"</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;foreach(</span><span style="color: #0000BB">$third_part_openid&nbsp;</span><span style="color: #007700">as&nbsp;</span><span style="color: #0000BB">$key&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">$value</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">property_exists</span><span style="color: #007700">(</span><span style="color: #0000BB">$value</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'isThirdPart'</span><span style="color: #007700">)&nbsp;&amp;&amp;&nbsp;</span><span style="color: #0000BB">true&nbsp;</span><span style="color: #007700">==&nbsp;</span><span style="color: #0000BB">$value</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">isThirdPart</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$member_data</span><span style="color: #007700">[</span><span style="color: #DD0000">'thirdpart'</span><span style="color: #007700">][]&nbsp;=&nbsp;array(</span><span style="color: #DD0000">'img'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">$value&nbsp;</span><span style="color: #007700">-&gt;&nbsp;</span><span style="color: #0000BB">get_image_url</span><span style="color: #007700">(),&nbsp;</span><span style="color: #DD0000">'url'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">$value&nbsp;</span><span style="color: #007700">-&gt;&nbsp;</span><span style="color: #0000BB">get_link_url</span><span style="color: #007700">());&nbsp;&nbsp;&nbsp;&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$member_data</span><span style="color: #007700">[</span><span style="color: #DD0000">'open_id_open'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #DD0000">'true'</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$member_data</span><span style="color: #007700">[</span><span style="color: #DD0000">'res_url'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'openid'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">res_url</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />......<br /></span>
+</span>
+</code></div><pre class="quote">注：上面的代码我们主要是注册了--passport 这个services 并且我们获取到了url，qq登录图片等信息。
+</pre>
+<li>接下来我们继续改造html，<b>app/b2c/widgets/topbar/default.html</b>添加代码如下：<pre>&lt;/html&gt;
+.....
+            &lt;{if $data.thirdpart}&gt;
+            &lt;{foreach from=$data.thirdpart item=openid}&gt;
+            &lt;span&gt;&lt;a href=&quot;&lt;{$openid.url}&gt;&quot; target=&quot;_blank&quot;&gt;&lt;img class=&quot;thirdpart&quot; src=&quot;&lt;{$openid.img}&gt;&quot; /&gt;&lt;/a&gt;&lt;/span&gt;
+            &lt;{/foreach}&gt;
+            &lt;{/if}&gt;
+......
+&lt;script&gt;
+......
+ $('accountlogin').addEvent('click',function(e){
+        var e = e || window.event;
+        var objTarget = e.target || e.srcElement;
+        
+        if(objTarget &amp;&amp; 'img' == objTarget.tagName.toLowerCase() &amp;&amp; objTarget.hasClass('thirdpart')){
+            return true;
+        }else{
+            loginBtn.fireEvent('click');
+        }
+    })
+&lt;/script&gt;
+&lt;/html&gt;
+</pre>
+<li>在<b>app/loginqq/statics/accountlogos/</b>添加qq登录图片。
+<li>更新挂件后，我们在前台看到如下效果：
+<p><br /><img border="0" alt="" align="middle" src="images/mem5.jpg" /></p>
+</li>
+</li>
+</li>
+</li>
+</ul>
+<h4><a name="id16">7、修改文件app/b2c/controller/site/passport.php</a></h4>
+<ul>
+<li>在<a href="trust_login.html#id14">5、loginqq_passport_qq</a> 中我们提到了点击qq登录图片后的URL：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">......<br /></span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'openid_ctl_site_trust'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">gen_url</span><span style="color: #007700">(array(</span><span style="color: #DD0000">'app'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'b2c'</span><span style="color: #007700">,</span><span style="color: #DD0000">'ctl'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'site_passport'</span><span style="color: #007700">,</span><span style="color: #DD0000">'act'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'openid_login_url'</span><span style="color: #007700">,</span><span style="color: #DD0000">'full'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">1</span><span style="color: #007700">,</span><span style="color: #DD0000">'arg0'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'qq'</span><span style="color: #007700">));</span><span style="color: #FF8000">//点击qq登录图片后的url<br /></span><span style="color: #007700">......<br /></span>
+</span>
+</code></div>
+<li>由此可见我们需要点击qq登录图片后，还是跳转到了app/b2c/controller/site/passport.php下了，我们添加如下
+<p>方法，（用二次开发模式来修改，避免影响以后的产品升级）：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">......<br />&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">/**<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;通过获取的url直接跳转<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@param&nbsp;$open_type&nbsp;信任类型（淘宝、qq等）<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@return&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">function&nbsp;</span><span style="color: #0000BB">openid_login_url</span><span style="color: #007700">(</span><span style="color: #0000BB">$open_type</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #DD0000">''&nbsp;</span><span style="color: #007700">==&nbsp;</span><span style="color: #0000BB">trim</span><span style="color: #007700">(</span><span style="color: #0000BB">$open_type</span><span style="color: #007700">)){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #DD0000">''</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">$_GET</span><span style="color: #007700">[</span><span style="color: #DD0000">'open_type'</span><span style="color: #007700">]&nbsp;==&nbsp;</span><span style="color: #DD0000">'taobao'</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$passport_model&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'openid_passport_'</span><span style="color: #007700">.</span><span style="color: #0000BB">$open_type</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}else{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$passport_model&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'login'</span><span style="color: #007700">.</span><span style="color: #0000BB">$open_type</span><span style="color: #007700">.</span><span style="color: #DD0000">'_passport_'</span><span style="color: #007700">.</span><span style="color: #0000BB">$open_type</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$obj_passport&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #0000BB">$passport_model</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">is_object</span><span style="color: #007700">(</span><span style="color: #0000BB">$obj_passport</span><span style="color: #007700">)&nbsp;&amp;&amp;&nbsp;</span><span style="color: #0000BB">method_exists</span><span style="color: #007700">(</span><span style="color: #0000BB">$obj_passport</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'get_link_url'</span><span style="color: #007700">)){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;echo&nbsp;</span><span style="color: #DD0000">"&lt;script&gt;top.window.location='"</span><span style="color: #007700">.</span><span style="color: #0000BB">$obj_passport&nbsp;</span><span style="color: #007700">-&gt;&nbsp;</span><span style="color: #0000BB">get_login_url</span><span style="color: #007700">().</span><span style="color: #DD0000">"'&lt;/script&gt;"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />......<br /></span>
+</span>
+</code></div></p>
+</li>
+</li>
+</ul>
+<h4><a name="id17">8、组织请求url（appid、appkey）</a></h4>
+<ul>
+<li>我们在这一步主要做的就是组织请求url，在url中要包含<b>appid</b>、<b>回调地址（callback）</b>等必要的参数。</li>
+</ul>
+
+<ul>
+<li>我们在<b>app/loginqq/lib/passport/qq.php</b>添加如下方法：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">......<br />&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">/**<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@desc&nbsp;组织跳转url<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*&nbsp;@return&nbsp;string<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*/<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">function&nbsp;</span><span style="color: #0000BB">get_login_url</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$configInfo&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$this&nbsp;</span><span style="color: #007700">-&gt;&nbsp;</span><span style="color: #0000BB">get_config</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(!</span><span style="color: #0000BB">is_array</span><span style="color: #007700">(</span><span style="color: #0000BB">$configInfo</span><span style="color: #007700">)&nbsp;||&nbsp;!isset(</span><span style="color: #0000BB">$configInfo</span><span style="color: #007700">[</span><span style="color: #DD0000">'site_passport_status'</span><span style="color: #007700">][</span><span style="color: #DD0000">'value'</span><span style="color: #007700">])){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'base_session'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">start</span><span style="color: #007700">();</span><span style="color: #FF8000">//---开启session<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$state&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">md5</span><span style="color: #007700">(</span><span style="color: #0000BB">uniqid</span><span style="color: #007700">(</span><span style="color: #0000BB">rand</span><span style="color: #007700">(),&nbsp;</span><span style="color: #0000BB">TRUE</span><span style="color: #007700">));<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$_SESSION</span><span style="color: #007700">[</span><span style="color: #DD0000">'account'</span><span style="color: #007700">][</span><span style="color: #DD0000">'qq_state'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">$state</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$appid&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'100250122'</span><span style="color: #007700">;&nbsp;</span><span style="color: #FF8000">//appid&nbsp;此参数必须<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$callback&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">'http://demand.ec-ae.com'</span><span style="color: #007700">;&nbsp;</span><span style="color: #FF8000">//此参数必须&nbsp;申请qq应用时填写的回调地址<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//组织请求地址<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$login_url&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">"https://graph.qq.com/oauth2.0/authorize?response_type=code&amp;client_id="&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">.&nbsp;</span><span style="color: #0000BB">$appid&nbsp;</span><span style="color: #007700">.&nbsp;</span><span style="color: #DD0000">"&amp;redirect_uri="&nbsp;</span><span style="color: #007700">.</span><span style="color: #0000BB">$callback&nbsp;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">.&nbsp;</span><span style="color: #DD0000">"&amp;state="&nbsp;</span><span style="color: #007700">.&nbsp;</span><span style="color: #0000BB">$state<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">.&nbsp;</span><span style="color: #DD0000">"&amp;scope="&nbsp;</span><span style="color: #007700">.&nbsp;</span><span style="color: #0000BB">$configInfo</span><span style="color: #007700">[</span><span style="color: #DD0000">'scope'</span><span style="color: #007700">][</span><span style="color: #DD0000">'value'</span><span style="color: #007700">];<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$login_url</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />......<br /></span>
+</span>
+</code></div></li>
+</ul>
+
+<ul>
+<li>此时刷新页面，点击首页<b>用qq登录</b>，就会跳转到腾讯提供的登录页面，如下图：
+<p><br /><img border="0" alt="" align="middle" src="images/mem6.jpg" /></p>
+</li>
+</ul>
+<h4><a name="id18">从第三方服务商那里获取用户信息</a></h4>
+<ul>
+<li>出现用户登录界面后，输入用户名密码后会跳转到我们之前填写的那个线上测试站点。返回的url信息如下：<pre>http://demand.ec-ae.com/?code=9F8DD60D51277A25E98ED84F9FCDB8CB&amp;state=8493298383ebec42ff8a7665ae47bdda
+</pre>
+<li>我们发现腾讯平台给我们传回了两个参数“code”和“state”，我们在下面将会用到。</li>
+</li>
+</ul>
+
+<ul>
+<li>此时我们还需要一下基本才能获取到用户信息：
+<p>1、用“临时令牌”换取“access_token”（访问令牌）。
+<li>组织的url如下：<pre>https://graph.qq.com/oauth2.0/token?grant_type=authorization_code
+&amp;client_id=100250122                                 //appid
+&amp;redirect_uri=http%3A%2F%2Fdemand.ec-ae.com          //回调地址（urlencode）
+&amp;client_secret=6db318cfb28083f54e7f555593345303      //appkey
+&amp;code=633524B843415A592F823BFCB1984364               //code
+</pre>
+<li>访问以上url后，我们会得到“access_token”（访问令牌），信息如下：<pre>access_token=87833D52D058E620997BCBDEDA1DA2BE&amp;expires_in=7776000
+</pre>2、用“access_token”（访问令牌）获得“openid”。
+<li>组织的url如下：<pre>https://graph.qq.com/oauth2.0/me?access_token=87833D52D058E620997BCBDEDA1DA2BE
+</pre>
+<li>访问以上url后,我们将得到如下信息：<pre>callback( {&quot;client_id&quot;:&quot;100250122&quot;,&quot;openid&quot;:&quot;F10E9F01F609014CA0F96D5138186A08&quot;} );
+</pre>3、用“access_token”、“appid”、“openid”获取用户信息（get_user_info）。
+<li>组织url如下：<pre>https://graph.qq.com/user/get_user_info? 
+access_token=87833D52D058E620997BCBDEDA1DA2BE&amp;     //access_token
+oauth_consumer_key=100250122&amp;                      //appid
+openid=F10E9F01F609014CA0F96D5138186A08&amp;           //openid
+format=json                                        //返回数据格式（xml或json）
+</pre>4、最终获取返回的用户数据。
+<li>访问【步骤3】的url后我们将得到如下返回数据：<pre>{
+&quot;ret&quot;:0,
+&quot;msg&quot;:&quot;&quot;,
+&quot;nickname&quot;:&quot;sunjinrong&quot;,
+&quot;figureurl&quot;:&quot;http://qzapp.qlogo.cn/qzapp/100250122/F10E9F01F609014CA0F96D5138186A08/30&quot;,
+&quot;figureurl_1&quot;:&quot;http://qzapp.qlogo.cn/qzapp/100250122/F10E9F01F609014CA0F96D5138186A08/50&quot;,
+&quot;figureurl_2&quot;:&quot;http://qzapp.qlogo.cn/qzapp/100250122/F10E9F01F609014CA0F96D5138186A08/100&quot;,
+&quot;gender&quot;:&quot;女&quot;,
+&quot;vip&quot;:&quot;0&quot;, 
+&quot;level&quot;:&quot;0&quot; 
+}
+</pre>
+<li>如果是xml格式返回数据：<pre>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt; 
+&lt;data&gt;
+&lt;ret&gt;0&lt;/ret&gt;
+&lt;msg&gt;&lt;/msg&gt;
+&lt;nickname&gt;Peter&lt;/nickname&gt; 
+&lt;figureurl&gt;http://qzapp.qlogo.cn/qzapp/111111/942FEA70050EEAFBD4DCE2C1FC775E56/30&lt;/figureurl&gt;
+&lt;figureurl_1&gt;http://qzapp.qlogo.cn/qzapp/111111/942FEA70050EEAFBD4DCE2C1FC775E56/50&lt;/figureurl&gt;
+&lt;figureurl_2&gt;http://qzapp.qlogo.cn/qzapp/111111/942FEA70050EEAFBD4DCE2C1FC775E56/100&lt;/figureurl&gt;
+&lt;gender&gt;男&lt;/gender&gt; 
+&lt;vip&gt;1&lt;/vip&gt; 
+&lt;level&gt;7&lt;/level&gt; 
+&lt;/data&gt;
+</pre>
+<li>错误时返回显示：<pre>Content-type: text/html; charset=utf-8
+{
+&quot;ret&quot;:2021,
+&quot;msg&quot;:&quot;请先登录&quot;
+}
+</pre>相关资料：<a href="http://wiki.opensns.qq.com/wiki/%E3%80%90QQ%E7%99%BB%E5%BD%95%E3%80%91get_user_info">QQ登录</a>、<a href="http://wiki.opensns.qq.com/wiki/%E3%80%90QQ%E7%99%BB%E5%BD%95%E3%80%91%E5%85%AC%E5%85%B1%E8%BF%94%E5%9B%9E%E7%A0%81%E8%AF%B4%E6%98%8E">公共返回码说明</a></li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</p>
+</li>
+</ul>
+<h4><a name="id19">初始化用户信息，登录成功！</a></h4>
+<ul>
+<li>将从腾讯获取的用户信息，存入到用户表，然后跳转到用户中心，信任登录完成。</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">简介</a>
+    <li><a href="#id2" class="reference internal">oAuth</a>
+        <ul>
+        <li><a href="#id3" class="reference internal">oAuth 2.0流程</a>
+    </ul>
+    <li><a href="#id4" class="reference internal">前期准备工作</a>
+        <ul>
+        <li><a href="#id5" class="reference internal">搭建外线测试站</a>
+        <li><a href="#id6" class="reference internal">申请appid、appkey</a>
+        <li><a href="#id7" class="reference internal">下载sdk包测试</a>
+    </ul>
+    <li><a href="#id8" class="reference internal">“改造”ECStore</a>
+        <ul>
+        <li><a href="#id9" class="reference internal">新建app--loginqq</a>
+            <ul>
+            <li><a href="#id10" class="reference internal">1、创建必要的目录</a>
+            <li><a href="#id11" class="reference internal">2、app.xml</a>
+            <li><a href="#id12" class="reference internal">3、注册services</a>
+            <li><a href="#id13" class="reference internal">4、loginqq_imageurl</a>
+            <li><a href="#id14" class="reference internal">5、loginqq_passport_qq</a>
+            <li><a href="#id15" class="reference internal">6、修改挂件：topbar</a>
+            <li><a href="#id16" class="reference internal">7、修改文件app/b2c/controller/site/passport.php</a>
+            <li><a href="#id17" class="reference internal">8、组织请求url（appid、appkey）</a>
+            <li><a href="#id18" class="reference internal">从第三方服务商那里获取用户信息</a>
+            <li><a href="#id19" class="reference internal">初始化用户信息，登录成功！</a>
+        </ul>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="login.html"
+                                  title="上一章">会员登录</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../promotion/promotion.html"
+                                  title="下一章">促销</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../promotion/promotion.html" title="促销" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="login.html" title="会员登录" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">ECStore 开发指南</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">会员</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

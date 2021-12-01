@@ -1,0 +1,303 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      常见问题 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="ecstore FAQ" href="index.html" />
+
+        <link rel="next" title="../append-a" href="附录A -- 系统扩展.html" />
+        <link rel="prev" title="index" href="ecstore FAQ.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../append-a.html" title="附录A -- 系统扩展" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="ecstore FAQ" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore FAQ</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> 常见问题</h1>
+            <h2><a name="id1">域名更改</a></h2>
+<ul>
+<li>问题描述<pre class="mark">更换域名后，导致与ocs或erp联通后，收不到ocs或erp的操作请求。
+
+</pre>
+<li>导致此问题的原由<pre class="mark">名词解释：
+1、shopex_id ———— 在ShopEx商家用户中心申请的一个ShopEx用户id
+2、证书号(certi_id)———— 由shopex_id 和域名一起生成的一个唯一标识号(此证书号码需要随着域名的更改而重新生成，生成方式请看下方【重新获取证书号】)
+3、node_id ———— 由certi_id和域名生成的一个唯一标示
+
+具体阐述：
+当域名改变，shopex用户中心还存的是旧的域名，当与ocs联通后，矩阵会根据node_id去用户中心获取域名，这时域名不是当前使用的域名，ecstore就无法获取ocs的操作请求。
+
+解决方法【重新获取证书号】：
+用ecstore提供的&quot;清除&quot;与用户中心的旧关系，重新建立关系，重新绑定ocs以保证ecstore的联通功能恢复正常。
+</pre>
+<li>解决问题的方案步骤
+<ol>
+<li>解除ecstore与ocs或erp的绑定关系
+<li>清除与shopex用户中心的关系数据(以下1、2两种方法)<pre class="mark">1、能够进入后台，对后台控制面板能够操作的用户，请进行以下操作:
+    ecstore后台 &gt; 控制面板 &gt; 清除中心关系数据 &gt; &quot;清除&quot;按钮
+2、 不能进入后台的用户，请使用cmd执行以下命令来操作:
+    php app/base/cmd cleanunicom
+2、如果ecstore的版本低于1.2.19，请用以下方式重新生成证书号
+    rm config/certi.php 或 mv config/certi.php config/certi.php.bak
+</pre>
+<li>登录后台输入shopex_id，重新建立与用户中心的关系，并重新绑定ocs或erp</li>
+</li>
+</li>
+</ol>
+</li>
+</li>
+</li>
+</ul>
+<h2><a name="id2">服务器迁移</a></h2></ol>
+
+<ul>
+<li>问题描述<pre class="mark">服务器迁移后，服务器的配置可能与原来有异同，导致ecstore的某些功能失去作用，例如：绑定ocs、图片的保存等等...
+</pre>
+<li>解决此问题的方案步骤
+<ol>
+<li>cmd执行以下命令，查看当前服务器环境的缺陷<pre class="mark">php app/base/cmd check_environment
+</pre>
+<li>依照cmd的返回结果，调整配置
+<li>根据以上域名改变的问题解决步骤，重新建立shopex用户中心的联系</li>
+</li>
+</li>
+</ol>
+</li>
+</li>
+</ul>
+<h2><a name="id3">激活码无效</a></h2></ol>
+
+<ul>
+<li>问题描述<pre class="mark">访问后台时，有时会经常提示激活码失效的问题，导致不能进入后台管理后台
+</pre>
+<li>做检测
+<ul>
+<li>mysql 是否启动,mysql运行是否正常，mysql InnoDB是否正常使用
+<li>多台web机都需要有对外的访问权限即（fsockopen请求外网可以正常）
+<li>网络是否稳定
+<li>检测硬盘是否可以写入（命令 touch test可以测试）
+<li>硬盘空间是否足够,内存空间是否足够
+<li>检测nginx的伪静态配置是否合格，<pre class="mark">    如：www.qinqinni.com/index.php/openapi/check/handshake
+
+    访问如上地址，看看返回结果是一串数字加字母的字符串  还是您的网站前台,
+    如果是网站前台，那证明“伪静态”配置有问题，请查看文档重新配置：http://www.ec-os.net/single_deployment/deploygment_one/static.html
+
+    具体地址公式如下：
+    网站域名/index.php/openapi/check/handshake
+
+</pre>
+<li>fsockopen 是否可以正常使用(以下为实例：)<pre class="mark">      &lt;?php
+      $fp = fsockopen(&quot;service.shopex.cn&quot;, 80, $errno, $errstr, 30);
+      if (!$fp) {
+          echo &quot;$errstr ($errno)&lt;br /&gt;\n&quot;;
+      } else {
+          $out = &quot;GET / HTTP/1.1\r\n&quot;;
+          $out .= &quot;Host: service.shopex.cn\r\n&quot;;
+          $out .= &quot;Connection: Close\r\n\r\n&quot;;
+          fwrite($fp, $out);
+          while (!feof($fp)) {
+              echo fgets($fp, 128);
+          }
+          fclose($fp);
+      }
+      exit;
+</pre></ul>
+
+<li>为了更能方便的排查激活码失效和队列运行问题，从ecstore2.0.32版本起，用以下cmd命令进行检测，帮助快速定位问题<pre class="mark">        php app/base/cmd help -v
+            
+</pre>
+<p>会出现如下内容：<pre class="mark">   dev:syscheck allcheck                   系统环境检测
+        --library / -l                函数及扩展库
+        --database / -d               mysql数据库
+        --harddiskspace / -h          硬盘空间
+        --wpermissions / -w           目录和文件的读取权限
+
+</pre>然后输入相应的命令，就可以排查对应的问题是否有异常<pre class="mark">    php app/base/cmd dev:syscheck allcheck   检测所有内容
+    php app/base/cmd dev:syscheck allcheck -l 检测函数及扩展库
+    php app/base/cmd dev:syscheck allcheck -d 检测mysql是否正常
+    php app/base/cmd dev:syscheck allcheck -h 检测硬盘是否有写入空间
+    php app/base/cmd dev:syscheck allcheck -w 检测常用目录和文件的写入权限
+</pre>
+<li>解决方法
+<ul>
+<li>重启mysql
+<li>重新配置服务器，看看域名解析服务器是否正常(fsockopen函数的使用)
+<li>data目录和/tmp目录必须有写入权限
+<li>硬盘空间必须充足
+<li>发送config/certi.php文件至商派服务邮箱,商派需要确认你的域名</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</p>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</li>
+</ul>
+</li>
+</li>
+</ul>
+<h2><a name="id4">测试环境激活码配置</a></h2>
+<ul>
+<ul>
+<li>版本限定<pre>    ecstore2.0版本必须大于等于 2.0.20
+</pre>
+<li>配置方法<pre>    1、在ecstore/config/config.php中搜索 #define('DEV_CHECKDEMO', true); ,删除前面的#号
+    2、在ecstore/config/config.php中添加 define('DEV_CHECKDEMO', true)
+</pre></li>
+</li>
+</ul>
+</ul>
+<h2><a name="id5">ecstore2.0 导入导出</a></h2></ul>
+</ul>
+
+<ul>
+<li>需要配置正确的ftp
+<li>ftp需要读写权限
+<li>服务器的/tmp目录必须有读写权限</li>
+</li>
+</li>
+</ul>
+<h2><a name="id6">chinapay 报错</a></h2>
+<ul>
+<li>如果安装了银联在线后报出错误，请检测PHP是否开启bcmath函数 和 netpayclient.php文件是否有过修改<pre class="mark">
+</pre></li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">域名更改</a>
+    <li><a href="#id2" class="reference internal">服务器迁移</a>
+    <li><a href="#id3" class="reference internal">激活码无效</a>
+    <li><a href="#id4" class="reference internal">测试环境激活码配置</a>
+    <li><a href="#id5" class="reference internal">ecstore2.0 导入导出</a>
+    <li><a href="#id6" class="reference internal">chinapay 报错</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="index.html"
+                                  title="上一章">ecstore FAQ</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../append-a.html"
+                                  title="下一章">附录A -- 系统扩展</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../append-a.html" title="附录A -- 系统扩展" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="index.html" title="ecstore FAQ" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">ecstore FAQ</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

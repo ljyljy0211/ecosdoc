@@ -1,0 +1,524 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      ECOS调试及调试工具 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="未归档" href="index.html" />
+
+        <link rel="next" title="pay/pay" href="支付方式开发文档.html" />
+        <link rel="prev" title="kvstore" href="kvstore.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="pay/pay.html" title="支付方式开发文档" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="kvstore.html" title="kvstore" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> ECOS调试及调试工具</h1>
+            <h2><a name="id1">本地调试</a></h2><h3><a name="id2">PHP基础断点调试法</a></h3><pre class="mark">此方法主要是是 php内置的函数来进行调试，
+比较简单方便，一般配合exit或者die方法来进行断点调试，
+打印自己需要的变量或者找到程序执行到的位置
+</pre><h4><a name="id3">echo /print</a></h4>
+<p>一般用来输出变量值，或者你不确定程序执行到了哪个分支的情况下使用</p>
+
+<p>例如：</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;$fanliMoney&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">100</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">$fanliMoney</span><span style="color: #007700">&lt;</span><span style="color: #0000BB">10</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print&nbsp;</span><span style="color: #DD0000">"返利0元"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}elseif(</span><span style="color: #0000BB">$fanliMoney</span><span style="color: #007700">&gt;=</span><span style="color: #0000BB">10&nbsp;</span><span style="color: #007700">&amp;&amp;&nbsp;</span><span style="color: #0000BB">$fanliMoney</span><span style="color: #007700">&lt;</span><span style="color: #0000BB">100</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print&nbsp;</span><span style="color: #DD0000">"返利1元"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}elseif(</span><span style="color: #0000BB">$fanliMoney</span><span style="color: #007700">&gt;=</span><span style="color: #0000BB">100&nbsp;</span><span style="color: #007700">&amp;&amp;&nbsp;</span><span style="color: #0000BB">$fanliMoney</span><span style="color: #007700">&lt;</span><span style="color: #0000BB">500</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;echo&nbsp;</span><span style="color: #DD0000">"返利5元"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /></span>
+</span>
+</code></div>
+<p>判断你的程序走到哪个分支，打印一下就知道了</p>
+<h4><a name="id4">printf</a></h4>
+<p>常用来调试输出一些其他输出不能正确输出的变量，比如在PHP中，浮点数和整数之间经常会造成迷惑，</p>
+
+<p>例如：</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;$float_score&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1234.10</span><span style="color: #007700">,</span><span style="color: #0000BB">2</span><span style="color: #007700">)*</span><span style="color: #0000BB">100</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$int_score&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">intval</span><span style="color: #007700">(</span><span style="color: #0000BB">$float_score</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$float_score</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$int_score</span><span style="color: #007700">);<br /></span>
+</span>
+</code></div>
+<p>结果：</p>
+<pre>	float 123410
+
+	int 123409
+</pre>
+<p>这个结果出乎意料，为什么会不一样呢？原来php对这个的处理不是特别精确的，</p>
+
+<p>所以上面的结果就可以用 printf 来查找错误，找出到底里面还藏着什么，</p>
+
+<p>我们用printf来打印结果看看程序：<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;$float_score&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">round</span><span style="color: #007700">(</span><span style="color: #0000BB">1234.10</span><span style="color: #007700">,</span><span style="color: #0000BB">2</span><span style="color: #007700">)*</span><span style="color: #0000BB">100</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$int_score&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">intval</span><span style="color: #007700">(</span><span style="color: #0000BB">$float_score</span><span style="color: #007700">);<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//用printf就能知道上面打印结果的原因了<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">printf</span><span style="color: #007700">(</span><span style="color: #DD0000">'%0.20f'</span><span style="color: #007700">,</span><span style="color: #0000BB">$float_score</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;echo&nbsp;</span><span style="color: #DD0000">"&lt;br&gt;"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">printf</span><span style="color: #007700">(</span><span style="color: #DD0000">'%0.20f'</span><span style="color: #007700">,</span><span style="color: #0000BB">$int_score</span><span style="color: #007700">);<br /></span>
+</span>
+</code></div></p>
+
+<p>结果:<pre>123409.99999999998544808477
+123409.00000000000000000000
+</pre>这时我们发现原因了，原来php对浮点数的处理是不太精确的(其实是计算机对浮点数的处理是不可能精确的），</p>
+
+<p>只是一个接近的结果，所以会出现打印值不同。</p>
+
+<p>平时在开发项目时，尤其电子商务网站对于金额的处理等等是不可以出错的，</p>
+
+<p>这时我们就该注意这些了。</p>
+<h4><a name="id5">print_r / var_dump / var_export  / debug_zval_dump</a></h4>
+<p>主要是用来输出数组和对象数据等，一般我们在查看接口返回值，或者某些不太确定变量的时候使用</p>
+
+<p>代码如下：</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;$arr&nbsp;</span><span style="color: #007700">=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"arr"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;array(</span><span style="color: #0000BB">0</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'val0'</span><span style="color: #007700">,</span><span style="color: #DD0000">"key1"</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">1</span><span style="color: #007700">),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"bool1"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"bool2"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"string"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'test&nbsp;string'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"int"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">100</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"object"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;new&nbsp;</span><span style="color: #0000BB">stdclass</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">"null"&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">NULL<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//加上&lt;pre&gt;，会格式化输出，方便查看<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">echo&nbsp;</span><span style="color: #DD0000">"&lt;pre&gt;"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">$arr</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">var_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$arr</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">var_export</span><span style="color: #007700">(</span><span style="color: #0000BB">$arr</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$arr2</span><span style="color: #007700">=</span><span style="color: #0000BB">$arr</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">debug_zval_dump</span><span style="color: #007700">(</span><span style="color: #0000BB">$arr</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;echo&nbsp;</span><span style="color: #DD0000">"&lt;/pre&gt;"</span><span style="color: #007700">;<br /></span>
+</span>
+</code></div>
+<p>结果分析：</p>
+
+<p><b>print_r：</b></p>
+<pre>Array
+(
+    [arr] =&gt; Array
+        (
+            [0] =&gt; val0
+            [key1] =&gt; 1
+        )
+
+    [bool1] =&gt; 1
+    [bool2] =&gt; 
+    [string] =&gt; test string
+    [int] =&gt; 100
+    [object] =&gt; stdClass Object
+        (
+        )
+
+    [null] =&gt; 
+)
+</pre>
+<p>print_r打印的结果看起来很直观，但是打印布尔值和NULL值时输出为空</p>
+<hr noshade size="1">
+<p><b>var_dump：</b></p>
+<pre>array
+  'arr' =&gt; 
+    array
+      0 =&gt; string 'val0' (length=4)
+      'key1' =&gt; int 1
+  'bool1' =&gt; boolean true
+  'bool2' =&gt; boolean false
+  'string' =&gt; string 'test string' (length=11)
+  'int' =&gt; int 100
+  'object' =&gt; 
+    object(stdClass)[1]
+  'null' =&gt; null
+
+</pre>
+<p>与 print_r类似， 但是多了数据类型的输出，例如接收来自外部的数据时，就可以查看接收到的数据的数据类型，方便我们进行处理</p>
+<hr noshade size="1">
+<p><b>var_export：</b></p>
+<pre>array (
+  'arr' =&gt; 
+  array (
+    0 =&gt; 'val0',
+    'key1' =&gt; 1,
+  ),
+  'bool1' =&gt; true,
+  'bool2' =&gt; false,
+  'string' =&gt; 'test string',
+  'int' =&gt; 100,
+  'object' =&gt; 
+  stdClass::__set_state(array(
+  )),
+  'null' =&gt; NULL,
+)
+</pre>
+<p>输出的数据是合法的php代码，可以直接赋值给一个变量，</p>
+
+<p>当我们记录日志到文件中时，可以用var_export格式化后直接存放到文件中；</p>
+
+<p>但是当var_export的变量是资源文件(例如引入图片，html文件等)类型时， var_export会返回NULL</p>
+<hr noshade size="1">
+<p><b>debug_zval_dump：</b></p>
+<pre>array(7) refcount(3){
+  [&quot;arr&quot;]=&gt;
+  array(2) refcount(1){
+    [0]=&gt;
+    string(4) &quot;val0&quot; refcount(1)
+    [&quot;key1&quot;]=&gt;
+    long(1) refcount(1)
+  }
+  [&quot;bool1&quot;]=&gt;
+  bool(true) refcount(1)
+  [&quot;bool2&quot;]=&gt;
+  bool(false) refcount(1)
+  [&quot;string&quot;]=&gt;
+  string(11) &quot;test string&quot; refcount(1)
+  [&quot;int&quot;]=&gt;
+  long(100) refcount(1)
+  [&quot;object&quot;]=&gt;
+  object(stdClass)#1 (0) refcount(1){
+  }
+  [&quot;null&quot;]=&gt;
+  NULL refcount(1)
+}
+</pre>
+<p>输出结果跟  var_dump 类似，唯一增加的一个值是refcount ,就是记录一个变量被引用了多少次（变量分离）</p>
+<h4><a name="id6">debug_backtrace / debug_print_backtrace</a></h4><h5><a name="id7">debug_backtrace</a></h5>
+<p>debug_backtrace是PHP Error的函数，它返回一个数组，显示的是代码执行的回溯信息，有当前的函数名，行号，文件名，类名，对象，调用类型等。这里我们用W3CSHOOL的一个例子，平时一般也不建议用这个来在浏览器中输出信息，因为信息太多，所以可以在写自己的日志方法时，可以用以记录其中的某些信息，</p>
+
+<p>例如：</p>
+<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">function&nbsp;</span><span style="color: #0000BB">one</span><span style="color: #007700">(</span><span style="color: #0000BB">$str1</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$str2</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">two</span><span style="color: #007700">(</span><span style="color: #DD0000">"Glenn"</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">"Quagmire"</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">two</span><span style="color: #007700">(</span><span style="color: #0000BB">$str1</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$str2</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">three</span><span style="color: #007700">(</span><span style="color: #DD0000">"Cleveland"</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">"Brown"</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">three</span><span style="color: #007700">(</span><span style="color: #0000BB">$str1</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$str2</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">print_r</span><span style="color: #007700">(</span><span style="color: #0000BB">debug_backtrace</span><span style="color: #007700">());<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">one</span><span style="color: #007700">(</span><span style="color: #DD0000">"Peter"</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">"Griffin"</span><span style="color: #007700">);<br /></span>
+</span>
+</code></div>
+<p>输出：</p>
+<pre>Array(
+[0] =&gt; Array (
+ [file] =&gt; C:\webfolder\test.php
+ [line] =&gt; 7
+ [function] =&gt; three
+ [args] =&gt; Array(
+  [0] =&gt; Cleveland
+  [1] =&gt; Brown 
+  ) 
+ )
+[1] =&gt; Array(
+ [file] =&gt; C:\webfolder\test.php
+ [line] =&gt; 3
+ [function] =&gt; two
+ [args] =&gt; Array(
+  [0] =&gt; Glenn
+  [1] =&gt; Quagmire
+  )
+ ) 
+[2] =&gt; Array(
+ [file] =&gt; C:\webfolder\test.php
+ [line] =&gt; 14
+ [function] =&gt; one
+ [args] =&gt; Array(
+  [0] =&gt; Peter
+  [1] =&gt; Griffin
+  )
+ )
+)
+</pre><h5><a name="id8">debug_print_backtrace</a></h5>
+<p>debug_backtrace也是PHP Error的一个函数，它没有返回值，打印出的是函数的调用顺序，以及调用的php文件和行数，我们系统的trigger_error函数中也是利用这个函数，这里我们仍然用商品品牌列表页这个方法showlist,如图<br /><img border="0" alt="" align="middle" src="image/debug_1.png" /></p>
+
+<p>浏览器端品牌列表页结果：</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/debug_2.png" />它清晰的显示了在调用showlist方法时的调用的一系列基本方法。</p>
+<h3><a name="id9">浏览器端插件调试法</a></h3>
+<p>当我用着php的基本的调试法，每次都要写格式化代码，打印代码，断点代码，而且还会阻断浏览器的正常显示，这时我们不想这样每次都这样麻烦，这是我们就可以用到一个叫firebug的一个插件firephp，这样你的PHP脚本就能够发送调试信息到浏览器，轻易的通过HTTP相应头编码，而不用每次都输入多余的代码和阻断网页的正常显示，是不是很有爱呢。</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/debug_3.png" /><br /><img border="0" alt="" align="middle" src="image/debug_4.png" /></p>
+
+<p>现在大部分程序员在开发网页项目时候都完全无法离开FireBug。这个小巧的&quot;臭虫&quot;是一个神奇而有用的html、css、javascript、dom、网络等的调试神器。但是你也许不知道这个还可以用来调试PHP，没错，它可以，感谢一款名为FirePHP的FireFox插件。</p>
+
+<p>通过一个小小的服务端库，和这款在Firebug上的插件，你的PHP脚本就能够发送调试信息到浏览器，轻易的通过HTTP相应头编码。一旦你设置，你可以在Firebug的控制台获得PHP脚本警告和错误，就感觉像直接调试JavaScript一样，而不需要阻断页面的正常加载。</p>
+
+<p>使用这个工具，首先你需要安装FirePHP插件。这个插件需要你已经安装FireBug。装好FirePHP之后，重新打开Firebug面板时候，你会看到新加了一个蓝色的臭虫图标。点击这个图标会出现一个开启或者关闭FirePHP的菜单。</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/debug_5.png" /></p>
+
+<p>当然，这时候我们还无法做任何事，你还需要安装FirePHP的服务端，点击这里下载，这里是目前最新的firephp核心包，当然还有pear这种方式。</p>
+
+<p>我这里的服务器项目根目录是D:\wamp\www，所以我将解压后的lib下的FirePHPCore文件夹放置于我的项目根目录下，然后在ecstore中你需要调试的代码开头引入”/FirePHPCore/fb.php&quot;核心文件，推荐在ecstore的index.php中引入，这样比较方便，不需要每次都写引入代码。</p>
+
+<p>这是因为FirePHP通过HTTP头发送记录的数据，你需要缓存你的代码产生的输出，从而来响应头信息从这里获取代码生成的内容。这个可以通过在代码头部的ob_start来实现。</p>
+
+<p>当这些步骤完成后，你可以开始使用FirePHP了。你需要做的只是调用fb函数在任何你想要记录的地方。同时你也可以使用一个可选的标签和常量去定义预定义信息，一个错误，一个警告，或者一条信息。</p>
+
+<p>测试：</p>
+
+<p>这里我在我们ecstore的b2c中的品牌列表页showList方法中打印其中的”$this-&gt;pagedata”这个变量，看看有哪些值</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/debug_6.png" /></p>
+
+<p>前台打开品牌列表页，firebug中有如下结果：</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/debug_7.png" /></p>
+
+<p>你还可以用firephp来跟踪你的程序，我继续修改代码</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/debug_8.png" /></p>
+
+<p>前台firebug中看到的结果如下：</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/debug_9.png" /></p>
+
+<p>这个跟踪功能可以让你调试更复杂的代码，让你精确的知道你的方法是在哪里被调用的。当然，别忘了你需要在你代码发布之前移除你的调试语句和firephp的引入代码。</p>
+<h3><a name="id10">调试器单步调试法</a></h3>
+<p>再聪明的你有时也会遇到自己很难调试信息的时候，这时候我们的单步调试功能就显现出它的强大了，对，你可以跟着代码一行一行的走，这样地毯式的搜索，能找不出错误吗，o(∩_∩)o 哈哈，对，就是这样，这就是强大的单步调试，让你看清每一步的走向，每一步变量值的变化，一切了如指掌，不需要您有火眼金睛就可以带你发现问题所在。</p>
+
+<p>常见的集成环境有Vim，eclipse，zendstudio等，vim可定制性的强大就不说了，zendstudio等其实都是基于eclipse开发的，所以这里主要讲解eclipse(PDT)+xdebug来进行单步调试，这种方法能跟到每一步代码，优点很明显，缺点就是使用时占用资源大。首先需要在官网下载php的xdebug插件,然后修改php.ini配置文件，增加如下配置:</p>
+<pre class="mark">[xdebug]
+;PHP5.3以上版本
+zend_extension = &quot;d:/wamp/bin/php/php5.3.5/zend_ext/php_xdebug-2.1.0-5.3-vc6.dll&quot;
+;PHP5.2及以下版本
+;zend_extension_ts = &quot;d:/wamp/bin/php/php5.3.5/zend_ext/php_xdebug-2.1.0-5.3-vc6.dll&quot;
+
+xdebug.profiler_enable=on
+xdebug.profiler_output_dir=&quot;d:/temp/xdebug&quot;
+xdebug.remote_enable = 1
+xdebug_remote_host = &quot;localhost&quot;
+xdebug.remote_port = 9000
+xdebug.remote_handler = &quot;dbgp&quot;
+</pre>
+<p>然后重启服务器，并能在phpinfo中查看到xdebug扩展即表明开启成功</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/debug_10.png" /></p>
+
+<p>注意：如果 php.ini 中开启了 ZendExtensionManager.dll 和zendOptimize，必须将他们都屏蔽掉，否则和xdebug冲突,xdebug一般不要下载nts版的接下来我们开始配置eclipse的调试环境</p>
+
+<p>(1)新增一个PHP 服务器	依次打开 window -&gt; Preferences -&gt; PHP -&gt; PHP Servers	点击 New 新建一个 Server	分别在上下两个文本框里添上 新建服务器的名称(任意写) 和 服务器的根目录地址(<a href="http://localhost/)">http://localhost/)</a></p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/eclipse_1.png" /></p>
+
+<p>(2)添加一个Executable	依次打开 window -&gt; Preferences -&gt; PHP -&gt; PHP Executables	点击 Add 新增一个Executable	Name 里填上一个名称(任意写)Executable Path 里写上php.exe的实际路径PHP ini file(optional) 里写上php.ini的实际路径，这个是可选的PHP debugger  这一项里选择XDebug</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/eclipse_2.png" /></p>
+
+<p>(3)使用刚才新增的PHP服务器和Executable	依次打开 window -&gt; Preferences -&gt; PHP -&gt; Debug	PHP Debugger 选择XDebugService  选择刚才新添加的PHP服务器PHP Executable  选择刚才新添加的Executable</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/eclipse_3.png" /></p>
+
+<p>(4)修改默认的调试浏览器	依次打开 window -&gt; Preferences -&gt; General -&gt; Web Browser	点击new新增一个浏览器（推荐火狐）	name 随便写Location 写上浏览器的执行文件地址parameter 可以不填</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/eclipse_4.png" /></p>
+
+<p>这样eclipse的调试环境就搭好了，接下来我们调试使用	依次打开 Run -&gt; Run Configurations…	右击PHP Web Page，然后new一个配置页，Name随便 写	Server Debugger选择Xdebug	PHP Server 选择你刚新建的Server	File 选择你项目的入口文件，一般选择index.php	Breakpoint一般默认，	URL根据你调试的代码路径可以默认也可以做相应的调整	如果已经在你需要调试的代码处打上断点，这时就可以点击  Debug 进行调试了</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/eclipse_5.png" /></p>
+
+<p>然后我门在需要调试代码的地方打上断点，eclipse中就是双击代码前的行号附近，就会打上断点，如图，我们仍然以商品品牌列表页这个方法作为例子，</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/eclipse_6.png" /></p>
+
+<p>我们在行号为30的代码前打了一个断点，然后我们就开始调试，第一次我们可以进教大家配置断点的窗口点debug按钮就开始调试了，以后就可以直接点击历史记录就开始调试了，如图</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/eclipse_7.png" /></p>
+
+<p>点击调试后，</p>
+
+<p>第一步会显示调试界面</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/eclipse_8.png" /></p>
+
+<p>与此同时，打开了我们设置的外部浏览器，</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/eclipse_9.png" /></p>
+
+<p>这时什么东西都没有，因为我们前面选择了</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/eclipse_10.png" /></p>
+
+<p>所以这时我们返回eclipse界面</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/eclipse_11.png" /></p>
+
+<p>点击图中标记的跳过断点按钮，然后再去浏览器查看，再注意链接地址是什么样的，这个链接地址就是调试时候的地址，如果</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/eclipse_12.png" /></p>
+
+<p>然后我们点击上图中的“品牌区”，也就是触发我们的品牌列表区这个方法了，这时候eclipse任务栏就会自动提示，</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/eclipse_13.png" /></p>
+
+<p>然后继续去eclipse界面，按F8或者跳过断点按钮</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/eclipse_14.png" /></p>
+
+<p>就会直接跳到我们打的断点处了，</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/eclipse_15.png" /></p>
+
+<p>这里我们能查看但任何你想要的值，是不是很帅气，忽忽。</p>
+<h2><a name="id11">线上调试</a></h2><h3><a name="id12">日志记录调试法</a></h3>
+<p>当我们做一些api，例如数据同步，如果我们不记录日志，一出问题，我们就不知从何查起了，因为这不一定就是代码错误，所以日志就得详细记录，否则，维护成本就太大了，所以这里主要讲一下ecstore系统中的日志调试怎么 操作的</p>
+
+<p>日志记录也是很重要的一种调试和监控手段，在查找问题的时候比较容易定位，当我们在做一些跟外界打交道的，例如api之类的信息，我需要记录打通了多少api，哪些数据传输成功或者失败，因为这是重要的，例如返利订单，返利商家和返利网之间就会产生利益差错了，如果信息错误不好查就可能损失许多呀，所以这个是至关重要的</p>
+
+<p>例如我们ectools中一段记录支付的代码</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/debug_11.png" /></p>
+
+<p>对于系统级日志，ecstore封装了一个kernel::log($message);来记录这些日志 ，此方法记录的日志存放在项目的/data/logs文件夹内,命名是以时间为文件夹名，以ip地址为log文件名。如果你要记录更多的错误日志或者自己要记录一些系统级日志，您可以参看php的日志记录函数error_log，记录更多的日志。</p>
+
+<p>而对于业务级的日志系统没有做什么封装，因为有各种业务所以不好封装的，所以对于业务级的一般都是存入数据库吧，具体操作就不需说了</p>
+<h3><a name="id13">php性能调试法</a></h3>
+<p>许多大网站像百丽、名鞋库这些大型电子商务站，对性能的要求特别高，所以经常要查看哪地方影响性能了，而在ecstore系统中，线上性能调试最好的方法就是xhprof了，安装好xhprof，再安装我们的xhprof的查看工具serveradm这个app，就了如指掌</p>
+
+<p>性能调试最基本的就是监视某个函数或者大片代码的执行的时间来看效率</p>
+
+<p>最简单的方法例如用microtime这种计算时间的函数来求取程序执行时间差</p>
+
+<p>而我们线上调试，有xdebug和xhprof等方法，由于xdebug调试占用cpu比较厉害，所以一般使用的都是XHProf工具</p>
+
+<p>XHProf简介</p>
+
+<p>是 FaceBook 开发的一个函数级别的 PHP 分层分析器，它是一个轻量型的php调试工具，运行很快</p>
+
+<p>XHProf安装</p>
+
+<p>因为XHProf只有linux版本，所以具体的安装XHProf可以参看我们的文档<a href="http://www.ec-os.net/misc/xhprof.html">http://www.ec-os.net/misc/xhprof.html</a></p>
+
+<p>XHProf使用</p>
+
+<p>安装好XHProf后，在ECStore的index.php中将代码#include(“app/serveradm/xhprof.php”);的注释去掉，然后安装查看app  serveradm，接下来可以分析数据了，有finder列表形式的，也有生成调用流程图的形式</p>
+
+<p>后台xhprof的finder列表可以查看到URI地址，所属app，控制器，方法，平均使用内存大小，使用内存峰值，程序执行时间，程序开始执行时刻</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/debug_12.png" /></p>
+
+<p>点击”分析报告”，可以查看对应URI的更详细的执行流程和相应信息，以及可以查看调用图</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/debug_13.png" /></p>
+
+<p>另外还可以查看其调用流程图，那就更详尽和一目了然了</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/debug_14.png" /></p>
+
+<p>所以就不用再找其他工具测试你写的代码的执行性能了，XHProf是你的好的选择</p>
+<h2><a name="id14">PHP单元调试法</a></h2>
+<p>如果想做单元测试，用PHPUnit工具，我们系统已经做了测试驱动的功能，直接通过测试用例来做就可以了，这里给出链接</p>
+
+<p><a href="http://www.ec-os.net/advance/base/tdd.html">http://www.ec-os.net/advance/base/tdd.html</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">本地调试</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">PHP基础断点调试法</a>
+            <ul>
+            <li><a href="#id3" class="reference internal">echo /print</a>
+            <li><a href="#id4" class="reference internal">printf</a>
+            <li><a href="#id5" class="reference internal">print_r / var_dump / var_export  / debug_zval_dump</a>
+            <li><a href="#id6" class="reference internal">debug_backtrace / debug_print_backtrace</a>
+                <ul>
+                <li><a href="#id7" class="reference internal">debug_backtrace</a>
+                <li><a href="#id8" class="reference internal">debug_print_backtrace</a>
+            </ul>
+        </ul>
+        <li><a href="#id9" class="reference internal">浏览器端插件调试法</a>
+        <li><a href="#id10" class="reference internal">调试器单步调试法</a>
+    </ul>
+    <li><a href="#id11" class="reference internal">线上调试</a>
+        <ul>
+        <li><a href="#id12" class="reference internal">日志记录调试法</a>
+        <li><a href="#id13" class="reference internal">php性能调试法</a>
+    </ul>
+    <li><a href="#id14" class="reference internal">PHP单元调试法</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="kvstore.html"
+                                  title="上一章">kvstore</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="pay/pay.html"
+                                  title="下一章">支付方式开发文档</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="pay/pay.html" title="支付方式开发文档" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="kvstore.html" title="kvstore" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

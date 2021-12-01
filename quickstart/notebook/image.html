@@ -1,0 +1,257 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      image -图片管理 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="创建一个带后端的留言版" href="index.html" />
+
+        <link rel="next" title="../../principles/index" href="Ecos的基本原则.html" />
+        <link rel="prev" title="pam" href="pam - 添加登录功能.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../../principles/index.html" title="Ecos的基本原则" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="pam.html" title="pam - 添加登录功能" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">快速入门</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">创建一个带后端的留言版</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> image -图片管理</h1>
+            
+<p>在notebook添加留言中加上一个图片上传功能，那么就要用到<b>image</b>了！<b>image</b>图片库——所有的图片信息都存在<b>sdb_image_image</b>表中，而我们则可以通过<b>image_id</b>得到我们所要的图片，<b>image</b>继承<b>site</b>，因此当安装好<b>site</b>时我们的<b>image</b>也就安装好了。那么开始使用<b>image</b>。</p>
+<h2><a name="id1">1.实现图片上传</a></h2>
+<ul>
+<li>1.1 调用<b>input_image</b>方法实现图片上传到<b>image</b>图片库</li>
+</ul>
+
+<p>打开notebook\app\notebook\view\admin\edit.html文件,在内容行和编辑行中间加入如下代码：<pre>  &lt;tr&gt;
+       &lt;th&gt;LOGO：&lt;/th&gt;
+       &lt;td&gt;
+       &lt;{input type=&quot;image&quot; name=&quot;item[item_imageid]&quot; value=$item.item_imageid width=160 height=90}&gt;
+       &lt;/td&gt;
+  &lt;/tr&gt;
+</pre>进入后台点击添加留言查看效果</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/image1.jpg" /></p>
+
+<p>点击<b>选择</b>得到</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/image2.jpg" /></p>
+
+<p><b>确认</b>后图片就<b>已经上传到图片库</b>里了！预览如下</p>
+
+<p><br /><img border="0" alt="" align="middle" src="image/image3.jpg" /></p>
+
+<p>如果现在点击<b>保存</b>那么就可以得到一个imageid的值了只要吧这个imageid存到我们的<b>sdb_notebook_item</b>中就可以直接调用imageid来显示我们的图片，下面详细介绍图片显示！那么现在我们添加<b>dbschema</b>中<b>item.php</b>文件加上如下代码：<pre>'item_imageid' =&gt;
+       array (
+	  'type' =&gt; 'varchar(32)',
+	  'label' =&gt;'默认图片',
+	  'width' =&gt; 75,
+	  'hidden' =&gt; true,
+	  'editable' =&gt; false,
+	  'in_list' =&gt; false,
+         ),
+</pre></p>
+
+<p>执行更新命令</p>
+<pre>D:\wamp\www\notebook\app\base&gt;cmd update
+</pre>
+<p>点击保存，信息保存成功!</p>
+<h2><a name="id2">2.图片的显示</a></h2>
+<ul>
+<li>从<b>sdb_notebook_item</b>表中获取<b>item_imageid</b>显示图片</ul>
+
+<ol>
+<ol>
+<li>打开\notebook\app\notebook\lib\finder\item.php，增加<b>getList</b>字段<i>item_imageid</i>，具体操作如下：
+<p><i>将</i><pre class="quote"> $items = $oItem-&gt;getList('item_subject, item_posttime, item_email',array('item_id' =&gt; $id), 0, 1);
+</pre><i>更改为</i><pre class="quote"> $items = $oItem-&gt;getList('item_subject, item_posttime, item_email,item_imageid',array('item_id' =&gt; $id), 0, 1);
+</pre>
+<li>将\notebook\app\notebook\view\admin下的<b>itemdetail.html</b>文件修改为:<pre>&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+&lt;div class=&quot;tableform&quot;&gt;
+&lt;table width=&quot;100%&quot; border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; class=&quot;gridlist&quot;&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+  &lt;th&gt;logo&lt;/th&gt;
+  &lt;th&gt;留言标题&lt;/th&gt;
+  &lt;th&gt;提交时间&lt;/th&gt;
+  &lt;th&gt;email&lt;/th&gt;
+&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;
+  &lt;td&gt;&lt;img src=&quot;&lt;{$item.item_imageid|storager:'s'}&gt;&quot;&gt;&lt;/td&gt;
+  &lt;td&gt;&lt;{$item.item_subject}&gt;&lt;/td&gt;
+  &lt;td&gt;&lt;{$item.item_posttime|cdate}&gt;&lt;/td&gt;
+  &lt;td&gt;&lt;{$item.item_email}&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+</pre></ol>
+
+<ul>
+<li>最终效果效果如下：<br /><img border="0" alt="" align="middle" src="image/image4.jpg" /></li>
+</ul>
+</p>
+</li>
+</ol>
+</ol>
+</ul>
+
+<ul>
+<li>缩略图效果实现
+<p>在notebook\app\notebook\lib\finder\item.php 添加上如下代码：<pre>var $column_edit2 = '缩略图';
+    function column_edit2($row){
+        $o =  app::get('notebook')-&gt;model('item');
+		$g =$o-&gt;db_dump(array('item_id'=&gt;$row['item_id']),'item_imageid');
+		$img_src = base_storager::image_path($g['item_imageid'],'s' );
+		if(!$img_src)return '';
+		return &quot;&lt;a href='$img_src' class='img-tip pointer' target='_blank'
+		        onmouseover='bindFinderColTip(event);'&gt;
+		&lt;span&gt;&amp;nbsp;pic&lt;/span&gt;&lt;/a&gt;&quot;;
+}
+</pre>查看效果:<br /><img border="0" alt="" align="middle" src="image/image5.jpg" /></p>
+</li>
+</ul>
+
+<ul>
+<li>图片大小显示：
+<p>显示原图<pre>&lt;img src=&quot;&lt;{$image_id|storager}&gt;&quot;&gt;
+</pre>显示大图<pre>&lt;img src=&quot;&lt;{$image_id|storager:'l'}&gt;&quot;&gt;
+</pre>显示中图<pre>&lt;img src=&quot;&lt;{$image_id|storager:'m'}&gt;&quot;&gt;
+</pre>显示小图<pre>&lt;img src=&quot;&lt;{$image_id|storager:'s'}&gt;&quot;&gt;
+</pre></p>
+</li>
+</ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">1.实现图片上传</a>
+    <li><a href="#id2" class="reference internal">2.图片的显示</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="pam.html"
+                                  title="上一章">pam - 添加登录功能</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="../../principles/index.html"
+                                  title="下一章">Ecos的基本原则</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="../../principles/index.html" title="Ecos的基本原则" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="pam.html" title="pam - 添加登录功能" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">快速入门</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">创建一个带后端的留言版</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

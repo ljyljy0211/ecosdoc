@@ -1,0 +1,276 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      NSIS &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../doc.html" />
+    <link rel="up" title="未归档" href="index.html" />
+
+        <link rel="next" title="begin61" href="begin61.html" />
+        <link rel="prev" title="texlive" href="TexLive2011.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="begin61.html" title="begin61" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="texlive.html" title="TexLive2011" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> NSIS</h1>
+            <h2><a name="id1">简介</a></h2>
+<p>NSIS（Nullsoft Scriptable Install System）是一个开源的 Windows 系统下安装程序制作程序。它提供了安装、卸载、系统设置、文件解压缩等功能。这如其名字所指出的那样，NSIS 是通过它的脚本语言来描述安装程序的行为和逻辑的。NSIS 的脚本语言和通常的编程语言有类似的结构和语法，但它是为安装程序这类应用所设计的。</p>
+<h2><a name="id2">下载</a></h2>
+<p><a href="http://nsis.sourceforge.net/Download">http://nsis.sourceforge.net/Download</a></p>
+<h2><a name="id3">编译</a></h2>
+<p>在你制作安装程序时创建了你的脚本后所要做的第二件事就是编译你的脚本<pre class="mark">MakeNSIS.exe 就是NSIS编译器。
+</pre>要编译你需要在你的 .nsi 文件上点击右键并选择“编译 NSIS 脚本”或“编译 NSIS 脚本 (选择压缩程序)”。这将会运行并调用 MakeNSISW (NSIS 编译器的界面)来编译你的脚本。</p>
+
+<p>MakeNSISW 将会给出 MakeNSIS 的输出并在一个可见的窗口里显示出来，你可以复制、测试安装程序、浏览和更多。</p>
+
+<p>你也可以从 Windows 命令行里使用 makensis.exe</p>
+<h2><a name="id4">例子</a></h2><pre class="mark">制作gvim安装包nsi脚本
+</pre><pre>; 安装程序初始定义常量
+!define PRODUCT_NAME &quot;GvimEx&quot;
+!define PRODUCT_VERSION &quot;1.0&quot;
+!define PRODUCT_PUBLISHER &quot;ShopEx&quot;
+!define PRODUCT_WEB_SITE &quot;http://www.shopex.cn&quot;
+!define PRODUCT_UNINST_KEY &quot;Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}&quot;
+!define PRODUCT_UNINST_ROOT_KEY &quot;HKLM&quot;
+
+SetCompressor lzma
+
+; ------ MUI 现代界面定义 (1.67 版本以上兼容) ------
+!include &quot;MUI.nsh&quot;
+
+; MUI 预定义常量
+!define MUI_ABORTWARNING
+# 自定义安装卸载图标
+!define MUI_ICON &quot;install.ico&quot;
+!define MUI_UNICON &quot;uninstall.ico&quot;
+!define MUI_FINISHPAGE_LINK &quot;欢迎访问shopex官方网站 http://www.shopex.cn&quot;
+!define MUI_FINISHPAGE_LINK_LOCATION &quot;http://www.shopex.cn/&quot;
+
+; 欢迎页面
+!insertmacro MUI_PAGE_WELCOME
+; 许可协议页面
+!insertmacro MUI_PAGE_LICENSE &quot;readme.txt&quot;
+; 安装目录选择页面
+!insertmacro MUI_PAGE_DIRECTORY
+; 安装过程页面
+!insertmacro MUI_PAGE_INSTFILES
+; 安装完成页面
+!define MUI_FINISHPAGE_SHOWREADME &quot;$INSTDIR\gvim.exe&quot;
+!insertmacro MUI_PAGE_FINISH
+
+; 安装卸载过程页面
+!insertmacro MUI_UNPAGE_INSTFILES
+
+; 安装界面包含的语言设置
+!insertmacro MUI_LANGUAGE &quot;SimpChinese&quot;
+
+; 安装预释放文件
+!insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
+; ------ MUI 现代界面定义结束 ------
+
+Name &quot;${PRODUCT_NAME} ${PRODUCT_VERSION}&quot;
+OutFile &quot;GvimEx.exe&quot;
+# 程序安装路径，默认是&quot;C:\Programfiles\&quot;
+InstallDir &quot;$PROGRAMFILES\GvimEx&quot;
+ShowInstDetails show
+ShowUnInstDetails show
+BrandingText &quot;ShopEx&quot;
+
+# Section &quot;区段名&quot; 区段索引
+Section &quot;GvimEx&quot; SEC01
+  SetOutPath &quot;$INSTDIR&quot;
+  SetOverwrite ifnewer
+  # 读取文件
+  File /r &quot;F:\icore\vim\givm\*.*&quot;
+  ;CreateDirectory &quot;&quot;
+  ;创建快捷方式
+  ;CreateShortCut &quot;$DESKTOP.lnk&quot; &quot;$INSTDIR\gvim.exe&quot;
+SectionEnd
+
+Section -AdditionalIcons
+  WriteIniStr &quot;$INSTDIR\${PRODUCT_NAME}.url&quot; &quot;InternetShortcut&quot; &quot;URL&quot; &quot;${PRODUCT_WEB_SITE}&quot;
+  CreateDirectory &quot;$SMPROGRAMS\GvimEx&quot;
+  CreateShortCut &quot;$SMPROGRAMS\GvimEx\Website.lnk&quot; &quot;$INSTDIR\${PRODUCT_NAME}.url&quot;
+  CreateShortCut &quot;$SMPROGRAMS\GvimEx\Uninstall.lnk&quot; &quot;$INSTDIR\uninst.exe&quot;
+SectionEnd
+
+Section -Post
+  WriteUninstaller &quot;$INSTDIR\uninst.exe&quot;
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} &quot;${PRODUCT_UNINST_KEY}&quot; &quot;DisplayName&quot; &quot;$(^Name)&quot;
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} &quot;${PRODUCT_UNINST_KEY}&quot; &quot;UninstallString&quot; &quot;$INSTDIR\uninst.exe&quot;
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} &quot;${PRODUCT_UNINST_KEY}&quot; &quot;DisplayVersion&quot; &quot;${PRODUCT_VERSION}&quot;
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} &quot;${PRODUCT_UNINST_KEY}&quot; &quot;URLInfoAbout&quot; &quot;${PRODUCT_WEB_SITE}&quot;
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} &quot;${PRODUCT_UNINST_KEY}&quot; &quot;Publisher&quot; &quot;${PRODUCT_PUBLISHER}&quot;
+SectionEnd
+
+/******************************
+ *  以下是安装程序的卸载部分  *
+ ******************************/
+
+Section Uninstall
+  Delete &quot;$INSTDIR\${PRODUCT_NAME}.url&quot;
+  Delete &quot;$INSTDIR\uninst.exe&quot;
+
+  Delete &quot;$SMPROGRAMS\GvimEx\Uninstall.lnk&quot;
+  Delete &quot;$SMPROGRAMS\GvimEx\Website.lnk&quot;
+  Delete &quot;$DESKTOP.lnk&quot;
+
+  RMDir &quot;$SMPROGRAMS\GvimEx&quot;
+  RMDir &quot;&quot;
+
+  RMDir /r &quot;$INSTDIR\*&quot;
+
+  RMDir &quot;$INSTDIR&quot;
+
+  DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} &quot;${PRODUCT_UNINST_KEY}&quot;
+  SetAutoClose true
+SectionEnd
+
+#-- 根据 NSIS 脚本编辑规则，所有 Function 区段必须放置在 Section 区段之后编写，以避免安装程序出现未可预知的问题。--#
+
+; 回调函数
+
+# 在当卸载程序接近完成初始化时调用
+Function un.onInit
+  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 &quot;您确实要完全移除 $(^Name) ，及其所有的组件？&quot; IDYES +2
+  Abort
+# 删除安装目录
+  RMDir &quot;$SMPROGRAMS\$INSTDIR&quot;
+FunctionEnd
+
+# 当卸载成功且正当卸载程序窗口关闭调用
+Function un.onUninstSuccess
+  HideWindow
+  MessageBox MB_ICONINFORMATION|MB_OK &quot;$(^Name) 已成功地从您的计算机移除。&quot;
+FunctionEnd
+</pre>          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">简介</a>
+    <li><a href="#id2" class="reference internal">下载</a>
+    <li><a href="#id3" class="reference internal">编译</a>
+    <li><a href="#id4" class="reference internal">例子</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="texlive.html"
+                                  title="上一章">TexLive2011</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="begin61.html"
+                                  title="下一章">begin61</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="begin61.html" title="begin61" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="texlive.html" title="TexLive2011" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">未归档</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

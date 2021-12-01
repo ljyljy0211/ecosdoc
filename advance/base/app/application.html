@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      app包管理 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../../doc.html" />
+    <link rel="up" title="app机制" href="../app.html" />
+
+        <link rel="next" title="app-content" href="资源探测器.html" />
+        <link rel="prev" title="setting" href="setting - 专属app的配置信息.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="app-content.html" title="资源探测器" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="setting.html" title="setting - 专属app的配置信息" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../app.html">app机制</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> app包管理</h1>
+            
+<p>app包管理是ecos的一大亮点, 不管app包是来自官方的<i>app store</i>, 或者从其他渠道获得的app, 或者自建的app, app包管理器都能方便的进行管理. <i>app store</i>目前尚未上线, 仅支持手动部署的方式</p>
+
+<p>手动部署:将需要安装的APP或升级的APP放到Ecos系统目录下的app目录里</p>
+<pre class="quote">补充知识: app store
+
+官方的app中心, 包含官方提供的各种类型的应用程序.
+</pre>
+<p>目前包管理器被整合在ecos的命令行工具中, 尚未有独立命令.</p>
+<h2><a name="id1">用法</a></h2><h3><a name="id2">install - 安装</a></h3>
+<p>安装或升级单个app, 或者多个app.</p>
+<pre>./cmd install app_name1 app_name2
+</pre>
+<p>有些时候需要以无交互方式进行自动化安装, 这时候可以用-o参数, 把所有安装过程中的所需要安装的app在task.php里install_options函数内所定义的必选参数带进去</p>
+<pre>./cmd install base -o &quot;base[db_host]=localhost&amp;base[db_user]=root&amp;base[db_password]=&amp;base[db_name]=ecos2&quot;
+</pre><pre class="quote">补充知识:
+
+cmd help -v 可以看到详细的命令参数
+
+详细可查看[命令行工具 http://www.ec-os.net/advance/base/cmd.html]
+</pre>
+<p>参数:<pre class="mark">install                                 安装应用
+          --reset / -r                  重新安装, 强制重新安装, 而不管是否app是否已经安装
+          --options / -o [1]            参数, 为自动化安装服务
+</pre></p>
+<h3><a name="id3">uninstall - 卸载</a></h3>
+<p>卸载单个APP, 保留其全部已经安装的依赖关系. 如果有APP依赖要被卸载的App, 则会提示错误<pre>./cmd uninstall base
+</pre></p>
+
+<p>删除指定APP，及其所有依赖此APP的其他APP<pre>./cmd uninstall -r base
+</pre></p>
+
+<p>参数:<pre class="mark">uninstall                               卸载应用
+          --recursive / -r              递归删除依赖之app
+</pre></p>
+<h3><a name="id4">update - 更新</a></h3>
+<p>更新单个或多个APP, 目前APP更新不会按照依赖关系进行更新<pre>./cmd update b2c base
+</pre>更新所有的APP<pre>./cmd update
+</pre>安装参数:<pre class="mark">update                                  升级应用程序
+          --sync                        升级应用程序信息库.  功能暂时不提供
+          --sync-only                   仅升级应用程序信息库. 功能暂时不提供
+          --force-download              强制下载. 功能暂时不提供
+          --download-only               仅下载应用. 功能暂时不提供
+          --ignore-download             忽略下载. 功能暂时不提供
+          --force-update-db             强制更新数据库表. 通常如果数据库定义文件(dbschema)没有更改, 则不会将数据库定义文件导入到数据库生成表
+          --force-update-app            强制更新应用程序. 通常如果将安装版本比已安装版本低, 系统只会更新此app的资源文件而不会执行此app的更新回调函数
+</pre></p>
+<h3><a name="id5">pause - 暂停</a></h3>
+<p>暂停和卸载的区别在于, 卸载会将所有app的数据都删除并且不可逆, 而暂停会保留所有中间数据.</p>
+
+<p>暂停单个或多个APP, 如果被其他APP所依赖则会提示用-r参数<pre>./cmd pause desktop
+</pre></p>
+
+<p>参数:<pre class="mark">pause                                   暂停应用
+          --recursive / -r              递归删除依赖之app
+</pre></p>
+<h3><a name="id6">active - 启用</a></h3>
+<p>当APP处于暂停状态时, 可以将它重新启用</p>
+
+<p>启用单个或多个APP</p>
+<pre>./cmd active desktop
+</pre>
+<p>参数:<pre class="mark">active                                  开启应用
+          --recursive / -r              递归启用依赖之app
+</pre></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">用法</a>
+        <ul>
+        <li><a href="#id2" class="reference internal">install - 安装</a>
+        <li><a href="#id3" class="reference internal">uninstall - 卸载</a>
+        <li><a href="#id4" class="reference internal">update - 更新</a>
+        <li><a href="#id5" class="reference internal">pause - 暂停</a>
+        <li><a href="#id6" class="reference internal">active - 启用</a>
+    </ul>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="setting.html"
+                                  title="上一章">setting - 专属app的配置信息</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="app-content.html"
+                                  title="下一章">资源探测器</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="app-content.html" title="资源探测器" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="setting.html" title="setting - 专属app的配置信息" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../../index.html">Ecos手册</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">基础框架 - base</a> &raquo;
+        </li>
+                <li>
+          <a href="../app.html">app机制</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>

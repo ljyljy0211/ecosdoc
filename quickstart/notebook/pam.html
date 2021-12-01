@@ -1,0 +1,488 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      pam - 添加登录功能 &mdash; ECOS百科全书    </title>
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="top" title="ECOS百科全书" href="../../doc.html" />
+    <link rel="up" title="创建一个带后端的留言版" href="index.html" />
+
+        <link rel="next" title="image" href="image -图片管理.html" />
+        <link rel="prev" title="site" href="Site - 让前端更优雅.html" />
+        <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-27708956-1']);
+      _gaq.push(['_trackPageview']);
+
+      (function() {
+        var ga = document.createElement('script');
+        ga.type = 'text/javascript';
+        ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(ga, s);
+      })();
+
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();
+        a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];
+        a.async=1;
+        a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-43980901-1', 'ec-os.net');
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body>
+    <!-- insert your head here -->
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="image.html" title="image -图片管理" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="site.html" title="Site - 让前端更优雅" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">快速入门</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">创建一个带后端的留言版</a> &raquo;
+        </li>
+              </ul>
+    </div>
+    
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            <h1> pam - 添加登录功能</h1>
+            
+<p><b>pam</b>全称：Pluggable Authentication Modules 即可插入的验证模块。和以往的登录认证不同,pam会把用户分成若干个体系,用不同的标识来区分不同的体系,在ECOS中我们把体系分成前台和后台，前台体系用member 后台体系用shopadmin来区分,然后通过不同的体系去进行不同的身份验证。</p>
+
+<p><b>pam</b>继承于<b>desktop</b>所以安装好<b>desktop</b>也就把pam安装好了！<b>pam</b>会把登录信息存储在表<b>sdb_pam_account</b>中密码以 <b>md5</b> 加密。在<b>pam</b>中能够自动的验证<b>pam</b>中的登录信息，提供验证码及其验证!</p>
+<h2><a name="id1">1.创建登录框</a></h2>
+<ul>
+<li>1.1 在导航栏加上'会员中心'导航</li>
+</ul>
+
+<p>修改notebook\app\notebook\site.xml文件,在原文件中加上如下代码：<pre> &lt;module controller='site_passport' &gt;
+        &lt;name&gt;passport&lt;/name&gt;
+        &lt;title&gt;会员中心&lt;/title&gt;
+        &lt;disable&gt;false&lt;/disable&gt;
+        &lt;allow_menu act='index'&gt;会员中心&lt;/allow_menu&gt;
+        &lt;default_menu&gt;
+            &lt;title&gt;会员中心&lt;/title&gt;
+            &lt;act&gt;index&lt;/act&gt;
+            &lt;hidden&gt;false&lt;/hidden&gt;
+        &lt;/default_menu&gt;
+&lt;/module&gt;
+</pre>
+<ul>
+<li>1.2 打开命令行执行更新命令 更新<b>site</b><pre>...notebook\app\base&gt;cmd update
+</pre>
+<li>1.3 创建登录显示处理控制器</li>
+</li>
+</ul>
+</p>
+
+<p>在app/notebook/controller/site/ 目录下创建 <b>passport.php</b> 文件<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">notebook_ctl_site_passport&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">site_controller&nbsp;</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">__construct</span><span style="color: #007700">(&amp;</span><span style="color: #0000BB">$app</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">parent</span><span style="color: #007700">::</span><span style="color: #0000BB">__construct</span><span style="color: #007700">(</span><span style="color: #0000BB">$app</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">_response</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">set_header</span><span style="color: #007700">(</span><span style="color: #DD0000">'Cache-Control'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'no-store'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'base_session'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">start</span><span style="color: #007700">();</span><span style="color: #FF8000">//开启session<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">}<br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">index</span><span style="color: #007700">()&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">gen_login_form</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">page</span><span style="color: #007700">(</span><span style="color: #DD0000">'member-login.html'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;}&nbsp;</span><span style="color: #FF8000">//用于显示登录页面<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">private&nbsp;function&nbsp;</span><span style="color: #0000BB">gen_login_form</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$url&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">gen_url</span><span style="color: #007700">(array(</span><span style="color: #DD0000">'app'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'notebook'</span><span style="color: #007700">,</span><span style="color: #DD0000">'ctl'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'site_passport'</span><span style="color: #007700">,</span><span style="color: #DD0000">'act'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'index'</span><span style="color: #007700">));<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$auth&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">pam_auth</span><span style="color: #007700">::</span><span style="color: #0000BB">instance</span><span style="color: #007700">(</span><span style="color: #0000BB">pam_account</span><span style="color: #007700">::</span><span style="color: #0000BB">get_account_type</span><span style="color: #007700">(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app_id</span><span style="color: #007700">));&nbsp;&nbsp;</span><span style="color: #FF8000">//实例化登录方式类<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$auth</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">set_appid</span><span style="color: #007700">(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app_id</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$pagedata</span><span style="color: #007700">[</span><span style="color: #DD0000">'singup_url'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">gen_url</span><span style="color: #007700">(array(</span><span style="color: #DD0000">'app'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'notebook'</span><span style="color: #007700">,</span><span style="color: #DD0000">'ctl'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'site_passport'</span><span style="color: #007700">,</span><span style="color: #DD0000">'act'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'reg'</span><span style="color: #007700">));</span><span style="color: #FF8000">//注册地址<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$pagedata</span><span style="color: #007700">[</span><span style="color: #DD0000">'loginName'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">$_COOKIE</span><span style="color: #007700">[</span><span style="color: #DD0000">'loginName'</span><span style="color: #007700">];<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">#设置回调函数地址<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$auth</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">set_redirect_url</span><span style="color: #007700">(</span><span style="color: #0000BB">base64_encode</span><span style="color: #007700">(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">gen_url</span><span style="color: #007700">(array(</span><span style="color: #DD0000">'app'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'notebook'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'ctl'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'site_passport'</span><span style="color: #007700">,</span><span style="color: #DD0000">'act'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'post_login'</span><span style="color: #007700">,</span><span style="color: #DD0000">'arg'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">base64_encode</span><span style="color: #007700">(</span><span style="color: #0000BB">$url</span><span style="color: #007700">)))));<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//设置验证后返回地址，已经base64_encode编码<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">foreach(</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">servicelist</span><span style="color: #007700">(</span><span style="color: #DD0000">'passport'</span><span style="color: #007700">)&nbsp;as&nbsp;</span><span style="color: #0000BB">$k</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$passport</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">$auth</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">is_module_valid</span><span style="color: #007700">(</span><span style="color: #0000BB">$k</span><span style="color: #007700">)){&nbsp;&nbsp;</span><span style="color: #FF8000">//验证登录方式是否开启<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">pagedata</span><span style="color: #007700">[</span><span style="color: #DD0000">'passports'</span><span style="color: #007700">][]&nbsp;=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'name'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$auth</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">get_name</span><span style="color: #007700">(</span><span style="color: #0000BB">$k</span><span style="color: #007700">)?</span><span style="color: #0000BB">$auth</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">get_name</span><span style="color: #007700">(</span><span style="color: #0000BB">$k</span><span style="color: #007700">):</span><span style="color: #0000BB">$passport</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">get_name</span><span style="color: #007700">(),&nbsp;</span><span style="color: #FF8000">//登陆框名<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'html'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">$passport</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">get_login_form</span><span style="color: #007700">(</span><span style="color: #0000BB">$auth</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'notebook'</span><span style="color: #007700">,&nbsp;</span><span style="color: #DD0000">'member-login.html'</span><span style="color: #007700">,&nbsp;</span><span style="color: #0000BB">$pagedata</span><span style="color: #007700">),&nbsp;</span><span style="color: #FF8000">//生成登录框<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br /><br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">gen_vcode</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$vcode&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'base_vcode'</span><span style="color: #007700">);&nbsp;</span><span style="color: #FF8000">//创建验证码实例<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$vcode</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">length</span><span style="color: #007700">(</span><span style="color: #0000BB">4</span><span style="color: #007700">);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #FF8000">//验证码数字长度<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$vcode</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">verify_key</span><span style="color: #007700">(</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app_id</span><span style="color: #007700">);</span><span style="color: #FF8000">//验证码key<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$vcode</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">display</span><span style="color: #007700">();&nbsp;</span><span style="color: #FF8000">//显示验证码<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">}<br />}<br /><br /></span>
+</span>
+</code></div>
+<ul>
+<li>1.4 创建显示登录页面</li>
+</ul>
+</p>
+
+<p>在app/notebook/ view 目录下创建 <b>member-login.html</b> 文件<pre> &lt;form  action=&quot;&lt;{$callback}&gt;&quot; method=&quot;post&quot; id='loginBar'&gt;
+  &lt;div class=&quot;loginbox&quot;&gt;
+      &lt;ul&gt;
+        &lt;li&gt;
+          &lt;label class=&quot;leftlabel&quot;&gt;&lt;i&gt;*&lt;/i&gt;&lt;{t}&gt;用户名：&lt;{/t}&gt;&lt;/label&gt;
+          &lt;div class=&quot;floatdiv&quot;&gt;
+      &lt;{input name=&quot;uname&quot; vtype=&quot;required&quot; class=&quot;inputstyle&quot; id=&quot;uname&quot; tabindex=&quot;1&quot; value=&quot;{$loginName}&quot;}&gt;
+      &amp;nbsp;&amp;nbsp;&lt;a href=&quot;&lt;{$singup_url}&gt;&quot;&gt;&lt;{t}&gt;立即注册&lt;{/t}&gt;&lt;/a&gt;&lt;/div&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+          &lt;label class=&quot;leftlabel&quot;&gt;&lt;i&gt;*&lt;/i&gt;&lt;{t}&gt;密码：&lt;{/t}&gt;&lt;/label&gt;
+          &lt;div class=&quot;floatdiv&quot;&gt;
+      &lt;{input name=&quot;password&quot; type=&quot;password&quot; class=&quot;inputstyle&quot; vtype=&quot;required&quot; id=&quot;password&quot; tabindex=&quot;2&quot;}&gt;
+        &lt;/li&gt;
+        &lt;{if $show_varycode}&gt;
+        &lt;li&gt;
+          &lt;label class=&quot;leftlabel&quot;&gt;&lt;i&gt;*&lt;/i&gt;&lt;{t}&gt;验证码：&lt;{/t}&gt;&lt;/label&gt;
+          &lt;div class=&quot;floatdiv&quot;&gt;
+      &lt;span id='verifyCodebox'&gt;
+      &lt;{input  vtype=&quot;required&amp;&amp;number&quot; size=&quot;4&quot; maxlength=&quot;4&quot; name=&quot;verifycode&quot; id=&quot;iptlogin&quot;  tabindex=&quot;3&quot;}&gt;
+      &lt;span class='verifyCode' style=&quot;display:none&quot;&gt;
+      &lt;img id=&quot;membervocde&quot; src=&quot;#&quot; border=&quot;1&quot; /&gt;
+      &lt;a href=&quot;javascript:changeimg('membervocde')&quot;&gt;&amp;nbsp;
+      &lt;{t}&gt;看不清楚?换个图片&lt;{/t}&gt;&lt;/a&gt; &lt;/span&gt; &lt;/span&gt;&lt;/div&gt;
+        &lt;/li&gt;
+        &lt;{/if}&gt;
+        &lt;li&gt;
+          &lt;label class=&quot;leftlabel&quot;&gt;&lt;/label&gt;
+          &lt;div class=&quot;floatdiv&quot;&gt;
+            &lt;input class=&quot;actbtn btn-login&quot; type=&quot;submit&quot; value=&quot;&lt;{t}&gt;登录&lt;{/t}&gt;&quot; tabindex=&quot;4&quot; /&gt;
+            &lt;input type=&quot;hidden&quot; name=&quot;forward&quot; value=&quot;&lt;{$forward}&gt;&quot;&gt;
+          &lt;/div&gt;
+        &lt;/li&gt;
+      &lt;/ul&gt;
+
+  &lt;/div&gt;
+&lt;/form&gt;
+&lt;{if $show_varycode}&gt;
+&lt;script&gt;
+
+$$('#loginBar input').addEvent('focus',function(){
+      if($(this.form).retrieve('showvcode',false))return;
+      changeimg('membervocde');
+      $('verifyCodebox').getElements('span').show();
+      $(this.form).store('showvcode',true);
+});
+
+function changeimg(id){
+    $(id).set('src','&lt;{link app=&quot;notebook&quot; ctl=&quot;site_passport&quot; act=&quot;gen_vcode&quot;}&gt;#'+$time());
+}
+&lt;/script&gt;
+&lt;{/if}&gt;
+
+</pre>
+<ul>
+<li>1.5 创建用于验证码调用文件</li>
+</ul>
+</p>
+
+<p>在notebook\app\notebook\lib 目录下面创建<b>service</b>文件夹之后再在此文件夹下面建立<b>vcode.php</b>文件<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">notebook_service_vcode</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">__construct</span><span style="color: #007700">(</span><span style="color: #0000BB">$app</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$app</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">status</span><span style="color: #007700">(){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'notebook'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">getConf</span><span style="color: #007700">(</span><span style="color: #DD0000">'site.login_valide'</span><span style="color: #007700">)&nbsp;==&nbsp;</span><span style="color: #DD0000">'false'</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(</span><span style="color: #0000BB">$_SESSION</span><span style="color: #007700">[</span><span style="color: #DD0000">'error_count'</span><span style="color: #007700">][</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">app_id</span><span style="color: #007700">]&nbsp;&gt;=&nbsp;</span><span style="color: #0000BB">3</span><span style="color: #007700">)<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'notebook'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">getConf</span><span style="color: #007700">(</span><span style="color: #DD0000">'site.login_valide'</span><span style="color: #007700">)&nbsp;==&nbsp;</span><span style="color: #DD0000">'true'&nbsp;</span><span style="color: #007700">?&nbsp;</span><span style="color: #0000BB">true&nbsp;</span><span style="color: #007700">:&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />}<br /></span>
+</span>
+</code></div>前台去看看效果<br /><img border="0" alt="" align="middle" src="image/pam1.jpg" />
+<ul>
+<li>1.6 创建notebook中配置信息文件和安装加载信息文件</li>
+</ul>
+</p>
+
+<p>在notebook\app\notebook 目录下面创建<b>setting.php</b>文件<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$setting</span><span style="color: #007700">=&nbsp;array(&nbsp;</span><span style="color: #DD0000">'site.login_valide'</span><span style="color: #007700">=&gt;array(</span><span style="color: #DD0000">'type'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">SET_T_BOOL</span><span style="color: #007700">,<br /></span><span style="color: #DD0000">'default'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'true'</span><span style="color: #007700">,</span><span style="color: #DD0000">'desc'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'notebook'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'会员登录需输入验证码'</span><span style="color: #007700">))<br />);<br /><br /></span>
+</span>
+</code></div>在notebook\app\notebook目录下创建<b>task.php</b>文件<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">notebook_task</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</span><span style="color: #0000BB">post_install</span><span style="color: #007700">(</span><span style="color: #0000BB">$options</span><span style="color: #007700">){</span><span style="color: #0000BB">pam_account</span><span style="color: #007700">::</span><span style="color: #0000BB">register_account_type</span><span style="color: #007700">(</span><span style="color: #DD0000">'notebook'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'member'</span><span style="color: #007700">,</span><span style="color: #0000BB">app</span><span style="color: #007700">::</span><span style="color: #0000BB">get</span><span style="color: #007700">(</span><span style="color: #DD0000">'notebook'</span><span style="color: #007700">)-&gt;</span><span style="color: #0000BB">_</span><span style="color: #007700">(</span><span style="color: #DD0000">'前台会员系统'</span><span style="color: #007700">));<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />}<br /><br /></span>
+</span>
+</code></div>
+<ul>
+<li>1.7 在<b>services</b>中注册<b>pam</b>相关服务</li>
+</ul>
+</p>
+
+<p>修改notebook\app\notebook\<b>services.xml</b>文件，在原文件中加上如下代码：<pre>&lt;service id=&quot;passport&quot;&gt;
+    &lt;class&gt;pam_passport_basic&lt;/class&gt;
+    &lt;class&gt;pam_passport_oauth&lt;/class&gt;
+    &lt;class&gt;pam_passport_uc&lt;/class&gt;
+&lt;/service&gt;
+&lt;service id=&quot;api.pam_callback&quot;&gt;
+    &lt;class&gt;pam_callback&lt;/class&gt;
+&lt;/service&gt;
+</pre>
+<ul>
+<li>1.8 卸载<b>notebook</b><pre>D:\wamp\www\notebook\app\base&gt;cmd uninstall -r notebook
+?Application notebook removed
+</pre>
+<li>1.9 重新安装<b>notebook</b><pre>D:\wamp\www\notebook\app\base&gt;cmd install notebook
+Creating table sdb_notebook_item
+Installing service notebook_addon
+Installing service desktop_finder.notebook_mdl_item
+Installing Cache_Expires DB:NOTEBOOK_ITEM
+UPDATE CACHE EXPIRES KV DATA
+?Installing menu notebook_ctl_admin_notebook
+Installing workground notebook_admin_notebook
+Installing permission notebook_manage
+Application notebook installed... ok.
+</pre>前台查看效果<br /><img border="0" alt="" align="middle" src="image/pam2.jpg" /></li>
+</li>
+</ul>
+</p>
+<h2><a name="id2">2.创建会员表</a></h2>
+<ul>
+<li>2.1 用<b>dbschema</b>创建登录注册信息表  详见<a href="../advance/base/dbschema.html">../advance/base/dbschema.html</a>用法</li>
+</ul>
+
+<p>在notebook\app\notebook\dbschema 目录下建立<b>member.php</b>文件<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$db</span><span style="color: #007700">[</span><span style="color: #DD0000">'member'</span><span style="color: #007700">]=<br />&nbsp;&nbsp;&nbsp;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'columns'&nbsp;</span><span style="color: #007700">=&gt;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'member_id'&nbsp;</span><span style="color: #007700">=&gt;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'number'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'required'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'extra'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'auto_increment'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'pkey'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'member_user'&nbsp;</span><span style="color: #007700">=&gt;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'varchar(100)'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'in_list'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'is_title'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default_in_list'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'用户名'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'filtertype'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'searchtype'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'searchtype'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'has'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'member_password'&nbsp;</span><span style="color: #007700">=&gt;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'lable'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'密码'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'varchar(32)'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'member_time'&nbsp;</span><span style="color: #007700">=&gt;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'in_list'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default_in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'注册时间'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'time'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'member_email'&nbsp;</span><span style="color: #007700">=&gt;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;array&nbsp;(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'in_list'</span><span style="color: #007700">=&gt;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default_in_list'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'label'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'email'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'type'&nbsp;</span><span style="color: #007700">=&gt;&nbsp;</span><span style="color: #DD0000">'email'</span><span style="color: #007700">,<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;),<br />&nbsp;&nbsp;&nbsp;&nbsp;);<br /></span>
+</span>
+</code></div>
+<ul>
+<li>2.2 执行更新命令 创建数据表<pre>D:\wamp\www\notebook\app\base&gt;cmd update
+Scanning local Applications... ok.
+?Updating base_application_dbtable@notebook.
+CREATE TABLE `sdb_notebook_member` (
+        `member_id` mediumint(8) unsigned not null,
+        `member_user` varchar(100),
+        `member_password` varchar(32),
+        `member_time` int(10) unsigned,
+        `member_email` varchar(255),
+        primary key (member_id)
+)ENGINE = MyISAM DEFAULT CHARACTER SET utf8;
+Updating base_application_cache_expires@notebook.
+Installing Cache_Expires DB:NOTEBOOK_ITEM
+UPDATE CACHE EXPIRES KV DATA
+</pre></li>
+</ul>
+</p>
+<h2><a name="id3">3.添加注册功能</a></h2><pre class="quote">注册流程主要是把用户输入信息录入到sdb_pam_account表和sdb_notebook_member中。
+</pre>
+<ul>
+<li>3.1 修改app\notebook\controller\site\<b>passport.php</b>文件,添加如下代码：<pre>...
+    function reg(){
+        $this-&gt;page('reg.html');
+    }
+    function regindb(){
+        $data = array(
+                'member_user'=&gt;$_POST['user'],
+                'member_password'=&gt;md5($_POST['password']),
+                'member_time'=&gt;time(),
+                'member_email'=&gt;$_POST['email'],
+            );
+        $this-&gt;app-&gt;model('member')-&gt;insert($data);//插入到notebook_member表中
+        unset($data['member_user']);
+        unset($data['member_password']);
+        unset($data['member_time']);
+        unset($data['member_email']);
+
+        $data = array(
+                'account_type'=&gt;'member',
+                'login_name'=&gt;$_POST['user'],
+                'login_password'=&gt;md5($_POST['password']),
+                'createtime'=&gt;time(),
+            );
+        $a = app::get('pam')-&gt;model('account')-&gt;insert($data);//插入到pam_account表中
+        unset($data);
+
+        $this-&gt;splash('success',$this-&gt;gen_url(array('app'=&gt;'notebook',
+                'ctl'=&gt;'site_passport','act'=&gt;'index')),app::get('notebook')-&gt;_('注册成功！'));
+    }
+...
+</pre>
+<li>3.2 在app\notebook\view\目录下，建立文件<b>reg.html</b>,代码如下：<pre>&lt;form action=&quot;&lt;{link app='notebook' ctl='site_passport' act='regindb' }&gt;&quot; method=&quot;post&quot;&gt;
+    &lt;span&gt;用户名:&lt;/span&gt;&lt;input type=&quot;text&quot; name=&quot;user&quot; placeholder=&quot;请输入用户名&quot;/&gt;&lt;br /&gt;&lt;br /&gt;
+    &lt;span&gt;密码:&lt;/span&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;input type=&quot;text&quot; name=&quot;password&quot; placeholder=&quot;请输入密码&quot; /&gt;&lt;br /&gt;&lt;br /&gt;
+    &lt;span&gt;邮箱:&lt;/span&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;input type=&quot;text&quot; name=&quot;email&quot; placeholder=&quot;请输入邮箱&quot; /&gt;&lt;br /&gt;
+    &lt;input type=&quot;submit&quot; value=&quot;提交&quot; /&gt;
+&lt;/form&gt;
+</pre>
+<li>3.3 点击<b>立即注册</b>后，效果图如下：
+<p><br /><img border="0" alt="" align="middle" src="image/pam7.png" /></p>
+</li>
+</li>
+</li>
+</ul>
+<h2><a name="id4">4.处理登陆</a></h2><pre class="quote">现在会员中心的基本功能已经实现，但是我们接下来还需要进行一些逻辑判断，以便使我们的会员中心更加符合业务逻辑。
+</pre>
+<ul>
+<li>4.1 根据pam验证返回的值判断是否登录成功<pre class="quote">在pam中notebook\app\pam\lib下的callback.php用于用户验证
+</pre>
+<p>修改notebook\app\notebook\controller\site目录下<b>passport.php</b>文件,添加<b>post_login</b>方法<pre> function post_login($url=null) {
+        $url = base64_decode($url);
+        $member_id = $_SESSION['account'][pam_account::get_account_type($this-&gt;app-&gt;app_id)];
+        if($member_id &amp;&amp; $_SESSION['last_error'] == ''){
+        //此通过Pam验证 如有必要可以再验证是否在member中存在
+           $username = $this-&gt;app-&gt;model('member')-&gt;getUsername($member_id);//调用
+       $_SESSION['username'] = $username;
+       $this-&gt;splash('success',$this-&gt;gen_url(array('app'=&gt;'notebook','ctl'=&gt;'site_passport','act'=&gt;'member')),app::get('notebook')-&gt;_('登录成功'));
+        }else{
+             $msg = $_SESSION['error']?$_SESSION['error']:app::get('notebook')-&gt;_('页面已过期,操作失败!');
+             unset($_SESSION['error']);
+             $this-&gt;splash('failed',$this-&gt;gen_url(array('app'=&gt;'notebook','ctl'=&gt;'site_passport','act'=&gt;'index')),app::get('notebook')-&gt;_($msg));
+        }
+    }
+
+    function member() {
+        $url = $this-&gt;gen_url(array('app'=&gt;'notebook','ctl'=&gt;'site_passport','act'=&gt;'index'));
+        if(!isset($_SESSION['username']))
+            $this-&gt;splash('failed',$url,app::get('notebook')-&gt;_('你还没登录，请登录！'));
+        $this-&gt;page('member.html');
+       }
+</pre>
+<li>4.2 创建会员中心页面</li>
+</p>
+</li>
+</ul>
+
+<p>在app/notebook/view 目录下创建<b>member.html</b>文件<pre>&lt;p&gt;欢迎进入会员中心 登录成功&lt;/p&gt;
+</pre>
+<ul>
+<li>4.3 返回登录用户名</li>
+</ul>
+</p>
+
+<p>在notebook\app\notebook\model 目录下创建<b>member.php</b>文件<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">class&nbsp;</span><span style="color: #0000BB">notebook_mdl_member&nbsp;</span><span style="color: #007700">extends&nbsp;</span><span style="color: #0000BB">base_db_model</span><span style="color: #007700">{<br />&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;function&nbsp;</span><span style="color: #0000BB">getUsername</span><span style="color: #007700">(</span><span style="color: #0000BB">$id</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$sql&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #DD0000">"select&nbsp;login_name&nbsp;from&nbsp;sdb_pam_account&nbsp;where&nbsp;account_id='"</span><span style="color: #007700">.</span><span style="color: #0000BB">$id</span><span style="color: #007700">.</span><span style="color: #DD0000">"'"</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$return&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$this</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">db</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">selectrow</span><span style="color: #007700">(</span><span style="color: #0000BB">$sql</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$usrename&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">$return</span><span style="color: #007700">[</span><span style="color: #DD0000">'login_name'</span><span style="color: #007700">];<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$usrename</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;&nbsp;}<br />}<br /></span>
+</span>
+</code></div></p>
+
+<ul>
+<li>4.4 登录后不再次显示登录框判断</li>
+</ul>
+
+<p>修改notebook\app\notebook\controller\site\passport.php文件<b>index</b>方法<pre>function index() {
+        $url = $this-&gt;gen_url(array('app'=&gt;'notebook','ctl'=&gt;'site_passport','act'=&gt;'member'));
+        if(isset($_SESSION['username']))
+            $this-&gt;splash('success',$url,app::get('notebook')-&gt;_('您已经是登陆状态，不需要重新登陆'));
+        $this-&gt;gen_login_form();
+        $this-&gt;page('member-login.html');
+    }
+</pre></p>
+
+<p>进入前台登录 查看效果<br /><img border="0" alt="" align="middle" src="image/pam3.jpg" /></p>
+<h2><a name="id5">5.创建登录状态挂件</a></h2>
+<ul>
+<li>5.1 在<b>app\notebook\widgets</b>目录下新建挂件<b>member</b>，方法如下：</ul>
+
+<ol>
+<ol>
+<li>首先，在<b>app\notebook\widgets</b>目录下新建文件夹<b>member</b>。
+<li>然后，在创建必要的文件<br /><img border="0" alt="" align="middle" src="image/pam4.jpg" />。
+<p>widgets.php 文件<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br />$setting</span><span style="color: #007700">[</span><span style="color: #DD0000">'author'</span><span style="color: #007700">]=</span><span style="color: #DD0000">'wuw'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$setting</span><span style="color: #007700">[</span><span style="color: #DD0000">'version'</span><span style="color: #007700">]=</span><span style="color: #DD0000">'v1.0'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$setting</span><span style="color: #007700">[</span><span style="color: #DD0000">'name'</span><span style="color: #007700">]=</span><span style="color: #DD0000">'member'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$setting</span><span style="color: #007700">[</span><span style="color: #DD0000">'stime'</span><span style="color: #007700">]=</span><span style="color: #DD0000">'2011-1-12'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$setting</span><span style="color: #007700">[</span><span style="color: #DD0000">'catalog'</span><span style="color: #007700">]=</span><span style="color: #DD0000">'notebook模板的挂件'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$setting</span><span style="color: #007700">[</span><span style="color: #DD0000">'description'</span><span style="color: #007700">]&nbsp;&nbsp;&nbsp;&nbsp;=</span><span style="color: #DD0000">'会员中心'</span><span style="color: #007700">;<br /></span><span style="color: #0000BB">$setting</span><span style="color: #007700">[</span><span style="color: #DD0000">'usual'</span><span style="color: #007700">]&nbsp;&nbsp;&nbsp;&nbsp;=&nbsp;</span><span style="color: #DD0000">'1'</span><span style="color: #007700">;&nbsp;&nbsp;</span><span style="color: #FF8000">//是否出现在挂件中心首页.(1\0)<br /></span><span style="color: #0000BB">$setting</span><span style="color: #007700">[</span><span style="color: #DD0000">'template'</span><span style="color: #007700">]&nbsp;=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #DD0000">'default.html'</span><span style="color: #007700">=&gt;</span><span style="color: #DD0000">'会员登登信息'<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #007700">);&nbsp;</span><span style="color: #FF8000">//挂件包含的模板文件和名称<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>widget_member.php 文件<div class="code"><code><span style="color: #000000">
+<span style="color: #0000BB">&lt;?php<br /></span><span style="color: #007700">function&nbsp;</span><span style="color: #0000BB">widget_member</span><span style="color: #007700">(</span><span style="color: #0000BB">$setting</span><span style="color: #007700">,&amp;</span><span style="color: #0000BB">$smarty</span><span style="color: #007700">){<br />&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$sess&nbsp;</span><span style="color: #007700">=&nbsp;</span><span style="color: #0000BB">kernel</span><span style="color: #007700">::</span><span style="color: #0000BB">single</span><span style="color: #007700">(</span><span style="color: #DD0000">'base_session'</span><span style="color: #007700">);<br />&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$sess</span><span style="color: #007700">-&gt;</span><span style="color: #0000BB">start</span><span style="color: #007700">();<br />&nbsp;&nbsp;&nbsp;if&nbsp;(</span><span style="color: #0000BB">$_SESSION</span><span style="color: #007700">[</span><span style="color: #DD0000">'username'</span><span style="color: #007700">]!=array()){<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$data</span><span style="color: #007700">[</span><span style="color: #DD0000">'username'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">$_SESSION</span><span style="color: #007700">[</span><span style="color: #DD0000">'username'</span><span style="color: #007700">];<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$data</span><span style="color: #007700">[</span><span style="color: #DD0000">'iflogin'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">true</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;}else{<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color: #0000BB">$data</span><span style="color: #007700">[</span><span style="color: #DD0000">'iflogin'</span><span style="color: #007700">]&nbsp;=&nbsp;</span><span style="color: #0000BB">false</span><span style="color: #007700">;<br />&nbsp;&nbsp;&nbsp;}<br />&nbsp;&nbsp;&nbsp;return&nbsp;</span><span style="color: #0000BB">$data</span><span style="color: #007700">;<br />}<br /></span><span style="color: #0000BB">?&gt;<br /></span>
+</span>
+</code></div>default.html 文件<pre>&lt;div&gt;
+  &lt;{if $data.iflogin==true}&gt;
+  欢迎你，&lt;{$data.username}&gt;！
+  &lt;a href=&quot;&lt;{link app='notebook' ctl='site_passport' act='logout' }&gt;&quot;&gt;退出&lt;/a&gt;
+  &lt;{else}&gt;
+  你好！
+  &lt;a href=&quot;&lt;{link app='notebook' ctl='site_passport' act='index' }&gt;&quot;&gt;登录&lt;/a&gt;
+  &lt;{/if}&gt;
+&lt;/div&gt;
+</pre>
+<li>最后在此执行更新命令。</li>
+</p>
+</li>
+</li>
+</ol>
+</ol>
+</ul>
+<pre>D:\wamp\www\notebook\app\base&gt;cmd update
+</pre></ol>
+
+<ul>
+<ul>
+<li>5.2 进入后台添加挂件
+<p><br /><img border="0" alt="" align="middle" src="image/pam5.jpg" /></p>
+</li>
+</ul>
+</ul>
+
+<p>添加好挂件 进入前台登录查看效果<br /><img border="0" alt="" align="middle" src="image/pam6.jpg" /></p>
+
+<ul>
+<li>5.3 添加退出功能</li>
+</ul>
+
+<p>在notebook\app\notebook\controller\site\passport.php文件中加入<b>logout</b>方法<pre>function logout() {
+      unset($_SESSION['account'][$this-&gt;type]);
+      unset($_SESSION['last_error']);
+      unset($_SESSION['username']);
+      unset($_SESSION['login_time']);
+      $this-&gt;splash('success',$this-&gt;gen_url(array('app'=&gt;'notebook',
+                'ctl'=&gt;'site_passport','act'=&gt;'index')),app::get('notebook')-&gt;_('你已退出系统'));
+}
+
+</pre></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doczensidebar">
+        <div class="doczensidebarwrapper">
+          <h3><a href="../../doc.html">內容目录</a></h3>
+          
+<ul>
+    <li><a href="#id1" class="reference internal">1.创建登录框</a>
+    <li><a href="#id2" class="reference internal">2.创建会员表</a>
+    <li><a href="#id3" class="reference internal">3.添加注册功能</a>
+    <li><a href="#id4" class="reference internal">4.处理登陆</a>
+    <li><a href="#id5" class="reference internal">5.创建登录状态挂件</a>
+</ul>
+
+                      <h4>上一个主题</h4>
+            <p class="topless"><a href="site.html"
+                                  title="上一章">Site - 让前端更优雅</a></p>
+                      <h4>下一个主题</h4>
+            <p class="topless"><a href="image.html"
+                                  title="下一章">image -图片管理</a></p>
+          
+          <h3>快速搜索</h3>
+<!--           <form method=get action="http://www.google.com.hk/search" target="_blank">
+  <input type=text name=q>
+  <input type=submit name=btnG value="搜索">
+
+  <input type=hidden name=ie value="UTF-8">
+  <input type=hidden name=oe value="UTF-8">
+  <input type=hidden name=hl value="zh-CN">
+  <input type=hidden name=domains value="www.ec-os.net">
+  <input type=hidden name=sitesearch value="www.ec-os.net">
+</form> -->
+          <form action="http://www.baidu.com/baidu" target="_blank"> 
+            <input type=text name=word> 
+            <input type=submit value="搜索"> 
+            <input name=ie type=hidden value="UTF-8">
+            <input name=tn type=hidden value="baidu"> 
+            <input name=cl type=hidden value="3"> 
+            <input name=ct type=hidden value="2097152"> 
+            <input name=si type=hidden value="www.ec-os.net"> 
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+          输入相关的模块，术语，类或者函数名称进行搜索
+          </p>
+        </div>
+      </div>
+
+      <div class="clearer"></div>
+    </div>
+
+        <div class="related">
+      <h3>导航</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../doc.html" title="总目录" accesskey="I">索引</a>
+        </li>
+                <li class="right" >
+          <a href="image.html" title="image -图片管理" accesskey="N">下一页</a> |
+        </li>
+                <li class="right" >
+          <a href="site.html" title="Site - 让前端更优雅" accesskey="P">上一页</a> |
+        </li>
+        
+                <li>
+          <a href="../../doc.html">ECOS百科全书</a> &raquo;
+        </li>
+                <li>
+          <a href="../index.html">快速入门</a> &raquo;
+        </li>
+                <li>
+          <a href="index.html">创建一个带后端的留言版</a> &raquo;
+        </li>
+              </ul>
+    </div>
+        <div class="footer">
+      使用 <a href="http://ec-os.net/doczen.html">Doczen</a> 0.1    </div>
+
+  </body>
+</html>
